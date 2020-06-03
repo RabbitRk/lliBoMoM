@@ -6,6 +6,25 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextColor="@color/white" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentcontainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view_linear"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
     <com.gauravk.bubblenavigation.BubbleNavigationLinearView
         android:id="@+id/bottom_navigation_view_linear"
         android:layout_width="match_parent"
@@ -25,7 +44,7 @@
             app:bt_active="true"
             app:bt_colorActive="@color/red_active"
             app:bt_colorInactive="@color/red_inactive"
-            app:bt_icon="@drawable/ic_home"
+            app:bt_icon="@drawable/ic_dashboard"
             app:bt_shape="@drawable/transition_background_drawable_home"
             app:bt_title="@string/home" />
 
@@ -36,9 +55,9 @@
             app:bt_badgeBackgroundColor="@color/green_active"
             app:bt_colorActive="@color/blue_active"
             app:bt_colorInactive="@color/blue_inactive"
-            app:bt_icon="@drawable/ic_search"
+            app:bt_icon="@drawable/ic_invent"
             app:bt_shape="@drawable/transition_background_drawable_search"
-            app:bt_title="@string/search" />
+            app:bt_title="@string/invent" />
 
         <com.gauravk.bubblenavigation.BubbleToggleView
             android:id="@+id/l_item_profile_list"
@@ -46,9 +65,9 @@
             android:layout_height="wrap_content"
             app:bt_colorActive="@color/blue_grey_active"
             app:bt_colorInactive="@color/blue_grey_inactive"
-            app:bt_icon="@drawable/ic_like"
+            app:bt_icon="@drawable/ic_receipt"
             app:bt_shape="@drawable/transition_background_drawable_like"
-            app:bt_title="@string/likes" />
+            app:bt_title="@string/invoice" />
 
         <com.gauravk.bubblenavigation.BubbleToggleView
             android:id="@+id/l_item_notification"
@@ -56,19 +75,19 @@
             android:layout_height="wrap_content"
             app:bt_colorActive="@color/green_active"
             app:bt_colorInactive="@color/green_inactive"
-            app:bt_icon="@drawable/ic_playlist"
+            app:bt_icon="@drawable/ic_order"
             app:bt_shape="@drawable/transition_background_drawable_list"
-            app:bt_title="@string/notification" />
+            app:bt_title="@string/orders" />
 
         <com.gauravk.bubblenavigation.BubbleToggleView
             android:id="@+id/l_item_profile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:bt_colorActive="@color/purple_active"
+            app:bt_icon="@drawable/ic_client"
             app:bt_colorInactive="@color/purple_inactive"
-            app:bt_icon="@drawable/ic_person"
             app:bt_shape="@drawable/transition_background_drawable_person"
-            app:bt_title="@string/profile" />
+            app:bt_title="@string/client" />
     </com.gauravk.bubblenavigation.BubbleNavigationLinearView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

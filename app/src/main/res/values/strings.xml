@@ -1,15 +1,18 @@
 <resources>
     <string name="app_name">MomoBill</string>
 
-    <string name="home">Home</string>
-    <string name="search">Search</string>
-    <string name="profile">Profile</string>
-    <string name="notification">Notify</string>
-    <string name="likes">Favs</string>
+    <string name="home">Dashboard</string>
+    <string name="invent">Inventory</string>
+    <string name="client">Client</string>
+    <string name="invoice">Invoice</string>
+    <string name="orders">Order</string>
     <string name="happy">Happy</string>
     <string name="room">Room</string>
     <string name="restaurant">Food</string>
     <string name="shop">Shop</string>
     <string name="photos">Pics</string>
     <string name="call">Call</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="s">DAS</string>
 </resources>
