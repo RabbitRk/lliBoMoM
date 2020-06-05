@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "859369210986",
+    "firebase_url": "https://invent-23ce1.firebaseio.com",
+    "project_id": "invent-23ce1",
+    "storage_bucket": "invent-23ce1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859369210986:android:98af092534ad79e7d17613",
+        "android_client_info": {
+          "package_name": "com.rabbitt.momobill"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "859369210986-uaulu5tkk5l2hkbas391lfv52oao5r6j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5E8NGI-TcRCTeQVU82yk4OI-EMvJA5bA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "859369210986-uaulu5tkk5l2hkbas391lfv52oao5r6j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
