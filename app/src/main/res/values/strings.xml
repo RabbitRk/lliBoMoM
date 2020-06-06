@@ -32,4 +32,6 @@
     <string name="_14">14</string>
     <string name="final_rate">Final rate</string>
     <string name="add_product">Add Product</string>
+    <string name="phone">Phone number</string>
+    <string name="register">Register</string>
 </resources>

@@ -1,16 +1,20 @@
 package com.rabbitt.momobill.fragment;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
@@ -20,14 +24,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.ClientActivity;
+import com.rabbitt.momobill.adapter.ClientAdapter;
 import com.rabbitt.momobill.model.Client;
 
-public class ClientFrag extends Fragment implements View.OnClickListener {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ClientFrag extends Fragment implements View.OnClickListener, ClientAdapter.OnRecyleItemListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "maluClientFrag";
-
+    private List<Client> data = new ArrayList<>();
+    private ClientAdapter clientAdapter;
+    private RecyclerView clientRecycler;
     private String mParam1;
     private String mParam2;
 
@@ -65,7 +75,7 @@ public class ClientFrag extends Fragment implements View.OnClickListener {
     private void init(View view) {
         //Initialization and Declaration
         FloatingActionButton fab = view.findViewById(R.id.fab_product_add);
-
+        clientRecycler = view.findViewById(R.id.recycler_client);
 
         //Onclick listener
         fab.setOnClickListener(this);
@@ -77,10 +87,11 @@ public class ClientFrag extends Fragment implements View.OnClickListener {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.i(TAG, "onDataChange: "+dataSnapshot);
-                Client client = dataSnapshot.getValue(Client.class);
-                if (client != null) {
-
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Client client = snapshot.getValue(Client.class);
+                    data.add(client);
                 }
+                updateRecycler(data);
             }
 
             @Override
@@ -90,9 +101,99 @@ public class ClientFrag extends Fragment implements View.OnClickListener {
         });
     }
 
+    private void updateRecycler(List<Client> data) {
+        //Update the recycler view
+        clientAdapter = new ClientAdapter(data, this, this);
+        LinearLayoutManager reLayout = new LinearLayoutManager(getActivity());
+        clientRecycler.setLayoutManager(reLayout);
+        reLayout.setOrientation(RecyclerView.VERTICAL);
+        clientRecycler.setItemAnimator(new DefaultItemAnimator());
+        clientRecycler.setAdapter(clientAdapter);
+        clientAdapter.notifyDataSetChanged();
+        clientRecycler.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public void onClick(View v) {
         Toast.makeText(getActivity(), "FAB Clicked", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(getActivity(), ClientActivity.class));
+    }
+
+    @Override
+    public void OnCall(int position) {
+        Log.i(TAG, "OnItemClick: "+position);
+        Log.i(TAG, "pos " + position);
+        Client model = data.get(position);
+
+        String number = model.getPhone();
+
+        try {
+            if (!number.equals("")) {
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:" + number));
+                startActivity(callIntent);
+            }
+        } catch (Exception ex) {
+            Log.i(TAG, "makeCall: " + ex.getMessage());
+        }
+
+        Log.i(TAG, "pos " + data);
+    }
+
+    @Override
+    public void OnText(int position) {
+        Log.i(TAG, "OnItemClick: "+position);
+        Log.i(TAG, "pos " + position);
+        Client model = data.get(position);
+
+        String number = model.getPhone();
+
+        boolean isWhatsappInstalled = whatsappInstalledOrNot();
+
+        if (isWhatsappInstalled) {
+            Uri mUri = Uri.parse("smsto:" + number);
+            Intent mIntent = new Intent(Intent.ACTION_SENDTO, mUri);
+            mIntent.setPackage("com.whatsapp");
+            mIntent.putExtra("sms_body", "The text goes here");
+            mIntent.putExtra("chat", true);
+            startActivity(Intent.createChooser(mIntent, ""));
+        } else {
+            Toast.makeText(getActivity(), "WhatsApp not Installed", Toast.LENGTH_SHORT).show();
+            Uri uri = Uri.parse("market://details?id=com.whatsapp");
+            Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(goToMarket);
+        }
+    }
+
+    @Override
+    public void OnMail(int position) {
+        Log.i(TAG, "OnItemClick: "+position);
+        Log.i(TAG, "pos " + position);
+        Client model = data.get(position);
+
+        String emailaddress = model.getEmail();
+
+        try {
+            if (!emailaddress.equals("")) {
+                Intent emailintent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto", emailaddress, null));
+                emailintent.putExtra(Intent.EXTRA_SUBJECT, "Santha Agency");
+                startActivity(Intent.createChooser(emailintent, null));
+            }
+        } catch (Exception ex) {
+            Log.i(TAG, "makeEmail: " + ex.getMessage());
+        }
+    }
+
+    private boolean whatsappInstalledOrNot() {
+        PackageManager pm = requireActivity().getPackageManager();
+        boolean app_installed;// = false;
+        try {
+            pm.getPackageInfo("com.whatsapp", PackageManager.GET_ACTIVITIES);
+            app_installed = true;
+        } catch (PackageManager.NameNotFoundException e) {
+            app_installed = false;
+        }
+        return app_installed;
     }
 }
