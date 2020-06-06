@@ -40,4 +40,7 @@
 
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
+
+    <color name="colorPrimaryPix">#007728</color>
+    <color name="colorPrimaryLightPix">#20BF55</color>
 </resources>

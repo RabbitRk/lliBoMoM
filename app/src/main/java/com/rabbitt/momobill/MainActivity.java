@@ -7,12 +7,17 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
+import com.gauravk.bubblenavigation.BubbleNavigationLinearView;
+import com.gauravk.bubblenavigation.listener.BubbleNavigationChangeListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.rabbitt.momobill.demo.DemoFragment;
+import com.rabbitt.momobill.fragment.ClientFrag;
+import com.rabbitt.momobill.fragment.InventoryFrag;
 
 import java.util.HashMap;
 
@@ -25,26 +30,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        final Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.home));
         loadFragment(new DemoFragment());
 
-        //Append the data in the Post branch
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Test");
-
-        String postid = reference.push().getKey();
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("postid","postid");
-        hashMap.put("postimage","postimage");
-        hashMap.put("description","description");
-        hashMap.put("publisher","publisher");
-
-        Log.i(TAG, "uploadImage_10: " + hashMap.toString());
-
-        reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+        BubbleNavigationLinearView bubbleNavigationLinearView = findViewById(R.id.bottom_navigation_view_linear);
+        bubbleNavigationLinearView.setNavigationChangeListener(new BubbleNavigationChangeListener() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Log.i(TAG, "onComplete: "+task.toString());
+            public void onNavigationChanged(View view, int position) {
+                Log.i(TAG, "onNavigationChanged: "+view.getId()+"  "+position);
+                switch (position)
+                {
+                    case 0:
+                        loadFragment(new DemoFragment());
+                        break;
+                    case 1:
+                        toolbar.setTitle("Inventory");
+                        loadFragment(new InventoryFrag());
+                        break;
+                    case 2:
+//                        loadFragment(new DemoFragment());
+                        break;
+                    case 3:
+//                        loadFragment(new DemoFragment());
+                        break;
+                    case 4:
+                        toolbar.setTitle("Clients");
+                        loadFragment(new ClientFrag());
+                        break;
+                }
             }
         });
     }

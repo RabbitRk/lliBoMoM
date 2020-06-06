@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,207 +7,252 @@
     android:orientation="vertical"
     tools:context=".activity.ProductActivity">
 
-
-    <com.makeramen.roundedimageview.RoundedImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/photo__" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/edx_bg"
-        android:hint="Product name"
-        android:inputType="textEmailAddress"
-        android:padding="10dp"
-        android:textSize="16sp" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/product_image"
+            android:layout_width="108dp"
+            android:layout_height="108dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="20dp"
+            android:onClick="add_image"
+            android:src="@drawable/photo__"
+            app:riv_corner_radius="10dp" />
 
         <EditText
-            android:layout_width="wrap_content"
+            android:id="@+id/txt_name"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/edx_bg"
-            android:hint="Quantity"
-            android:padding="10dp"
-            android:textSize="16sp" />
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/edx_bg"
-            android:hint="ml"
+            android:hint="@string/product_name"
+            android:importantForAutofill="no"
             android:inputType="textEmailAddress"
             android:padding="10dp"
             android:textSize="16sp" />
-    </LinearLayout>
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/edx_bg"
-        android:digits="0123456789"
-        android:hint="Sale rate"
-        android:inputType="number"
-        android:padding="10dp"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/txt_phone"
-        style="@style/textMini"
-        android:layout_marginStart="20dp"
-        android:text="GST per unit" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="10dp"
-        android:orientation="horizontal"
-        android:padding="10dp">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:hint="CGST">
+            android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="80dp"
+            <EditText
+                android:id="@+id/txt_quantity"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/edx_bg"
+                android:digits="0123456789"
+                android:hint="@string/quantity"
+                android:importantForAutofill="no"
+                android:inputType="number"
                 android:padding="10dp"
                 android:textSize="16sp" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:hint="SGST">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="80dp"
+            <EditText
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/edx_bg"
+                android:enabled="false"
+                android:hint="@string/ml"
+                android:importantForAutofill="no"
+                android:inputType="textEmailAddress"
                 android:padding="10dp"
                 android:textSize="16sp" />
+        </LinearLayout>
 
-        </com.google.android.material.textfield.TextInputLayout>
+        <EditText
+            android:id="@+id/txt_sale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/edx_bg"
+            android:digits="0123456789"
+            android:hint="@string/sale_rate"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:padding="10dp"
+            android:textSize="16sp" />
 
-        <View
-            android:layout_width="2dp"
-            android:layout_height="50dp"
+        <TextView
+            android:id="@+id/txt_phone"
+            style="@style/textMini"
+            android:layout_marginStart="20dp"
+            android:text="@string/gst_per_unit" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:background="@color/colorPrimary" />
+            android:layout_marginStart="10dp"
+            android:orientation="horizontal"
+            android:padding="10dp">
 
-        <com.google.android.material.textfield.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/cgst_txt"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edx_bg"
+                    android:digits="0123456789"
+                    android:hint="@string/cgst"
+                    android:inputType="number"
+                    android:padding="10dp"
+                    android:textSize="16sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/sgst_txt"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edx_bg"
+                    android:digits="0123456789"
+                    android:hint="@string/sgst"
+                    android:inputType="number"
+                    android:padding="10dp"
+                    android:textSize="16sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <View
+                android:layout_width="2dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_vertical"
+                android:background="@color/colorPrimary" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/cess_txt"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edx_bg"
+                    android:digits="0123456789"
+                    android:hint="@string/cess"
+                    android:inputType="number"
+                    android:padding="10dp"
+                    android:textSize="16sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+        </LinearLayout>
+
+        <RadioGroup
+            android:id="@+id/radioGroup_tax"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:hint="CESS">
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="80dp"
+            <RadioButton
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/edx_bg"
-                android:padding="10dp"
-                android:textSize="16sp" />
+                android:buttonTint="@color/colorAccent"
+                android:text="@string/_1_5" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+            <RadioButton
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/colorAccent"
+                android:text="@string/_2_5" />
 
+            <RadioButton
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/colorAccent"
+                android:text="@string/_6" />
 
+            <RadioButton
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/colorAccent"
+                android:text="@string/_9" />
+
+            <RadioButton
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/colorAccent"
+                android:text="@string/_14" />
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/tax_ex_in"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/colorPrimary"
+                android:checked="true"
+                android:text="@string/inclusive" />
+
+            <RadioButton
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/colorPrimary"
+                android:text="@string/exclusive" />
+
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/final_rate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/edx_bg"
+            android:digits="0123456789"
+            android:enabled="false"
+            android:hint="@string/final_rate"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:padding="10dp"
+            android:textSize="16sp" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/btn_bg"
+            android:onClick="add_product"
+            android:padding="10dp"
+            android:text="@string/add_product"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
     </LinearLayout>
-
-    <RadioGroup
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="20dp"
-        android:id="@+id/radioGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:buttonTint="@color/colorAccent"
-            android:text="1.5" />
-
-        <RadioButton
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:buttonTint="@color/colorAccent"
-            android:text="2.5" />
-
-        <RadioButton
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:buttonTint="@color/colorAccent"
-            android:text="6" />
-
-        <RadioButton
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:buttonTint="@color/colorAccent"
-            android:text="9" />
-
-        <RadioButton
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:buttonTint="@color/colorAccent"
-            android:text="14" />
-    </RadioGroup>
-
-    <RadioGroup
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:buttonTint="@color/colorPrimary"
-            android:text="Inclusive" />
-
-        <RadioButton
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:buttonTint="@color/colorPrimary"
-            android:text="Exclusive" />
-
-    </RadioGroup>
-    <Button
-        android:onClick="add_product"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/btn_bg"
-        android:padding="10dp"
-        android:text="Add Product"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18dp" />
-</LinearLayout>
+</ScrollView>

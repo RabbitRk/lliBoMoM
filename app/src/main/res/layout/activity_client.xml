@@ -31,6 +31,7 @@
                 android:textStyle="bold" />
 
             <EditText
+                android:id="@+id/txt_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -43,19 +44,21 @@
                 android:padding="10dp" />
 
             <EditText
+                android:id="@+id/txt_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/edx_bg"
-                android:inputType="number"
+                android:inputType="phone"
                 android:textSize="16sp"
                 android:digits="0123456789"
                 android:hint="Phone number"
                 android:padding="10dp" />
 
             <EditText
+                android:id="@+id/txt_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -68,6 +71,7 @@
                 android:padding="10dp" />
 
             <EditText
+                android:id="@+id/txt_add1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -79,6 +83,7 @@
                 android:padding="10dp" />
 
             <EditText
+                android:id="@+id/txt_add2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -90,6 +95,7 @@
                 android:padding="10dp" />
 
             <EditText
+                android:id="@+id/txt_cty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -101,6 +107,7 @@
                 android:padding="10dp" />
 
             <EditText
+                android:id="@+id/txt_state"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -112,6 +119,7 @@
                 android:padding="10dp" />
 
             <EditText
+                android:id="@+id/txt_pincode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -125,6 +133,7 @@
                 android:padding="10dp" />
 
             <EditText
+                android:id="@+id/txt_gst"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"

@@ -1,28 +1,33 @@
 package com.rabbitt.momobill.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
+import com.rabbitt.momobill.activity.ClientActivity;
+import com.rabbitt.momobill.model.Client;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ClientFrag#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ClientFrag extends Fragment {
+public class ClientFrag extends Fragment implements View.OnClickListener {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = "maluClientFrag";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -30,15 +35,6 @@ public class ClientFrag extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ClientFrag.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ClientFrag newInstance(String param1, String param2) {
         ClientFrag fragment = new ClientFrag();
         Bundle args = new Bundle();
@@ -61,6 +57,42 @@ public class ClientFrag extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_client, container, false);
+        View inflate = inflater.inflate(R.layout.fragment_client, container, false);
+        init(inflate);
+        return inflate;
+    }
+
+    private void init(View view) {
+        //Initialization and Declaration
+        FloatingActionButton fab = view.findViewById(R.id.fab_product_add);
+
+
+        //Onclick listener
+        fab.setOnClickListener(this);
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child("Client");
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.i(TAG, "onDataChange: "+dataSnapshot);
+                Client client = dataSnapshot.getValue(Client.class);
+                if (client != null) {
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onClick(View v) {
+        Toast.makeText(getActivity(), "FAB Clicked", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(getActivity(), ClientActivity.class));
     }
 }

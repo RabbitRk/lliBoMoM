@@ -29,10 +29,12 @@
         android:layout_marginBottom="20dp"
         android:background="@drawable/edx_bg"
         android:hint="Product name"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:layout_below="@+id/txt_shop_name"
         android:drawableEnd="@drawable/ic_search"
-        android:padding="10dp" />
+        android:padding="10dp"
+        android:inputType="text"
+        android:importantForAutofill="no" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_product"
@@ -42,7 +44,7 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:src="@drawable/ic_add"
-        android:id="@+id/fab_client_add"
+        android:id="@+id/fab_product_add"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_width="wrap_content"
