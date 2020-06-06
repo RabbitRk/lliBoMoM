@@ -39,4 +39,5 @@
     <color name="grey_bg_light">#fafafa</color>
 
     <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
 </resources>

@@ -1,5 +1,6 @@
 package com.rabbitt.momobill;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -7,6 +8,8 @@ import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.rabbitt.momobill.demo.DemoFragment;
@@ -38,7 +41,12 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i(TAG, "uploadImage_10: " + hashMap.toString());
 
-        reference.child(postid).setValue(hashMap);
+        reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Log.i(TAG, "onComplete: "+task.toString());
+            }
+        });
     }
 
     public Boolean loadFragment(final Fragment fragment) {
