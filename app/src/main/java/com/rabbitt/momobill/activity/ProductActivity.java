@@ -35,6 +35,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.rabbitt.momobill.R;
+import com.rabbitt.momobill.prefsManager.IncrementPref;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -58,6 +59,7 @@ public class ProductActivity extends AppCompatActivity {
     double amount;
     private StorageReference storageRef;
 
+    IncrementPref incrementPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +88,9 @@ public class ProductActivity extends AppCompatActivity {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         //creates a storage reference
         storageRef = storage.getReference();
+
+        //incrementation preference declaration
+        incrementPref = new IncrementPref(this);
 
         cess.addTextChangedListener(new TextWatcher() {
             @Override
@@ -186,11 +191,11 @@ public class ProductActivity extends AppCompatActivity {
             av_val = roundDecimals(av_val);
             gst_val = roundDecimals(gst_val);
 
-            Log.i(TAG, "calculateTax: av: "+av_val+"   gst: "+gst_val);
+            Log.i(TAG, "calculateTax: av: " + av_val + "   gst: " + gst_val);
 
             amount = av_val + gst_val;
 
-            Log.i(TAG, "calculateTax: amount: "+Math.round(amount));
+            Log.i(TAG, "calculateTax: amount: " + Math.round(amount));
         } else {
             sale_r = (sale_r * (gst / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
 
@@ -244,7 +249,7 @@ public class ProductActivity extends AppCompatActivity {
     public void add_product(View view) {
 
         Log.i(TAG, "uploadImage_fire: " + getFileExtension(final_uri));
-        final StorageReference riversRef = storageRef.child("ProductImage/"+product_name.getText().toString().trim());
+        final StorageReference riversRef = storageRef.child("ProductImage/" + product_name.getText().toString().trim());
 
         assert final_uri != null;
 
@@ -262,54 +267,55 @@ public class ProductActivity extends AppCompatActivity {
                     public void onSuccess(Uri uri) {
                         Log.i(TAG, "onSuccess: " + uri.toString());
                         imageUri = uri;
-                        Toast.makeText(ProductActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
+                        //Firebase functionality
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Product");
+
+                        final String newKey = incrementPref.getProductId();
+
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("product_id", newKey);
+                        hashMap.put("img_url", String.valueOf(imageUri));
+                        hashMap.put("product_name", product_name.getText().toString().trim());
+                        hashMap.put("quantity", quantity.getText().toString().trim());
+                        hashMap.put("sale_rate", sale_rate.getText().toString().trim());
+                        hashMap.put("date_added", getDate());
+                        hashMap.put("cgst_sgst", cgst.getText().toString().trim());
+                        hashMap.put("cess", cess.getText().toString().trim());
+                        hashMap.put("in_ex", in_.isChecked() ? "inc" : "exc");
+                        hashMap.put("unit", "0");
+
+                        Log.i(TAG, "addProduct: " + hashMap.toString());
+                        reference.child(newKey).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Log.i(TAG, "onComplete: " + task.toString());
+
+                                //  product_name.setText("");
+                                //  quantity.setText("");
+                                //  sale_rate.setText("");
+                                //  cgst.setText("");
+                                //  cess.setText("");
+                                //  final_rate.setText("");
+                                //  imageView.setImageBitmap(null);
+
+                                //Updating product ID
+                                incrementPref.setProductID(String.valueOf(Integer.parseInt(newKey) + 1));
+
+                                Toast.makeText(ProductActivity.this, "Product added successfully", Toast.LENGTH_SHORT).show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.i(TAG, "onFailure: " + e.toString());
+                            }
+                        });
                     }
                 });
             }
         });
 
-
-        //Firebase functionality
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Product");
-
-        String newKey = IdFormattor(reference.push().getKey());
-
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("product_id",newKey);
-        hashMap.put("img_url",String.valueOf(imageUri));
-        hashMap.put("product_name",product_name.getText().toString().trim());
-        hashMap.put("quantity",quantity.getText().toString().trim());
-        hashMap.put("sale_rate",sale_rate.getText().toString().trim());
-        hashMap.put("date_added", getDate());
-        hashMap.put("cgst_sgst",cgst.getText().toString().trim());
-        hashMap.put("cess",cess.getText().toString().trim());
-        hashMap.put("in_ex", in_.isChecked() ? "inc":"exc");
-        hashMap.put("unit","0");
-        hashMap.put("hsn","_");
-        hashMap.put("per_case","_");
-
-        Log.i(TAG, "addProduct: " + hashMap.toString());
-        reference.child(newKey).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Log.i(TAG, "onComplete: "+task.toString());
-//                product_name.setText("");
-//                quantity.setText("");
-//                sale_rate.setText("");
-//                cgst.setText("");
-//                cess.setText("");
-//                final_rate.setText("");
-//                imageView.setImageBitmap(null);
-
-                Toast.makeText(ProductActivity.this, "Product added successfully", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.i(TAG, "onFailure: "+e.toString());
-            }
-        });
     }
+
     public String IdFormattor(String string) {
         string = string.toLowerCase();
         string = string.replaceAll("-", "_");
@@ -324,6 +330,7 @@ public class ProductActivity extends AppCompatActivity {
 
         return df.format(c);
     }
+
     public void add_image(View view) {
         Pix.start(this, Options.init().setRequestCode(100));
     }

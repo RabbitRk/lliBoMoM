@@ -6,13 +6,7 @@ public class Product {
     String product_name;
     String quantity;
     String sale_rate;
-    String date_added;
-    String cgst_sgst;
-    String cess;
-    String in_ex;
     String unit;
-    String hsn;
-    String per_case;
     String product_id;
 
     public String getProduct_id() {
@@ -55,38 +49,6 @@ public class Product {
         this.sale_rate = sale_rate;
     }
 
-    public String getDate_added() {
-        return date_added;
-    }
-
-    public void setDate_added(String date_added) {
-        this.date_added = date_added;
-    }
-
-    public String getCgst_sgst() {
-        return cgst_sgst;
-    }
-
-    public void setCgst_sgst(String cgst_sgst) {
-        this.cgst_sgst = cgst_sgst;
-    }
-
-    public String getCess() {
-        return cess;
-    }
-
-    public void setCess(String cess) {
-        this.cess = cess;
-    }
-
-    public String getIn_ex() {
-        return in_ex;
-    }
-
-    public void setIn_ex(String in_ex) {
-        this.in_ex = in_ex;
-    }
-
     public String getUnit() {
         return unit;
     }
@@ -95,19 +57,4 @@ public class Product {
         this.unit = unit;
     }
 
-    public String getHsn() {
-        return hsn;
-    }
-
-    public void setHsn(String hsn) {
-        this.hsn = hsn;
-    }
-
-    public String getPer_case() {
-        return per_case;
-    }
-
-    public void setPer_case(String per_case) {
-        this.per_case = per_case;
-    }
 }

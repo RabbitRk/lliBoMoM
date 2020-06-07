@@ -40,11 +40,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.holder> 
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ProductAdapter.holder holder, int position) {
+
         Product dataModel = dataModelArrayList.get(position);
         holder.product_name.setText(dataModel.getProduct_name());
-        holder.quantity.setText("Quantity :" + dataModel.getQuantity());
-        holder.units.setText("Units :" + dataModel.getUnit());
-        holder.price.setText("Price :" + dataModel.getSale_rate());
+        holder.quantity.setText("Quantity: " + dataModel.getQuantity() + " ml");
+        holder.units.setText("Units: " + dataModel.getUnit());
+        holder.price.setText("Price: Rs. " + dataModel.getSale_rate());
 
         //Load image
         Glide.with(context)

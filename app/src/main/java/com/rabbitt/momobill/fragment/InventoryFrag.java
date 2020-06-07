@@ -1,5 +1,6 @@
 package com.rabbitt.momobill.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -32,12 +33,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.ProductActivity;
-import com.rabbitt.momobill.adapter.ClientAdapter;
 import com.rabbitt.momobill.adapter.ProductAdapter;
-import com.rabbitt.momobill.model.Client;
 import com.rabbitt.momobill.model.Product;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -102,7 +99,22 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.i(TAG, "onDataChange: " + dataSnapshot);
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Product product = snapshot.getValue(Product.class);
+
+                    String img_url = snapshot.child("img_url").getValue(String.class);
+                    String product_name = snapshot.child("product_name").getValue(String.class);
+                    String quantity = snapshot.child("quantity").getValue(String.class);
+                    String sale_rate = snapshot.child("sale_rate").getValue(String.class);
+                    String unit = snapshot.child("unit").getValue(String.class);
+                    String product_id = snapshot.child("product_id").getValue(String.class);
+
+                    Product product = new Product();
+                    product.setImg_url(img_url);
+                    product.setProduct_name(product_name);
+                    product.setQuantity(quantity);
+                    product.setSale_rate(sale_rate);
+                    product.setUnit(unit);
+                    product.setProduct_id(product_id);
+
                     data.add(product);
                 }
                 updateRecycler(data);
@@ -118,6 +130,10 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
     }
 
     private void updateRecycler(List<Product> data) {
+
+        if (productAdapter != null){
+            productAdapter.notifyDataSetChanged();
+        }
         //Update the recycler view
         productAdapter = new ProductAdapter(data, this, this);
         LinearLayoutManager reLayout = new LinearLayoutManager(getActivity());
@@ -162,6 +178,7 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
         openDialog(unit, quantity, name, product_id);
     }
 
+    @SuppressLint("SetTextI18n")
     public void openDialog(final String ex_unit, String quantity, String name_, final String product_id) {
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.unit_dialog);
@@ -172,7 +189,7 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
         final EditText units = dialog.findViewById(R.id.units);
 
         name.setText(name_);
-        quanitiy.setText(quantity);
+        quanitiy.setText(quantity+" ml");
 
         Button dialogButton = dialog.findViewById(R.id.ok_button);
         dialogButton.setOnClickListener(new View.OnClickListener() {
@@ -200,7 +217,7 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Product");
 
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("unit", unit);
+        hashMap.put("unit", String.valueOf(unit));
 
         Log.i(TAG, "addProduct: " + hashMap.toString());
         reference.child(product_id).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
