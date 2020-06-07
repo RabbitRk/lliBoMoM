@@ -210,13 +210,14 @@
             android:orientation="horizontal">
 
             <RadioButton
+                android:id="@+id/radio_default"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/colorPrimary"
-                android:checked="true"
                 android:text="@string/inclusive" />
 
             <RadioButton
+                android:id="@+id/radio_ex"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:buttonTint="@color/colorPrimary"

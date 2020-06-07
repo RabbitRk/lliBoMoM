@@ -35,6 +35,7 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "maluClientFrag";
+
     private List<Client> data = new ArrayList<>();
     private ClientAdapter clientAdapter;
     private RecyclerView clientRecycler;
@@ -74,7 +75,7 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
 
     private void init(View view) {
         //Initialization and Declaration
-        FloatingActionButton fab = view.findViewById(R.id.fab_product_add);
+        FloatingActionButton fab = view.findViewById(R.id.fab_client_add);
         clientRecycler = view.findViewById(R.id.recycler_client);
 
         //Onclick listener
@@ -131,7 +132,7 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
             if (!number.equals("")) {
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
                 callIntent.setData(Uri.parse("tel:" + number));
-                startActivity(callIntent);
+                startActivity(Intent.createChooser(callIntent, null));
             }
         } catch (Exception ex) {
             Log.i(TAG, "makeCall: " + ex.getMessage());
