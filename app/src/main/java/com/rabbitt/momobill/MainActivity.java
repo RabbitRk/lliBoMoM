@@ -17,7 +17,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.rabbitt.momobill.demo.DemoFragment;
 import com.rabbitt.momobill.fragment.ClientFrag;
+import com.rabbitt.momobill.fragment.DashFrag;
 import com.rabbitt.momobill.fragment.InventoryFrag;
+import com.rabbitt.momobill.fragment.InvoiceFrag;
+import com.rabbitt.momobill.fragment.OrderFrag;
 
 import java.util.HashMap;
 
@@ -32,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.home));
-        loadFragment(new DemoFragment());
+        loadFragment(new DashFrag());
 
         BubbleNavigationLinearView bubbleNavigationLinearView = findViewById(R.id.bottom_navigation_view_linear);
         bubbleNavigationLinearView.setNavigationChangeListener(new BubbleNavigationChangeListener() {
@@ -42,17 +45,20 @@ public class MainActivity extends AppCompatActivity {
                 switch (position)
                 {
                     case 0:
-                        loadFragment(new DemoFragment());
+                        toolbar.setTitle(getString(R.string.home));
+                        loadFragment(new DashFrag());
                         break;
                     case 1:
                         toolbar.setTitle("Inventory");
                         loadFragment(new InventoryFrag());
                         break;
                     case 2:
-//                        loadFragment(new DemoFragment());
+                        toolbar.setTitle("Invoice");
+                        loadFragment(new InvoiceFrag());
                         break;
                     case 3:
-//                        loadFragment(new DemoFragment());
+                        toolbar.setTitle("Order");
+                        loadFragment(new OrderFrag());
                         break;
                     case 4:
                         toolbar.setTitle("Clients");

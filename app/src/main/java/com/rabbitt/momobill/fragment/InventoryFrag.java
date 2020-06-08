@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -98,6 +100,9 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.i(TAG, "onDataChange: " + dataSnapshot);
+                if (data != null) {
+                    data.clear();
+                }
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
                     String img_url = snapshot.child("img_url").getValue(String.class);
@@ -125,13 +130,31 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
 
             }
         });
+
+        EditText edx = view.findViewById(R.id.txt_product_search);
+        edx.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                filter(s.toString());
+            }
+        });
         //Onclick listener
         fab.setOnClickListener(this);
     }
 
     private void updateRecycler(List<Product> data) {
 
-        if (productAdapter != null){
+        if (productAdapter != null) {
             productAdapter.notifyDataSetChanged();
         }
         //Update the recycler view
@@ -153,13 +176,13 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
     }
 
     private void filter(String text) {
-//        ArrayList<Product> filteredList = new ArrayList<>();
-//        for (Product item : filteredList) {
-//            if (item.getText1().toLowerCase().contains(text.toLowerCase())) {
-//                filteredList.add(item);
-//            }
-//        }
-//        mAdapter.filterList(filteredList);
+        List<Product> filteredList = new ArrayList<>();
+        for (Product item : data) {
+            if (item.getProduct_name().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(item);
+            }
+        }
+        productAdapter.filterList(filteredList);
     }
 
     @Override
@@ -173,7 +196,7 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
         String quantity = model.getQuantity();
         String name = model.getProduct_name();
 
-        Log.i(TAG, "OnItemClick: "+product_id+"  "+unit+"  "+quantity+"  "+name);
+        Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  " + quantity + "  " + name);
 
         openDialog(unit, quantity, name, product_id);
     }
@@ -189,7 +212,7 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
         final EditText units = dialog.findViewById(R.id.units);
 
         name.setText(name_);
-        quanitiy.setText(quantity+" ml");
+        quanitiy.setText(quantity + " ml");
 
         Button dialogButton = dialog.findViewById(R.id.ok_button);
         dialogButton.setOnClickListener(new View.OnClickListener() {

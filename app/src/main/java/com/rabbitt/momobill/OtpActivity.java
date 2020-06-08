@@ -45,7 +45,7 @@ public class OtpActivity extends AppCompatActivity {
     //Sending verification code to the mobile phone
     private void sendVerificationCode(String number) {
         Log.i(TAG, "sendVerificationCode: "+number);
-//        loading = ProgressDialog.show(this, "Registering", "Please wait...we will automatically verify your OTP", false, true);
+        loading = ProgressDialog.show(this, "Registering", "Please wait...we will automatically verify your OTP", false, true);
         PhoneAuthProvider.getInstance().verifyPhoneNumber(number, 60, TimeUnit.SECONDS, TaskExecutors.MAIN_THREAD, mCallBack);
     }
 
@@ -63,7 +63,7 @@ public class OtpActivity extends AppCompatActivity {
                     String currentuser = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
                     Log.i(TAG, "signInWithCredential: " + currentuser);
                     loading.dismiss();
-                    OtpActivity.this.goHomePage(currentuser);
+                    goHomePage(currentuser);
                 } else {
                     loading.dismiss();
                     Toast.makeText(OtpActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+<!--            <RelativeLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content">-->
+
+<!--                -->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/usernameTextView"-->
+<!--                    style="@style/viewParent.headerText"-->
+<!--                    android:text="Kapil Mohan"-->
+<!--                    android:textSize="18sp"-->
+<!--                    android:layout_toRightOf="@id/profileCircleImageView"-->
+<!--                    android:layout_marginTop="20dp"/>-->
+
+<!--                <TextView-->
+<!--                    style="@style/viewParent.headerText"-->
+<!--                    android:text="Edit personal details"-->
+<!--                    android:textSize="16sp"-->
+<!--                    android:textColor="#5D5C5C"-->
+<!--                    android:layout_below="@id/usernameTextView"-->
+<!--                    android:layout_toRightOf="@id/profileCircleImageView"/>-->
+
+<!--                <ImageView-->
+<!--                    style="@style/viewParent"-->
+<!--                    android:src="@drawable/ic_more"-->
+<!--                    android:layout_alignParentRight="true"-->
+<!--                    android:layout_centerVertical="true"/>-->
+
+<!--            </RelativeLayout>-->
+
+<!--            <Switch-->
+<!--                android:id="@+id/darkModeSwitch"-->
+<!--                style="@style/settingsText"-->
+<!--                android:drawableStart="@drawable/ic_dark_mode"-->
+<!--                android:text="Dark Mode" />-->
+
+            <TextView
+                style="@style/viewParent.headerText.settingsMiniTitle"
+                android:text="Profile"/>
+
+            <TextView
+                style="@style/viewParent.headerText.settingsTextIcon"
+                android:drawableStart="@drawable/ic_image"
+                android:text="Update Logo" />
+
+            <TextView
+                style="@style/viewParent.headerText.settingsTextIcon"
+                android:drawableStart="@drawable/ic_mail"
+                android:drawableTint="@color/colorPrimaryDark"
+                android:text="Update Email" />
+            <TextView
+                style="@style/viewParent.headerText.settingsTextIcon"
+                android:drawableStart="@drawable/ic_call"
+                android:drawableTint="@color/colorPrimaryDark"
+                android:text="Update Phone" />
+
+            <TextView
+                style="@style/viewParent.headerText.settingsMiniTitle"
+                android:text="Configurations"/>
+
+<!--            <Switch-->
+<!--                style="@style/settingsText"-->
+<!--                android:checked="true"-->
+<!--                android:drawableStart="@drawable/ic_notifications"-->
+<!--                android:text="Notifications" />-->
+
+<!--            <TextView-->
+<!--                style="@style/viewParent.headerText.settingsMiniTitle"-->
+<!--                android:text="Regional"/>-->
+
+            <TextView
+                style="@style/viewParent.headerText.settingsTextIcon"
+                android:drawableStart="@drawable/ic_print"
+                android:text="Printer" />
+
+            <TextView
+                style="@style/viewParent.headerText.settingsTextIcon"
+                android:drawableStart="@drawable/ic_pen"
+                android:text="Signature" />
+
+
+<!--            <TextView-->
+<!--                style="@style/viewParent.headerText.settingsMiniTitle"-->
+<!--                android:text="App ver 0.0.1"-->
+<!--                android:textAlignment="center"/>-->
+
+        </LinearLayout>
+    </ScrollView>

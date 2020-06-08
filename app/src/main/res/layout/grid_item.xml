@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:maxLines="1"
+        android:padding="5dp"
+        android:textColor="@color/black"
+        android:ellipsize="end"
+        android:text="Photo1"/>
+
+    <!--    <ImageView-->
+    <!--        android:id="@+id/image_taken"-->
+    <!--        android:scaleType="centerCrop"-->
+    <!--        android:background="@drawable/btn_bg_lite"-->
+    <!--        android:src="@drawable/ic_photo"-->
+    <!--        android:layout_width="108dp"-->
+    <!--        android:layout_height="108dp"/>-->
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/image_taken"
+        android:layout_height="108dp"
+        android:layout_width="108dp"
+        android:src="@drawable/photo__"
+        android:scaleType="centerCrop"
+        app:riv_corner_radius="10dp"
+        app:riv_oval="false" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:maxLines="1"
+        android:padding="5dp"
+        android:textColor="@color/black"
+        android:ellipsize="end"
+        android:text="Photo1"/>
+
+</LinearLayout>
+    <!--   android:src="@drawable/ic_photo" -->

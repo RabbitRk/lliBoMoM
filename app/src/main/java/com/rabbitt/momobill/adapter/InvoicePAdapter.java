@@ -13,18 +13,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.fragment.InventoryFrag;
+import com.rabbitt.momobill.fragment.InvoiceFrag;
 import com.rabbitt.momobill.model.Product;
 
 import java.util.List;
 
-public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.holder> {
+public class InvoicePAdapter extends RecyclerView.Adapter<InvoicePAdapter.holder> {
 
     private static final String TAG = "maluClientAdapter";
     private List<Product> dataModelArrayList;
-    private InventoryFrag context;
+    private InvoiceFrag context;
     private OnRecyleItemListener mOnRecycleItemListener;
 
-    public ProductAdapter(List<Product> ClientAdap, InventoryFrag context, OnRecyleItemListener onRecyleItemListener) {
+    public InvoicePAdapter(List<Product> ClientAdap, InvoiceFrag context, OnRecyleItemListener onRecyleItemListener) {
         this.dataModelArrayList = ClientAdap;
         this.context = context;
         this.mOnRecycleItemListener = onRecyleItemListener;
@@ -32,14 +33,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.holder> 
 
     @NonNull
     @Override
-    public ProductAdapter.holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public InvoicePAdapter.holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_list_item, null);
         return new holder(view, mOnRecycleItemListener);
     }
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull ProductAdapter.holder holder, int position) {
+    public void onBindViewHolder(@NonNull InvoicePAdapter.holder holder, int position) {
 
         Product dataModel = dataModelArrayList.get(position);
         holder.product_name.setText(dataModel.getProduct_name());

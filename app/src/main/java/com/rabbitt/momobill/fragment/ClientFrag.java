@@ -88,6 +88,9 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.i(TAG, "onDataChange: "+dataSnapshot);
+                if (data != null) {
+                    data.clear();
+                }
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Client client = snapshot.getValue(Client.class);
                     data.add(client);
