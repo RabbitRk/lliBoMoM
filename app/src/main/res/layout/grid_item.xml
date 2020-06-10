@@ -7,6 +7,7 @@
     android:layout_height="wrap_content">
 
     <TextView
+        android:id="@+id/grid_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAllCaps="false"
@@ -14,7 +15,7 @@
         android:padding="5dp"
         android:textColor="@color/black"
         android:ellipsize="end"
-        android:text="Photo1"/>
+        android:text="Coke"/>
 
     <!--    <ImageView-->
     <!--        android:id="@+id/image_taken"-->
@@ -25,7 +26,7 @@
     <!--        android:layout_height="108dp"/>-->
 
     <com.makeramen.roundedimageview.RoundedImageView
-        android:id="@+id/image_taken"
+        android:id="@+id/grid_image"
         android:layout_height="108dp"
         android:layout_width="108dp"
         android:src="@drawable/photo__"
@@ -34,6 +35,7 @@
         app:riv_oval="false" />
 
     <TextView
+        android:id="@+id/grid_quan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAllCaps="false"
@@ -41,7 +43,7 @@
         android:padding="5dp"
         android:textColor="@color/black"
         android:ellipsize="end"
-        android:text="Photo1"/>
+        android:text="ml"/>
 
 </LinearLayout>
     <!--   android:src="@drawable/ic_photo" -->

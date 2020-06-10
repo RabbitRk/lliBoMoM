@@ -66,6 +66,7 @@
             android:textSize="16sp" />
 
         <Button
+            android:id="@+id/cart_btn"
             android:text="Cart"
             android:layout_marginStart="20dp"
             android:textSize="16sp"

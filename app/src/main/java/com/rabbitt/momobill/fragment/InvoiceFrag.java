@@ -1,6 +1,11 @@
 package com.rabbitt.momobill.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -8,11 +13,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
@@ -22,15 +22,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.rabbitt.momobill.R;
+import com.rabbitt.momobill.adapter.CartSheet;
 import com.rabbitt.momobill.adapter.GridSpacingItemDecoration;
 import com.rabbitt.momobill.adapter.InvoicePAdapter;
-import com.rabbitt.momobill.adapter.ProductAdapter;
-import com.rabbitt.momobill.model.Product;
+import com.rabbitt.momobill.model.ProductInvoice;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleItemListener {
+public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleItemListener, View.OnClickListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -40,7 +40,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     private String mParam2;
 
     private RecyclerView invoice_recycler;
-    private List<Product> data = new ArrayList<>();
+    private List<ProductInvoice> data = new ArrayList<>();
     private InvoicePAdapter productAdapter;
 
     public InvoiceFrag() {
@@ -77,6 +77,9 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     private void init(View inflate) {
 
         invoice_recycler = inflate.findViewById(R.id.recycler_product_invoice);
+
+        Button cart = inflate.findViewById(R.id.cart_btn);
+
         MaterialSpinner spinner = (MaterialSpinner) inflate.findViewById(R.id.spinner);
         spinner.setItems("Ice Cream Sandwich", "Jelly Bean", "KitKat", "Lollipop", "Marshmallow");
         spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
@@ -104,14 +107,18 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                     String sale_rate = snapshot.child("sale_rate").getValue(String.class);
                     String unit = snapshot.child("unit").getValue(String.class);
                     String product_id = snapshot.child("product_id").getValue(String.class);
+                    String gst = snapshot.child("cgst_sgst").getValue(String.class);
+                    String cess = snapshot.child("cess").getValue(String.class);
 
-                    Product product = new Product();
+                    ProductInvoice product = new ProductInvoice();
                     product.setImg_url(img_url);
                     product.setProduct_name(product_name);
                     product.setQuantity(quantity);
                     product.setSale_rate(sale_rate);
                     product.setUnit(unit);
                     product.setProduct_id(product_id);
+                    product.setCgst(gst);
+                    product.setCess(cess);
 
                     data.add(product);
                 }
@@ -123,9 +130,11 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
             }
         });
+
+        cart.setOnClickListener(this);
     }
 
-    private void updateRecycler(List<Product> data) {
+    private void updateRecycler(List<ProductInvoice> data) {
         productAdapter = new InvoicePAdapter(data, this, this);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 3, LinearLayoutManager.VERTICAL, false);
         invoice_recycler.setLayoutManager(gridLayoutManager);
@@ -139,5 +148,11 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     @Override
     public void OnItemClick(int position) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        CartSheet cartSheet = new CartSheet(data, this, this);
+        cartSheet.show(getParentFragmentManager(), "cart");
     }
 }
