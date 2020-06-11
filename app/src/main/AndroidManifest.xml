@@ -11,17 +11,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.OpeningActivity" />
+        <activity android:name=".activity.LiveReport" />
+        <activity
+            android:name=".activity.OpeningActivity"
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity android:name=".activity.SettingsActivity" />
         <activity android:name=".OtpActivity" />
-        <activity android:name=".activity.ClientActivity" />
-        <activity android:name=".activity.ProductActivity" />
+        <activity
+            android:name=".activity.ClientActivity"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".activity.ProductActivity"
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity android:name=".SplashScreen" />
         <activity android:name=".RegisterActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,7 +29,10 @@ import com.rabbitt.momobill.adapter.OpenAdapter;
 import com.rabbitt.momobill.model.Product;
 import com.rabbitt.momobill.prefsManager.IncrementPref;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -139,12 +144,12 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
 
     }
 
-    public void opening_submit(View view) {
-
-    }
+//    public void opening_submit(View view) {
+//
+//    }
 
     public void fab_report(View view) {
-
+        startActivity(new Intent(this, LiveReport.class));
     }
 
     @Override
@@ -176,12 +181,48 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
             final String OP_VAL = i.getOpeningVal();
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Opening");
 
+            //Getting Existing data from the database
+
+//            DatabaseReference exist = FirebaseDatabase.getInstance().getReference()
+//                    .child("Opening").child(getDate());
+//
+//            reference.addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                    Log.i(TAG, "onDataChange: " + dataSnapshot);
+//                    if (data != null) {
+//                        data.clear();
+//                    }
+//                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//
+//                        String img_url = snapshot.child("img_url").getValue(String.class);
+//                        String product_name = snapshot.child("product_name").getValue(String.class);
+//                        String quantity = snapshot.child("quantity").getValue(String.class);
+//                        String sale_rate = snapshot.child("sale_rate").getValue(String.class);
+//                        String unit = snapshot.child("unit").getValue(String.class);
+//                        String product_id = snapshot.child("product_id").getValue(String.class);
+//
+//                    }
+//                    updateRecycler(data);
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                }
+//            });
+
+
+            //Adding to the entered value to the existing database value
+
+
+            //adding products to database
             HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put("product_name", name);
             hashMap.put("unit", s);
-
+            hashMap.put("quantity", quantity);
             Log.i(TAG, "addProduct: " + hashMap.toString());
-            reference.child("0").child(OP_VAL).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            reference.child(getDate()).child(product_id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "onComplete: " + task.toString());
@@ -199,6 +240,14 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
             Toast.makeText(this, "Units Invalid. Please update the stock", Toast.LENGTH_SHORT).show();
         }
 
-        //Add in the Map
+    }
+
+    public String getDate() {
+        Date c = Calendar.getInstance().getTime();
+
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat df = new SimpleDateFormat(getString(R.string.short_format));
+
+        return df.format(c);
     }
 }

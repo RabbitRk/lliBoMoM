@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -45,6 +45,7 @@ public class OpenAdapter extends RecyclerView.Adapter<OpenAdapter.holder> {
 
         Product dataModel = dataModelArrayList.get(position);
         holder.product_name.setText(dataModel.getProduct_name());
+        holder.quantity.setText(dataModel.getQuantity()+" ml");
 
         //Load image
         Glide.with(context)
@@ -59,10 +60,10 @@ public class OpenAdapter extends RecyclerView.Adapter<OpenAdapter.holder> {
 
     public class holder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView product_name;
+        TextView product_name, quantity;
         ImageView image;
         EditText editText;
-        Button button;
+        ImageButton button;
         OnRecyleItemListener onRecyleItemListener;
 
         public holder(@NonNull View itemView, OnRecyleItemListener onRecyleItemListener) {
@@ -73,6 +74,7 @@ public class OpenAdapter extends RecyclerView.Adapter<OpenAdapter.holder> {
             image = itemView.findViewById(R.id.image_taken);
             editText=  itemView.findViewById(R.id.txt_unit);
             button = itemView.findViewById(R.id.pro_add);
+            quantity = itemView.findViewById(R.id.txt_quantity);
 
             button.setOnClickListener(this);
         }
@@ -80,7 +82,7 @@ public class OpenAdapter extends RecyclerView.Adapter<OpenAdapter.holder> {
         @Override
         public void onClick(View v) {
             onRecyleItemListener.OnItemClick(getAdapterPosition(), this.editText.getText().toString());
-            itemView.setVisibility(View.GONE);
+//            itemView.setVisibility(View.GONE);
         }
     }
 
