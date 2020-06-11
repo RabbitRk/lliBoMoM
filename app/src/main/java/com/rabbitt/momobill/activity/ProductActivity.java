@@ -100,17 +100,16 @@ public class ProductActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() != 0) {
-                    calculateCess(s);
-                } else {
-                    cess.setText("");
-                }
 
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if (s.length() != 0) {
+                    calculateCess(s);
+                } else {
+                    cess.setText("");
+                }
             }
         });
 
@@ -186,7 +185,7 @@ public class ProductActivity extends AppCompatActivity {
 
             double in_gst = gst + 100;
             double av_val = sale_r * (100 / in_gst);//it gives the actual value without GST
-            double gst_val = (sale_r * gst) / 100;//calculating the the tax
+            double gst_val = (av_val * gst) / 100;//calculating the the tax
 
             av_val = roundDecimals(av_val);
             gst_val = roundDecimals(gst_val);
@@ -211,34 +210,34 @@ public class ProductActivity extends AppCompatActivity {
 
         double cess = Double.parseDouble(String.valueOf(s));
         double gst = Double.parseDouble(cgst.getText().toString().trim()) * 2;
+
+        double taxval = cess + gst;
+
         double sale_r = Integer.parseInt(sale_rate.getText().toString().trim());
 
         Log.i(TAG, "calculateCess: " + cess);
 
         //calulate GST
-//        if (in_.isChecked()) {
-//
-//            double in_gst = gst + 100;
-//            double av_val = sale_r * (100 / in_gst);//it gives the actual value without GST
-//            double gst_val = (sale_r * gst) / 100;//calculating the the tax
-//
-//            av_val = roundDecimals(av_val);
-//            gst_val = roundDecimals(gst_val);
-//
-//            Log.i(TAG, "calculateTax: av: "+av_val+"   gst: "+gst_val);
-//            amount = av_val + gst_val;
-//
-//            Log.i(TAG, "calculateTax: amount: "+amount);
-//        } else {
-//            sale_r = (sale_r * (gst / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
-//
-//            amount = roundDecimals(sale_r);
-//
-//        }
+        if (in_.isChecked()) {
 
-        final_rate.setText(String.valueOf(amount));
+            double in_gst = taxval + 100;
+            double av_val = sale_r * (100 / in_gst);//it gives the actual value without GST
+            double gst_val = (av_val * taxval) / 100;//calculating the the tax
+
+            av_val = roundDecimals(av_val);
+            gst_val = roundDecimals(gst_val);
+
+            Log.i(TAG, "calculateTax: av: "+av_val+"   gst: "+gst_val);
+            amount = av_val + gst_val;
+
+            Log.i(TAG, "calculateTax: amount: "+amount);
+        } else {
+            sale_r = (sale_r * (taxval / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
+            amount = roundDecimals(sale_r);
+        }
+
+        final_rate.setText(String.valueOf(Math.round(amount)));
         amount = 0.0;
-
     }
 
     double roundDecimals(double d) {

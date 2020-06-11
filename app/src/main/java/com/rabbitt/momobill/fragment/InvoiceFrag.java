@@ -77,8 +77,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View inflate = inflater.inflate(R.layout.fragment_invoice, container, false);
         init(inflate);
@@ -172,9 +171,9 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 Log.i(TAG, "onDataChange: " + dataSnapshot);
-                if (data != null) {
-                    data.clear();
-                }
+//                if (data != null) {
+//                    data.clear();
+//                }
 
                 clients.clear();
 

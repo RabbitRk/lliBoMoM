@@ -1,28 +1,20 @@
 package com.rabbitt.momobill;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+
 import com.gauravk.bubblenavigation.BubbleNavigationLinearView;
 import com.gauravk.bubblenavigation.listener.BubbleNavigationChangeListener;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.rabbitt.momobill.demo.DemoFragment;
 import com.rabbitt.momobill.fragment.ClientFrag;
 import com.rabbitt.momobill.fragment.DashFrag;
 import com.rabbitt.momobill.fragment.InventoryFrag;
 import com.rabbitt.momobill.fragment.InvoiceFrag;
 import com.rabbitt.momobill.fragment.OrderFrag;
-
-import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
