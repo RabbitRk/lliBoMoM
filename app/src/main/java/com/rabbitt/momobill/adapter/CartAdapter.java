@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.fragment.InvoiceFrag;
-import com.rabbitt.momobill.model.Product;
 import com.rabbitt.momobill.model.ProductInvoice;
 
 import java.util.List;
@@ -41,15 +40,19 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.holder> {
     public void onBindViewHolder(@NonNull CartAdapter.holder holder, int position) {
 
         ProductInvoice dataModel = dataModelArrayList.get(position);
-        holder.product_name.setText(dataModel.getProduct_name());
-        holder.quantity.setText("Quantity: " + dataModel.getQuantity() + " ml");
-        holder.units.setText("Units: " + dataModel.getUnit());
-        holder.price.setText("Price: Rs. " + dataModel.getSale_rate());
 
-        //Load image
-//        Glide.with(context)
-//                .load(dataModel.getImg_url())
-//                .into(holder.image);
+        holder.product_name.setText(dataModel.getProduct_name());
+        holder.quantity.setText(dataModel.getQuantity() + " ml");
+        holder.units.setText(dataModel.getUnit());
+        holder.price.setText(dataModel.getSale_rate());
+        holder.cess.setText(dataModel.getCess());
+        holder.cgst.setText(dataModel.getCgst());
+
+        //      Load image
+        //      Glide.with(context)
+        //           .load(dataModel.getImg_url())
+        //           .into(holder.image);
+
     }
 
     @Override
@@ -70,8 +73,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.holder> {
             quantity = itemView.findViewById(R.id.txt_quantity);
             units = itemView.findViewById(R.id.txt_units);
             price = itemView.findViewById(R.id.txt_price);
-            cess = itemView.findViewById(R.id.txt_tax);
-            cgst = itemView.findViewById(R.id.tax_cess);
+            cess = itemView.findViewById(R.id.tax_cess);
+            cgst = itemView.findViewById(R.id.txt_tax);
 
             itemView.setOnClickListener(this);
         }

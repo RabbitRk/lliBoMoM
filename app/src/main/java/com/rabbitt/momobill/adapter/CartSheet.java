@@ -42,15 +42,14 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
     private void init(View v) {
         invoice_recycler = v.findViewById(R.id.recycler_cart);
-
+        updateRecycler(data);
     }
 
     private void updateRecycler(List<ProductInvoice> data) {
         productAdapter = new CartAdapter(data, invoiceFrag, this);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 3, LinearLayoutManager.VERTICAL, false);
-        invoice_recycler.setLayoutManager(gridLayoutManager);
-        invoice_recycler.addItemDecoration(new GridSpacingItemDecoration(3, 10, true));
-        invoice_recycler.setItemAnimator(new DefaultItemAnimator());
+        LinearLayoutManager reLayout = new LinearLayoutManager(getActivity());
+        invoice_recycler.setLayoutManager(reLayout);
+        reLayout.setOrientation(RecyclerView.VERTICAL);
         invoice_recycler.setAdapter(productAdapter);
         productAdapter.notifyDataSetChanged();
         invoice_recycler.setVisibility(View.VISIBLE);

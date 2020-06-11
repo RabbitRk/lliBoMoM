@@ -6,13 +6,18 @@ import android.content.SharedPreferences;
 public class IncrementPref {
     public static final String PRODUCT = "PRODUCT";
     public static final String PRODUCT_ID = "PRODUCT_ID";
+    public static final String CLIENT = "CLIENT";
+    public static final String CLIENT_ID = "CLIENT_ID";
 
-    SharedPreferences product_shrp;
-    SharedPreferences.Editor product_edit;
+    SharedPreferences product_shrp, client_shrp;
+    SharedPreferences.Editor product_edit, client_edit;
 
     public IncrementPref(Context context) {
          product_shrp = context.getSharedPreferences(PRODUCT, Context.MODE_PRIVATE);
          product_edit = product_shrp.edit();
+
+        client_shrp = context.getSharedPreferences(CLIENT, Context.MODE_PRIVATE);
+        client_edit = product_shrp.edit();
     }
 
     public void setProductID(String id)
@@ -24,6 +29,17 @@ public class IncrementPref {
     public String getProductId()
     {
         return product_shrp.getString(PRODUCT_ID, "0");
+    }
+
+    public void setClientID(String id)
+    {
+        product_edit.putString(CLIENT_ID, id);
+        product_edit.commit();
+    }
+
+    public String getClientId()
+    {
+        return product_shrp.getString(CLIENT_ID, "0");
     }
 
 

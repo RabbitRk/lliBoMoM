@@ -1,11 +1,21 @@
 package com.rabbitt.momobill.fragment;
 
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -25,6 +35,7 @@ import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.adapter.CartSheet;
 import com.rabbitt.momobill.adapter.GridSpacingItemDecoration;
 import com.rabbitt.momobill.adapter.InvoicePAdapter;
+import com.rabbitt.momobill.model.Product;
 import com.rabbitt.momobill.model.ProductInvoice;
 
 import java.util.ArrayList;
@@ -42,6 +53,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     private RecyclerView invoice_recycler;
     private List<ProductInvoice> data = new ArrayList<>();
     private InvoicePAdapter productAdapter;
+    private MaterialSpinner spinner;
 
     public InvoiceFrag() {
         // Required empty public constructor
@@ -80,14 +92,10 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
         Button cart = inflate.findViewById(R.id.cart_btn);
 
-        MaterialSpinner spinner = (MaterialSpinner) inflate.findViewById(R.id.spinner);
-        spinner.setItems("Ice Cream Sandwich", "Jelly Bean", "KitKat", "Lollipop", "Marshmallow");
-        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+        spinner = (MaterialSpinner) inflate.findViewById(R.id.spinner);
 
-            @Override public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
-            }
-        });
+
+        getClients();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                 .child("Product");
@@ -131,7 +139,72 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             }
         });
 
+        EditText edx = inflate.findViewById(R.id.txt_name);
+        edx.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                filter(s.toString());
+            }
+        });
+
         cart.setOnClickListener(this);
+    }
+
+    private void getClients() {
+
+        final ArrayList<String> clients = new ArrayList<>();
+        final ArrayList<String> client_id = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("Client");
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                Log.i(TAG, "onDataChange: " + dataSnapshot);
+                if (data != null) {
+                    data.clear();
+                }
+
+                clients.clear();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    //Getting string from the snapshot
+                    String name = snapshot.child("name").getValue(String.class);
+                    String client_id_ = snapshot.child("client_id").getValue(String.class);
+                    //Arraylist for the spinner
+                    clients.add(name);
+                    //Arraylist for the ID
+                    client_id.add(client_id_);
+                }
+                spinner.setItems(clients);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                Log.i(TAG, "onItemSelected: "+client_id.get(position)+" Position "+position+" ClientName "+clients.get(position));
+                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void updateRecycler(List<ProductInvoice> data) {
@@ -147,12 +220,71 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
     @Override
     public void OnItemClick(int position) {
+        Log.i(TAG, "OnItemClick: " + position);
+        Log.i(TAG, "pos " + position);
+        ProductInvoice model = data.get(position);
 
+        String product_id = model.getProduct_id();
+        String unit = model.getUnit();
+        String quantity = model.getQuantity();
+        String name = model.getProduct_name();
+
+        Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  " + quantity + "  " + name);
+
+        openDialog(unit, quantity, name, product_id);
+    }
+
+    @SuppressLint("SetTextI18n")
+    public void openDialog(final String ex_unit, String quantity, String name_, final String product_id) {
+
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.invoice_dialog);
+        dialog.setCancelable(true);
+
+        TextView name = dialog.findViewById(R.id.text);
+        TextView quanitiy = dialog.findViewById(R.id.dia_quantity);
+        TextView unit = dialog.findViewById(R.id.dia_lbl);
+        final EditText units = dialog.findViewById(R.id.units);
+
+        name.setText(name_);
+        quanitiy.setText(quantity + " ml");
+        unit.setText(ex_unit);
+
+        Button dialogButton = dialog.findViewById(R.id.ok_button);
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (units.getText().toString().trim().equals("")) {
+                    Toast.makeText(getActivity(), "Please enter units", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    // updateFirebase(dialog, ex_unit, product_id, units.getText().toString().trim());
+                }
+            }
+        });
+
+        try {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
+        } catch (WindowManager.BadTokenException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onClick(View v) {
         CartSheet cartSheet = new CartSheet(data, this, this);
         cartSheet.show(getParentFragmentManager(), "cart");
+    }
+
+    private void filter(String text) {
+        List<ProductInvoice> filteredList = new ArrayList<>();
+        for (ProductInvoice item : data) {
+            if (item.getProduct_name().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(item);
+            }
+        }
+        productAdapter.filterList(filteredList);
     }
 }
