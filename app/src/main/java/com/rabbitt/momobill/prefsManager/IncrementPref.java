@@ -6,6 +6,10 @@ import android.content.SharedPreferences;
 public class IncrementPref {
     public static final String PRODUCT = "PRODUCT";
     public static final String PRODUCT_ID = "PRODUCT_ID";
+    public static final String OPENING_VAL = "OPENING_VAL";
+
+
+
     public static final String CLIENT = "CLIENT";
     public static final String CLIENT_ID = "CLIENT_ID";
 
@@ -40,6 +44,17 @@ public class IncrementPref {
     public String getClientId()
     {
         return product_shrp.getString(CLIENT_ID, "0");
+    }
+
+    public void setOpeningVal(String id)
+    {
+        product_edit.putString(OPENING_VAL, id);
+        product_edit.commit();
+    }
+
+    public String getOpeningVal()
+    {
+        return product_shrp.getString(OPENING_VAL, "0");
     }
 
 

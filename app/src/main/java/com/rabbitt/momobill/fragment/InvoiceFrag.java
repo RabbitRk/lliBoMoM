@@ -35,7 +35,6 @@ import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.adapter.CartSheet;
 import com.rabbitt.momobill.adapter.GridSpacingItemDecoration;
 import com.rabbitt.momobill.adapter.InvoicePAdapter;
-import com.rabbitt.momobill.model.Product;
 import com.rabbitt.momobill.model.ProductInvoice;
 
 import java.util.ArrayList;
