@@ -116,17 +116,24 @@
         android:layout_height="0dp"
         android:layout_weight="0.6"
         android:orientation="vertical" >
-        
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content">
         <androidx.cardview.widget.CardView
             android:id="@+id/txt_today"
             app:cardCornerRadius="10dp"
             android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
             android:layout_marginTop="10dp"
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
+            app:cardBackgroundColor="@color/colorPrimary"
             android:layout_height="100dp">
             <TextView
                 android:text="Today Opening"
+                android:padding="10dp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </androidx.cardview.widget.CardView>
@@ -137,23 +144,39 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="10dp"
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
+            app:cardBackgroundColor="@color/colorPrimary"
+
             android:layout_height="100dp">
             <TextView
-                android:text="Monthly Report"
+                android:text="Settings"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:padding="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content">
         <androidx.cardview.widget.CardView
             android:id="@+id/txt_credit"
             app:cardCornerRadius="10dp"
             android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
             android:layout_marginTop="10dp"
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
+            app:cardBackgroundColor="@color/colorPrimary"
+
             android:layout_height="100dp">
             <TextView
-                android:text="Credit Report"
+                android:text="Monthly Report"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:padding="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </androidx.cardview.widget.CardView>
@@ -163,14 +186,18 @@
             app:cardCornerRadius="10dp"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
+            app:cardBackgroundColor="@color/colorPrimary"
             android:layout_marginTop="10dp"
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
             android:layout_height="100dp">
             <TextView
                 android:text="Invoice List"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:padding="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </androidx.cardview.widget.CardView>
     </LinearLayout>
-
+    </LinearLayout>
 </LinearLayout>

@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center_vertical"
     android:orientation="vertical"
     tools:context=".activity.ClientActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Add Clients"
+        app:titleTextColor="@color/white" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -38,10 +50,10 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
-                android:textSize="16sp"
                 android:background="@drawable/edx_bg"
                 android:hint="Name"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/txt_phone"
@@ -51,11 +63,11 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/edx_bg"
-                android:inputType="phone"
-                android:textSize="16sp"
                 android:digits="0123456789"
                 android:hint="Phone number"
-                android:padding="10dp" />
+                android:inputType="phone"
+                android:padding="10dp"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/txt_email"
@@ -66,9 +78,9 @@
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/edx_bg"
                 android:hint="Email"
-                android:textSize="16sp"
                 android:inputType="textEmailAddress"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/txt_add1"
@@ -79,8 +91,8 @@
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/edx_bg"
                 android:hint="Address line 1"
-                android:textSize="16sp"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/txt_add2"
@@ -90,9 +102,9 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/edx_bg"
-                android:textSize="16sp"
                 android:hint="Address line 2"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/txt_cty"
@@ -101,10 +113,10 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
-                android:textSize="16sp"
                 android:background="@drawable/edx_bg"
                 android:hint="City"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/txt_state"
@@ -115,8 +127,8 @@
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/edx_bg"
                 android:hint="State"
-                android:textSize="16sp"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/txt_pincode"
@@ -126,11 +138,11 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/edx_bg"
+                android:digits="0123456789"
                 android:hint="Pin code"
                 android:inputType="number"
-                android:textSize="16sp"
-                android:digits="0123456789"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/txt_gst"
@@ -141,17 +153,17 @@
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/edx_bg"
                 android:hint="GSTIN"
-                android:textSize="16sp"
-                android:padding="10dp" />
+                android:padding="10dp"
+                android:textSize="16sp" />
 
             <Button
-                android:onClick="add_client"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/btn_bg"
+                android:onClick="add_client"
                 android:padding="10dp"
                 android:text="Add Client"
                 android:textAllCaps="false"

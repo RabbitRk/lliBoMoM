@@ -1,54 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Settings"
+        app:titleTextColor="@color/white" />
+
+    <ScrollView
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="20dp">
-<!--            <RelativeLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content">-->
 
-<!--                -->
+            <!--            <RelativeLayout-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content">-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/usernameTextView"-->
-<!--                    style="@style/viewParent.headerText"-->
-<!--                    android:text="Kapil Mohan"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:layout_toRightOf="@id/profileCircleImageView"-->
-<!--                    android:layout_marginTop="20dp"/>-->
+            <!--                -->
 
-<!--                <TextView-->
-<!--                    style="@style/viewParent.headerText"-->
-<!--                    android:text="Edit personal details"-->
-<!--                    android:textSize="16sp"-->
-<!--                    android:textColor="#5D5C5C"-->
-<!--                    android:layout_below="@id/usernameTextView"-->
-<!--                    android:layout_toRightOf="@id/profileCircleImageView"/>-->
+            <!--                <TextView-->
+            <!--                    android:id="@+id/usernameTextView"-->
+            <!--                    style="@style/viewParent.headerText"-->
+            <!--                    android:text="Kapil Mohan"-->
+            <!--                    android:textSize="18sp"-->
+            <!--                    android:layout_toRightOf="@id/profileCircleImageView"-->
+            <!--                    android:layout_marginTop="20dp"/>-->
 
-<!--                <ImageView-->
-<!--                    style="@style/viewParent"-->
-<!--                    android:src="@drawable/ic_more"-->
-<!--                    android:layout_alignParentRight="true"-->
-<!--                    android:layout_centerVertical="true"/>-->
+            <!--                <TextView-->
+            <!--                    style="@style/viewParent.headerText"-->
+            <!--                    android:text="Edit personal details"-->
+            <!--                    android:textSize="16sp"-->
+            <!--                    android:textColor="#5D5C5C"-->
+            <!--                    android:layout_below="@id/usernameTextView"-->
+            <!--                    android:layout_toRightOf="@id/profileCircleImageView"/>-->
 
-<!--            </RelativeLayout>-->
+            <!--                <ImageView-->
+            <!--                    style="@style/viewParent"-->
+            <!--                    android:src="@drawable/ic_more"-->
+            <!--                    android:layout_alignParentRight="true"-->
+            <!--                    android:layout_centerVertical="true"/>-->
 
-<!--            <Switch-->
-<!--                android:id="@+id/darkModeSwitch"-->
-<!--                style="@style/settingsText"-->
-<!--                android:drawableStart="@drawable/ic_dark_mode"-->
-<!--                android:text="Dark Mode" />-->
+            <!--            </RelativeLayout>-->
+
+            <!--            <Switch-->
+            <!--                android:id="@+id/darkModeSwitch"-->
+            <!--                style="@style/settingsText"-->
+            <!--                android:drawableStart="@drawable/ic_dark_mode"-->
+            <!--                android:text="Dark Mode" />-->
 
             <TextView
                 style="@style/viewParent.headerText.settingsMiniTitle"
-                android:text="Profile"/>
+                android:text="Profile" />
 
             <TextView
                 style="@style/viewParent.headerText.settingsTextIcon"
@@ -60,6 +77,7 @@
                 android:drawableStart="@drawable/ic_mail"
                 android:drawableTint="@color/colorPrimaryDark"
                 android:text="Update Email" />
+
             <TextView
                 style="@style/viewParent.headerText.settingsTextIcon"
                 android:drawableStart="@drawable/ic_call"
@@ -68,17 +86,17 @@
 
             <TextView
                 style="@style/viewParent.headerText.settingsMiniTitle"
-                android:text="Configurations"/>
+                android:text="Configurations" />
 
-<!--            <Switch-->
-<!--                style="@style/settingsText"-->
-<!--                android:checked="true"-->
-<!--                android:drawableStart="@drawable/ic_notifications"-->
-<!--                android:text="Notifications" />-->
+            <!--            <Switch-->
+            <!--                style="@style/settingsText"-->
+            <!--                android:checked="true"-->
+            <!--                android:drawableStart="@drawable/ic_notifications"-->
+            <!--                android:text="Notifications" />-->
 
-<!--            <TextView-->
-<!--                style="@style/viewParent.headerText.settingsMiniTitle"-->
-<!--                android:text="Regional"/>-->
+            <!--            <TextView-->
+            <!--                style="@style/viewParent.headerText.settingsMiniTitle"-->
+            <!--                android:text="Regional"/>-->
 
             <TextView
                 style="@style/viewParent.headerText.settingsTextIcon"
@@ -91,10 +109,11 @@
                 android:text="Signature" />
 
 
-<!--            <TextView-->
-<!--                style="@style/viewParent.headerText.settingsMiniTitle"-->
-<!--                android:text="App ver 0.0.1"-->
-<!--                android:textAlignment="center"/>-->
+            <!--            <TextView-->
+            <!--                style="@style/viewParent.headerText.settingsMiniTitle"-->
+            <!--                android:text="App ver 0.0.1"-->
+            <!--                android:textAlignment="center"/>-->
 
         </LinearLayout>
     </ScrollView>
+</LinearLayout>

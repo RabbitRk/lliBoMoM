@@ -3,9 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".activity.OpeningActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:title="Opening Stock"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextColor="@color/white" />
     <TextView
         android:id="@+id/txt_shop_name"
         android:layout_width="wrap_content"
@@ -14,6 +25,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:padding="5dp"
+        android:layout_below="@+id/toolbar"
         android:text="Products"
         android:textColor="@color/black"
         android:textSize="18sp"
@@ -51,20 +63,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="130dp"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/btn_bg"
-                android:padding="10dp"
-                android:onClick="opening_submit"
-                android:text="Add Opening"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="18sp" />
+<!--            <Button-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="20dp"-->
+<!--                android:layout_marginTop="20dp"-->
+<!--                android:layout_marginEnd="130dp"-->
+<!--                android:layout_marginBottom="20dp"-->
+<!--                android:background="@drawable/btn_bg"-->
+<!--                android:padding="10dp"-->
+<!--                android:onClick="opening_submit"-->
+<!--                android:text="Add Opening"-->
+<!--                android:textAllCaps="false"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:textSize="18sp" />-->
         </LinearLayout>
 
 

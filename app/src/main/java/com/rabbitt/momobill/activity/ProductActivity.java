@@ -247,72 +247,79 @@ public class ProductActivity extends AppCompatActivity {
 
     public void add_product(View view) {
 
-        Log.i(TAG, "uploadImage_fire: " + getFileExtension(final_uri));
-        final StorageReference riversRef = storageRef.child("ProductImage/" + product_name.getText().toString().trim());
+        try
+        {
+            Log.i(TAG, "uploadImage_fire: " + getFileExtension(final_uri));
+            final StorageReference riversRef = storageRef.child("ProductImage/" + product_name.getText().toString().trim());
 
-        assert final_uri != null;
+            assert final_uri != null;
 
-        riversRef.putFile(final_uri).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-                Log.i(TAG, "onFailure: " + exception.getMessage());
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                riversRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        Log.i(TAG, "onSuccess: " + uri.toString());
-                        imageUri = uri;
-                        //Firebase functionality
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Product");
+            riversRef.putFile(final_uri).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle unsuccessful uploads
+                    Log.i(TAG, "onFailure: " + exception.getMessage());
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    riversRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Log.i(TAG, "onSuccess: " + uri.toString());
+                            imageUri = uri;
+                            //Firebase functionality
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Product");
 
-                        final String newKey = incrementPref.getProductId();
+                            final String newKey = incrementPref.getProductId();
 
-                        HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("product_id", newKey);
-                        hashMap.put("img_url", String.valueOf(imageUri));
-                        hashMap.put("product_name", product_name.getText().toString().trim());
-                        hashMap.put("quantity", quantity.getText().toString().trim());
-                        hashMap.put("sale_rate", sale_rate.getText().toString().trim());
-                        hashMap.put("date_added", getDate());
-                        hashMap.put("cgst_sgst", cgst.getText().toString().trim());
-                        hashMap.put("cess", cess.getText().toString().trim());
-                        hashMap.put("in_ex", in_.isChecked() ? "inc" : "exc");
-                        hashMap.put("unit", "0");
+                            HashMap<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("product_id", newKey);
+                            hashMap.put("img_url", String.valueOf(imageUri));
+                            hashMap.put("product_name", product_name.getText().toString().trim());
+                            hashMap.put("quantity", quantity.getText().toString().trim());
+                            hashMap.put("sale_rate", sale_rate.getText().toString().trim());
+                            hashMap.put("date_added", getDate());
+                            hashMap.put("cgst_sgst", cgst.getText().toString().trim());
+                            hashMap.put("cess", cess.getText().toString().trim());
+                            hashMap.put("in_ex", in_.isChecked() ? "inc" : "exc");
+                            hashMap.put("unit", "0");
 
-                        Log.i(TAG, "addProduct: " + hashMap.toString());
-                        reference.child(newKey).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Log.i(TAG, "onComplete: " + task.toString());
+                            Log.i(TAG, "addProduct: " + hashMap.toString());
+                            reference.child(newKey).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    Log.i(TAG, "onComplete: " + task.toString());
 
-                                //  product_name.setText("");
-                                //  quantity.setText("");
-                                //  sale_rate.setText("");
-                                //  cgst.setText("");
-                                //  cess.setText("");
-                                //  final_rate.setText("");
-                                //  imageView.setImageBitmap(null);
+                                    //  product_name.setText("");
+                                    //  quantity.setText("");
+                                    //  sale_rate.setText("");
+                                    //  cgst.setText("");
+                                    //  cess.setText("");
+                                    //  final_rate.setText("");
+                                    //  imageView.setImageBitmap(null);
 
-                                //Updating product ID
-                                incrementPref.setProductID(String.valueOf(Integer.parseInt(newKey) + 1));
+                                    //Updating product ID
+                                    incrementPref.setProductID(String.valueOf(Integer.parseInt(newKey) + 1));
 
-                                Toast.makeText(ProductActivity.this, "Product added successfully", Toast.LENGTH_SHORT).show();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.i(TAG, "onFailure: " + e.toString());
-                            }
-                        });
-                    }
-                });
-            }
-        });
-
+                                    Toast.makeText(ProductActivity.this, "Product added successfully", Toast.LENGTH_SHORT).show();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.i(TAG, "onFailure: " + e.toString());
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        catch(Exception e)
+        {
+            Toast.makeText(this, "Please check all the values", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "Exception: "+e.toString());
+        }
     }
 
     public String IdFormattor(String string) {
