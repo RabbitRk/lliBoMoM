@@ -8,13 +8,16 @@ public class IncrementPref {
     public static final String PRODUCT_ID = "PRODUCT_ID";
     public static final String OPENING_VAL = "OPENING_VAL";
 
+    public static final String INVOICE = "INVOICE";
+    public static final String INVOICE_ID = "INVOICE_ID";
+    public static final String ORDER_ID = "ORDER_ID";
 
 
     public static final String CLIENT = "CLIENT";
     public static final String CLIENT_ID = "CLIENT_ID";
 
-    SharedPreferences product_shrp, client_shrp;
-    SharedPreferences.Editor product_edit, client_edit;
+    SharedPreferences product_shrp, client_shrp, invoice_shrp;
+    SharedPreferences.Editor product_edit, client_edit, invoice_edit;
 
     public IncrementPref(Context context) {
          product_shrp = context.getSharedPreferences(PRODUCT, Context.MODE_PRIVATE);
@@ -22,7 +25,11 @@ public class IncrementPref {
 
         client_shrp = context.getSharedPreferences(CLIENT, Context.MODE_PRIVATE);
         client_edit = product_shrp.edit();
+
+        invoice_shrp = context.getSharedPreferences(INVOICE, Context.MODE_PRIVATE);
+        invoice_edit = product_shrp.edit();
     }
+
 
     public void setProductID(String id)
     {
@@ -55,6 +62,28 @@ public class IncrementPref {
     public String getOpeningVal()
     {
         return product_shrp.getString(OPENING_VAL, "0");
+    }
+
+    public void setInvoiceId(String id)
+    {
+        invoice_edit.putString(INVOICE_ID, id);
+        invoice_edit.commit();
+    }
+
+    public String getInvoiceId()
+    {
+        return invoice_shrp.getString(INVOICE_ID, "0");
+    }
+
+    public void setOrderId(String id)
+    {
+        invoice_edit.putString(ORDER_ID, id);
+        invoice_edit.commit();
+    }
+
+    public String getOrderId()
+    {
+        return invoice_shrp.getString(ORDER_ID, "0");
     }
 
 

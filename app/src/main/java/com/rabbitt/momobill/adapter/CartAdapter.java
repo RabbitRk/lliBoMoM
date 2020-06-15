@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.rabbitt.momobill.R;
@@ -19,10 +20,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.holder> {
 
     private static final String TAG = "maluClientAdapter";
     private List<ProductInvoice> dataModelArrayList;
-    private InvoiceFrag context;
+    private Fragment context;
     private OnRecyleItemListener mOnRecycleItemListener;
 
-    public CartAdapter(List<ProductInvoice> ClientAdap, InvoiceFrag context, OnRecyleItemListener onRecyleItemListener) {
+    public CartAdapter(List<ProductInvoice> ClientAdap, Fragment context, OnRecyleItemListener onRecyleItemListener) {
         this.dataModelArrayList = ClientAdap;
         this.context = context;
         this.mOnRecycleItemListener = onRecyleItemListener;

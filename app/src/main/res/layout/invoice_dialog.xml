@@ -32,15 +32,16 @@
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/dia_lbl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Coke"
-                android:layout_marginTop="16dp"
-                android:layout_alignParentEnd="true"
-                android:textColor="@color/textGrey"
-                android:textSize="16sp" />
+<!--            <TextView-->
+<!--                android:id="@+id/dia_lbl"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Coke"-->
+<!--                android:layout_marginTop="16dp"-->
+<!--                android:layout_alignParentEnd="true"-->
+<!--                android:textColor="@color/textGrey"-->
+<!--                android:layout_marginEnd="20dp"-->
+<!--                android:textSize="16sp" />-->
 
 <!--            <TextView-->
 <!--            android:id="@+id/dia_lbl"-->

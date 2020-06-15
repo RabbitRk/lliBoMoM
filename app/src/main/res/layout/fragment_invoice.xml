@@ -18,7 +18,6 @@
         android:textSize="16sp"
         app:ms_text_color="@color/textGrey" />
 
-
     <LinearLayout
         android:id="@+id/order_layout"
         android:layout_width="match_parent"

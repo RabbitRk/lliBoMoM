@@ -37,10 +37,13 @@ import com.rabbitt.momobill.adapter.GridSpacingItemDecoration;
 import com.rabbitt.momobill.adapter.InvoicePAdapter;
 import com.rabbitt.momobill.model.ProductInvoice;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleItemListener, View.OnClickListener {
+public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleItemListener, View.OnClickListener, CartSheet.cartDelete {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -51,9 +54,12 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
     private RecyclerView invoice_recycler;
     private List<ProductInvoice> data = new ArrayList<>();
+    private List<ProductInvoice> cart = new ArrayList<>();
     private InvoicePAdapter productAdapter;
     private MaterialSpinner spinner;
 
+    final ArrayList<String> clients = new ArrayList<>();
+    final ArrayList<String> client_id = new ArrayList<>();
     public InvoiceFrag() {
         // Required empty public constructor
     }
@@ -160,8 +166,6 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
     private void getClients() {
 
-        final ArrayList<String> clients = new ArrayList<>();
-        final ArrayList<String> client_id = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance()
                 .getReference()
                 .child("Client");
@@ -229,24 +233,24 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
         Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  " + quantity + "  " + name);
 
-        openDialog(unit, quantity, name, product_id);
+        openDialog(model, unit, quantity, name, product_id);
     }
 
     @SuppressLint("SetTextI18n")
-    public void openDialog(final String ex_unit, String quantity, String name_, final String product_id) {
-
+    public void openDialog(final ProductInvoice model, final String ex_unit, String quantity, String name_, final String product_id) {
+        
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.invoice_dialog);
         dialog.setCancelable(true);
 
         TextView name = dialog.findViewById(R.id.text);
         TextView quanitiy = dialog.findViewById(R.id.dia_quantity);
-        TextView unit = dialog.findViewById(R.id.dia_lbl);
+//        TextView unit = dialog.findViewById(R.id.dia_lbl);
         final EditText units = dialog.findViewById(R.id.units);
 
         name.setText(name_);
         quanitiy.setText(quantity + " ml");
-        unit.setText(ex_unit);
+//        unit.setText(ex_unit);
 
         Button dialogButton = dialog.findViewById(R.id.ok_button);
         dialogButton.setOnClickListener(new View.OnClickListener() {
@@ -257,7 +261,20 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                 }
                 else
                 {
-                    // updateFirebase(dialog, ex_unit, product_id, units.getText().toString().trim());
+                    double sale_ = Double.parseDouble(model.getSale_rate()) * Double.parseDouble(units.getText().toString().trim());
+                    ProductInvoice product = new ProductInvoice();
+                    product.setProduct_name(model.getProduct_name());
+                    product.setQuantity(model.getQuantity());
+                    product.setSale_rate(String.valueOf(sale_));
+                    product.setUnit(units.getText().toString().trim());
+                    product.setProduct_id(model.getProduct_id());
+                    product.setCgst(model.getCgst());
+                    product.setCess(model.getCess());
+                    product.setImg_url(model.getImg_url());
+
+                    cart.add(product);
+                    dialog.dismiss();
+//                     createInvoice(dialog, ex_unit, product_id, units.getText().toString().trim());
                 }
             }
         });
@@ -270,9 +287,39 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         }
     }
 
+
+
+    private void createInvoice(final Dialog dialog, String ex_unit, String product_id, String trim) {
+
+//        int unit = Integer.parseInt(ex_unit) + Integer.parseInt(new_unit);
+
+//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Invoice");
+//
+//        IncrementPref pref = new IncrementPref(getActivity());
+//        String invoice_num = pref.getInvoiceId();
+//        HashMap<String, Object> hashMap = new HashMap<>();
+//        hashMap.put("invoice_id", invoice_num);
+//
+//        Log.i(TAG, "addProduct: " + hashMap.toString());
+//        reference.child(invoice_num).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//                Log.i(TAG, "onComplete: " + task.toString());
+//                Toast.makeText(getActivity(), "Units added successfully", Toast.LENGTH_SHORT).show();
+//                dialog.dismiss();
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.i(TAG, "onFailure: " + e.toString());
+//            }
+//        });
+//        dialog.dismiss();
+    }
+
     @Override
     public void onClick(View v) {
-        CartSheet cartSheet = new CartSheet(data, this, this);
+        CartSheet cartSheet = new CartSheet(cart, this, this, this, "invoice",  client_id.get(spinner.getSelectedIndex()), getDate());
         cartSheet.show(getParentFragmentManager(), "cart");
     }
 
@@ -284,5 +331,19 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             }
         }
         productAdapter.filterList(filteredList);
+    }
+
+    @Override
+    public void OnDelete(int position) {
+        cart.remove(position);
+    }
+
+    public String getDate() {
+        Date c = Calendar.getInstance().getTime();
+
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat df = new SimpleDateFormat(getString(R.string.short_format));
+
+        return df.format(c);
     }
 }

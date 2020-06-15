@@ -14,6 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorAccent"
+        android:layout_marginTop="10dp"
         android:shrinkColumns="*"
         android:stretchColumns="*">
 
@@ -62,5 +63,41 @@
         android:id="@+id/recycler_cart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-
+    <Button
+        android:id="@+id/ok_button"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/btn_bg"
+        android:backgroundTint="@color/colorPrimary"
+        android:drawablePadding="0dp"
+        android:gravity="center"
+        android:minWidth="150dp"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:text="Create Invoice"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white" />
+    <Button
+        android:id="@+id/clear_data"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/btn_bg"
+        android:backgroundTint="@color/red_active"
+        android:drawablePadding="0dp"
+        android:gravity="center"
+        android:minWidth="150dp"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:text="Clear"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white" />
 </LinearLayout>

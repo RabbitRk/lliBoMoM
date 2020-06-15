@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -23,10 +24,10 @@ public class InvoicePAdapter extends RecyclerView.Adapter<InvoicePAdapter.holder
 
     private static final String TAG = "maluClientAdapter";
     private List<ProductInvoice> dataModelArrayList;
-    private InvoiceFrag context;
+    private Fragment context;
     private OnRecyleItemListener mOnRecycleItemListener;
 
-    public InvoicePAdapter(List<ProductInvoice> ClientAdap, InvoiceFrag context, OnRecyleItemListener onRecyleItemListener) {
+    public InvoicePAdapter(List<ProductInvoice> ClientAdap, Fragment context, OnRecyleItemListener onRecyleItemListener) {
         this.dataModelArrayList = ClientAdap;
         this.context = context;
         this.mOnRecycleItemListener = onRecyleItemListener;
