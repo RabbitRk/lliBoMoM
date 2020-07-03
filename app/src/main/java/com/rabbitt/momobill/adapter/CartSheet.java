@@ -2,6 +2,7 @@ package com.rabbitt.momobill.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -51,15 +52,17 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     private String btn_val;
     private String client_id;
     private String date_of;
+    Context context;
     View v;
 
-    public CartSheet(List<ProductInvoice> data, Fragment invoiceFrag, Fragment frag, cartDelete cartDelete, String value, String order, String s) {
+    public CartSheet(List<ProductInvoice> data, Fragment invoiceFrag, Fragment frag, cartDelete cartDelete, String value, String order, String s, Context context) {
         this.data = data;
         this.invoiceFrag = invoiceFrag;
         this.cartDelete = cartDelete;
         this.btn_val = value;
         this.client_id = order;
         this.date_of = s;
+        this.context = context;
     }
 
     @Nullable
@@ -123,7 +126,6 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
         hashMap.put("client_id", client_id);
 
-
         for (ProductInvoice pv : data) {
             HashMap<String, Object> pro = new HashMap<>();
             Log.i(TAG, "updateFirebase: " + pv.getProduct_id());
@@ -134,6 +136,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
             pro.put("unit", pv.getUnit());
             pro.put("cgst", pv.getCgst());
             pro.put("cess", pv.getCess());
+            pro.put("in_ex", pv.getIn());
 
             hashMap.put(pv.getProduct_id(), pro);
         }
@@ -144,7 +147,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         String order_num = pref.getOrderId();
 
         Log.i(TAG, "addProduct: " + hashMap.toString());
-        reference.child(date_of).child(client_id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+        reference.child(date_of).child(client_id).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Log.i(TAG, "onComplete: " + task.toString());
@@ -251,10 +254,10 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
     private void generateInvoice() {
         Uri uri = null;
-        for (ProductInvoice pv : data) {
-            uri = Uri.parse(pv.getImg_url());
-            break;
-        }
+//        for (ProductInvoice pv : data) {
+//            uri = Uri.parse(pv.getImg_url());
+//            break;
+//        }
 //        File file4 = new File("https://firebasestorage.googleapis.com/v0/b/invent-23ce1.appspot.com/o/ProductImage%2FCoke?alt=media&token=cb955945-bd38-4461-8960-1e20f05bbb2e");
 //        = Uri.parse(file4.getPath());
 
@@ -262,7 +265,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         file = new File(path1);
 //        Invoice in = new Invoice(num_to_words,invoice.getText().toString(), dateString.getText().toString(), companyname, ad, user_gst, cp, user_phone, Name, Address, state, zip, Gstin, items, GST, total.getText().toString(), accno, ifsccode);
         Invoice in = new Invoice();
-        in.pdfcreate(file, uri, uri, uri);
+        in.pdfcreate(file, uri, uri, uri, context);
         startActivity(new Intent(getActivity(), pdfreader.class).putExtra("inv", "INV").putExtra("from","genrate"));
     }
 

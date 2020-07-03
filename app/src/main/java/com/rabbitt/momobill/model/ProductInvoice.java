@@ -10,6 +10,15 @@ public class ProductInvoice {
     String product_id;
     String cgst;
     String cess;
+    String in;
+
+    public String getIn() {
+        return in;
+    }
+
+    public void setIn(String in) {
+        this.in = in;
+    }
 
     public String getCgst() {
         return cgst;

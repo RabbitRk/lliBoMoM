@@ -39,6 +39,7 @@ public class OtpActivity extends AppCompatActivity {
         Intent i = getIntent();
         phone_no = i.getStringExtra("phone_no");
         Log.i(TAG, "onCreate: "+phone_no);
+        mAuth = FirebaseAuth.getInstance();
         sendVerificationCode(phone_no);
     }
 
@@ -75,7 +76,6 @@ public class OtpActivity extends AppCompatActivity {
     private void goHomePage(String currentuser) {
         Intent intent = new Intent (OtpActivity.this, SignUpActivity.class);
         intent.putExtra("phone_no", phone_no);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }

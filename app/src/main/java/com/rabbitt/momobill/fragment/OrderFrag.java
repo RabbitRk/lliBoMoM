@@ -138,6 +138,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     String product_id = snapshot.child("product_id").getValue(String.class);
                     String gst = snapshot.child("cgst_sgst").getValue(String.class);
                     String cess = snapshot.child("cess").getValue(String.class);
+                    String in_ex = snapshot.child("in_ex").getValue(String.class);
 
                     ProductInvoice product = new ProductInvoice();
                     product.setImg_url(img_url);
@@ -148,6 +149,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     product.setProduct_id(product_id);
                     product.setCgst(gst);
                     product.setCess(cess);
+                    product.setIn(in_ex);
 
                     data.add(product);
                 }
@@ -193,9 +195,6 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 Log.i(TAG, "onDataChange: " + dataSnapshot);
-//                if (data != null) {
-//                    data.clear();
-//                }
 
                 clients.clear();
 
@@ -264,12 +263,10 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
 
         TextView name = dialog.findViewById(R.id.text);
         TextView quanitiy = dialog.findViewById(R.id.dia_quantity);
-//        TextView unit = dialog.findViewById(R.id.dia_lbl);
         final EditText units = dialog.findViewById(R.id.units);
 
         name.setText(name_);
         quanitiy.setText(quantity + " ml");
-//        unit.setText(ex_unit);
 
         Button dialogButton = dialog.findViewById(R.id.ok_button);
         dialogButton.setOnClickListener(new View.OnClickListener() {
@@ -289,6 +286,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     product.setProduct_id(model.getProduct_id());
                     product.setCgst(model.getCgst());
                     product.setCess(model.getCess());
+                    product.setIn(model.getIn());
 
                     cart.add(product);
                     dialog.dismiss();
@@ -341,7 +339,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     }
                     else
                     {
-                        CartSheet cartSheet = new CartSheet(cart, this, this, this, "order", client_id.get(spinner.getSelectedIndex()), dateTxt.getText().toString());
+                        CartSheet cartSheet = new CartSheet(cart, this, this, this, "order", client_id.get(spinner.getSelectedIndex()), dateTxt.getText().toString(), getContext());
                         cartSheet.show(getParentFragmentManager(), "cart");
                     }
                 }

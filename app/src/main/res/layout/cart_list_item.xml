@@ -8,10 +8,9 @@
     android:stretchColumns="*">
 
     <TableRow
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal">
-
         <TextView
             android:id="@+id/txt_product"
             android:text="Hello"
@@ -21,6 +20,7 @@
             android:id="@+id/txt_quantity"
             android:text="Hello"
             style="@style/textCartMini"/>
+<!--        </LinearLayout>-->
 
         <TextView
             android:id="@+id/txt_units"

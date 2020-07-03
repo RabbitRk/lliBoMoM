@@ -34,10 +34,63 @@
             android:text="Orders"
             android:textSize="16sp" />
 
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorAccent"
+            android:shrinkColumns="*"
+            android:stretchColumns="*">
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/txt_product"
+                    style="@style/textCart"
+                    android:text="Product" />
+
+                <TextView
+                    android:id="@+id/txt_units"
+                    style="@style/textCart"
+                    android:text="Units" />
+
+                <TextView
+                    android:id="@+id/txt_tax"
+                    style="@style/textCart"
+                    android:text="GST" />
+
+                <TextView
+                    android:id="@+id/tax_cess"
+                    style="@style/textCart"
+                    android:text="CESS" />
+
+                <TextView
+                    android:id="@+id/txt_price"
+                    style="@style/textCart"
+                    android:text="Price" />
+
+                <TextView
+                    android:id="@+id/btn"
+                    style="@style/textCart"
+                    android:text="Action" />
+
+            </TableRow>
+
+        </TableLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_order_invoice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/cart_btn_order"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="convert" />
     </LinearLayout>
 
     <LinearLayout
@@ -63,9 +116,9 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 

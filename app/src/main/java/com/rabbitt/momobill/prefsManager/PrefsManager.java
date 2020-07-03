@@ -7,8 +7,21 @@ public class PrefsManager {
     // Shared preferences file name
     private static final String PREF_NAME = "PREF_NAME";
     private static final String LOGIN = "IsFirstTimeLaunch";
-    private static final String USER_PREF = "USER_PREFS";
-    private static final String USER_PHONE = "USER_PHONE";
+
+    public static final String OWNER = "OWNER";
+
+    public static final String USER_PREF = "USER_PREFS";
+
+    public static final String USER_PHONE = "USER_PHONE";
+
+    public static final String USER_NAME = "USER_NAME";
+    public static final String USER_EMAIL = "USER_EMAIL";
+    public static final String USER_LOC = "USER_LOC";
+    public static final String USER_LOC_2 = "USER_LOC_2";
+    public static final String USER_CITY = "USER_CITY";
+    public static final String USER_STATE = "USER_STATE";
+    public static final String USER_PIN = "USER_PIN";
+    public static final String USER_GST = "USER_GST";
 
     private SharedPreferences pref, userpref;
     private SharedPreferences.Editor editor, user_editor;
@@ -33,15 +46,35 @@ public class PrefsManager {
         editor.commit();
     }
 
-    public void userPreferences_(String id, String username, String phonenumber, String email, String addressStr, String dobStr, String gender) {
-//        user_editor.putString(USER_NAME,username);
-//        user_editor.putString(USER_EMAIL,email);
-//        user_editor.putString(USER_PHONE,phonenumber);
-//        user_editor.putString(USER_LOC,addressStr);
-//        user_editor.putString(USER_LOC_OFFICE,"");
-//        user_editor.putString(USER_DOB,dobStr);
-//        user_editor.putString(USER_GENDER,gender);
-//        user_editor.putString(USER_BIO,"-");
-//        user_editor.commit();
+    public boolean isOwner() {
+        return pref.getBoolean(OWNER, false);
+    }
+
+    public void setOwner(boolean isFirstTime) {
+        editor.putBoolean(OWNER, isFirstTime);
+        editor.commit();
+    }
+
+
+    public void userPreferences_(
+            String name,
+            String phone,
+            String email,
+            String add1,
+            String add2,
+            String city,
+            String state,
+            String pincode,
+            String gst) {
+        user_editor.putString(USER_NAME, name);
+        user_editor.putString(USER_EMAIL, email);
+        user_editor.putString(USER_PHONE, phone);
+        user_editor.putString(USER_LOC, add1);
+        user_editor.putString(USER_LOC_2, add2);
+        user_editor.putString(USER_CITY, city);
+        user_editor.putString(USER_STATE, state);
+        user_editor.putString(USER_PIN, pincode);
+        user_editor.putString(USER_GST, gst);
+        user_editor.commit();
     }
 }

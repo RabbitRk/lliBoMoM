@@ -1,6 +1,7 @@
 package com.rabbitt.momobill;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +19,10 @@ import com.rabbitt.momobill.fragment.DashFrag;
 import com.rabbitt.momobill.fragment.InventoryFrag;
 import com.rabbitt.momobill.fragment.InvoiceFrag;
 import com.rabbitt.momobill.fragment.OrderFrag;
+import com.rabbitt.momobill.prefsManager.PrefsManager;
+
+import static com.rabbitt.momobill.prefsManager.PrefsManager.OWNER;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PREF;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +33,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        PrefsManager prefsManager = new PrefsManager(this);
+        prefsManager.setFirstTimeLaunch(true);
+
+//        if ()
+
+        SharedPreferences shrp = getSharedPreferences(USER_PREF, MODE_PRIVATE);
+
+
+        Log.i(TAG, "onCreate: Boolean:  "+shrp.getBoolean(OWNER,false));
         final Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.home));
         loadFragment(new DashFrag());

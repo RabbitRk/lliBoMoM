@@ -1,6 +1,7 @@
 package com.rabbitt.momobill.model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -34,6 +35,12 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_GST;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_LOC;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_LOC_2;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PHONE;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PREF;
+
 public class Invoice {
     private static final String TAG = "maluPDF";
 
@@ -65,13 +72,15 @@ public class Invoice {
 //    }
 
 
-    public void pdfcreate(File file, Uri path, Uri stamp, Uri logopath) {
+    public void pdfcreate(File file, Uri path, Uri stamp, Uri logopath, Context context) {
 
         Log.i(TAG, "pdfcreate: " + path);
         com.itextpdf.text.Document doc = new com.itextpdf.text.Document(PageSize.A4, 0f, 0f, 0f, 0f);
         String outPath = file.getPath();
 
         try {
+            SharedPreferences shrp = context.getSharedPreferences(USER_PREF, Context.MODE_PRIVATE);
+
             PdfWriter.getInstance(doc, new FileOutputStream(outPath));
             doc.open();
             doc.setMargins(0, 0, 0, 0);           // setting margin
@@ -109,7 +118,7 @@ public class Invoice {
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable.addCell(cell);
-            cell = new PdfPCell(new Paragraph("" + "user_com", FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
+            cell = new PdfPCell(new Paragraph("" + "Santha Agency", FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable.addCell(cell);
@@ -128,7 +137,7 @@ public class Invoice {
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable.addCell(cell);
-            cell = new PdfPCell(new Paragraph("" + "user_add", FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
+            cell = new PdfPCell(new Paragraph("" + shrp.getString(USER_LOC, "")+" "+shrp.getString(USER_LOC_2,""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable.addCell(cell);
@@ -143,7 +152,7 @@ public class Invoice {
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable.addCell(cell);
-            cell = new PdfPCell(new Paragraph("Phone :" + "user_phone", FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
+            cell = new PdfPCell(new Paragraph("Phone :" + shrp.getString(USER_PHONE,""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
             //cell.setPaddingLeft(2);
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -157,7 +166,7 @@ public class Invoice {
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable.addCell(cell);
-            cell = new PdfPCell(new Paragraph("GSTIN " + "user_gst", FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
+            cell = new PdfPCell(new Paragraph("GSTIN " + shrp.getString(USER_GST,""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
             //cell.setPaddingLeft(2);
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);

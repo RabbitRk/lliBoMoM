@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:shrinkColumns="*"
+    android:stretchColumns="*"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+<TableRow
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:id="@+id/txt_product"
+        android:text="Product"
+        style="@style/textCartMini"/>
+
+    <TextView
+        android:id="@+id/txt_units"
+        style="@style/textCartMini"
+        android:text="Units" />
+
+    <TextView
+        android:id="@+id/txt_tax"
+        android:text="GST"
+        style="@style/textCartMini"/>
+
+    <TextView
+        android:id="@+id/tax_cess"
+        android:text="CESS"
+        style="@style/textCartMini"/>
+
+    <TextView
+        android:id="@+id/txt_price"
+        style="@style/textCartMini"
+        android:text="Price"
+        />
+
+    <Button
+        android:id="@+id/btn"
+        style="@style/textCartMini"
+        android:text="Action"
+        />
+
+</TableRow>
+
+</TableLayout>
