@@ -27,6 +27,7 @@ import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PREF;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "maluHomeActivity";
+    Boolean bool;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,46 +37,54 @@ public class MainActivity extends AppCompatActivity {
         PrefsManager prefsManager = new PrefsManager(this);
         prefsManager.setFirstTimeLaunch(true);
 
-//        if ()
-
         SharedPreferences shrp = getSharedPreferences(USER_PREF, MODE_PRIVATE);
-
+        bool = shrp.getBoolean(OWNER,true);
 
         Log.i(TAG, "onCreate: Boolean:  "+shrp.getBoolean(OWNER,false));
         final Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(getString(R.string.home));
-        loadFragment(new DashFrag());
 
-        BubbleNavigationLinearView bubbleNavigationLinearView = findViewById(R.id.bottom_navigation_view_linear);
-        bubbleNavigationLinearView.setNavigationChangeListener(new BubbleNavigationChangeListener() {
-            @Override
-            public void onNavigationChanged(View view, int position) {
-                Log.i(TAG, "onNavigationChanged: "+view.getId()+"  "+position);
-                switch (position)
-                {
-                    case 0:
-                        toolbar.setTitle(getString(R.string.home));
-                        loadFragment(new DashFrag());
-                        break;
-                    case 1:
-                        toolbar.setTitle("Inventory");
-                        loadFragment(new InventoryFrag());
-                        break;
-                    case 2:
-                        toolbar.setTitle("Invoice");
-                        loadFragment(new InvoiceFrag());
-                        break;
-                    case 3:
-                        toolbar.setTitle("Order");
-                        loadFragment(new OrderFrag());
-                        break;
-                    case 4:
-                        toolbar.setTitle("Clients");
-                        loadFragment(new ClientFrag());
-                        break;
+        if (bool){
+            toolbar.setTitle(getString(R.string.home));
+            loadFragment(new DashFrag());
+
+            BubbleNavigationLinearView bubbleNavigationLinearView = findViewById(R.id.bottom_navigation_view_linear);
+            bubbleNavigationLinearView.setNavigationChangeListener(new BubbleNavigationChangeListener() {
+                @Override
+                public void onNavigationChanged(View view, int position) {
+                    Log.i(TAG, "onNavigationChanged: "+view.getId()+"  "+position);
+                    switch (position)
+                    {
+                        case 0:
+                            toolbar.setTitle(getString(R.string.home));
+                            loadFragment(new DashFrag());
+                            break;
+                        case 1:
+                            toolbar.setTitle("Inventory");
+                            loadFragment(new InventoryFrag());
+                            break;
+                        case 2:
+                            toolbar.setTitle("Invoice");
+                            loadFragment(new InvoiceFrag());
+                            break;
+                        case 3:
+                            toolbar.setTitle("Order");
+                            loadFragment(new OrderFrag());
+                            break;
+                        case 4:
+                            toolbar.setTitle("Clients");
+                            loadFragment(new ClientFrag());
+                            break;
+                    }
                 }
-            }
-        });
+            });
+        }
+        else
+        {
+            toolbar.setTitle("Order");
+            loadFragment(new OrderFrag());
+        }
+
+
     }
 
     public Boolean loadFragment(final Fragment fragment) {

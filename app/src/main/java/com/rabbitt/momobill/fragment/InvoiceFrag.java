@@ -264,8 +264,13 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
                     order.add(product);
                 }
-                Log.i(TAG, "onDataChange: "+order.remove(order.size()-1));
-                updateOrder(order);
+                Log.i(TAG, "onDataChange: "+order.size());
+
+                if (order.size() != 0)
+                {
+                    updateOrder(order);
+                }
+//                Log.i(TAG, "onDataChange: "+order.remove(order.size()-1));
             }
 
             @Override
@@ -347,6 +352,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                     product.setCgst(model.getCgst());
                     product.setCess(model.getCess());
                     product.setImg_url(model.getImg_url());
+                    product.setIn(model.getIn());
 
                     cart.add(product);
                     dialog.dismiss();

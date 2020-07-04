@@ -2,21 +2,14 @@ package com.rabbitt.momobill.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
-
-import androidx.core.content.ContextCompat;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
-import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -24,16 +17,11 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.rabbitt.momobill.R;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_GST;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_LOC;
@@ -72,7 +60,7 @@ public class Invoice {
 //    }
 
 
-    public void pdfcreate(File file, Uri path, Uri stamp, Uri logopath, Context context) {
+    public void pdfcreate(File file, Uri path, Uri stamp, Uri logopath, Context context, List<ProductInvoice> data) {
 
         Log.i(TAG, "pdfcreate: " + path);
         com.itextpdf.text.Document doc = new com.itextpdf.text.Document(PageSize.A4, 0f, 0f, 0f, 0f);
@@ -277,13 +265,13 @@ public class Invoice {
             doc.add(innertable2);
 
 
-            PdfPTable innertable5 = new PdfPTable(6);
+            PdfPTable innertable5 = new PdfPTable(7);
             innertable5.setWidthPercentage(100);
             // innertable5.setWidths(new int[]{11,4,7,5,5,5});
 
             PdfPCell cell5 = new PdfPCell(new Phrase("Product Description"));
             innertable5.addCell(cell5);
-            cell5 = new PdfPCell(new Phrase("HSN code"));
+            cell5 = new PdfPCell(new Phrase("Units"));
             innertable5.addCell(cell5);
             cell5 = new PdfPCell(new Phrase("Taxable Value"));
             innertable5.addCell(cell5);
@@ -294,46 +282,58 @@ public class Invoice {
             cell5 = new PdfPCell(new Phrase("CGST"));
             innertable5.addCell(cell5);
 
+            cell5 = new PdfPCell(new Phrase("CESS"));
+            innertable5.addCell(cell5);
+
             cell5 = new PdfPCell(new Phrase("Total"));
-            cell5.setMinimumHeight(10f);
             innertable5.addCell(cell5);
 
 
             Double amtbefore = 0.0;
 
-//            for(int i=0;i<items.size();i++) {
-//                String item[] = items.get(i);
+            for(int i=0;i<data.size();i++) {
+                ProductInvoice productInvoice = data.get(i);
 //                String gsco[] = GST.get(i);
-//
-//                cell5 = new PdfPCell(new Phrase(item[0]));
-//                innertable5.addCell(cell5);
-//                cell5 = new PdfPCell(new Phrase(item[1]));
-//                innertable5.addCell(cell5);
-//                cell5 = new PdfPCell(new Phrase("     "));
-//                innertable5.addCell(cell5);
+
+                cell5 = new PdfPCell(new Phrase(productInvoice.getProduct_name()));
+                innertable5.addCell(cell5);
+                cell5 = new PdfPCell(new Phrase(productInvoice.getCess()));
+                innertable5.addCell(cell5);
+                cell5 = new PdfPCell(new Phrase(productInvoice.getSale_rate()));
+                innertable5.addCell(cell5);
+
+                cell5 = new PdfPCell(new Phrase(productInvoice.getProduct_name()));
+                innertable5.addCell(cell5);
+                cell5 = new PdfPCell(new Phrase(productInvoice.getCess()));
+                innertable5.addCell(cell5);
+                cell5 = new PdfPCell(new Phrase(productInvoice.getSale_rate()));
+                innertable5.addCell(cell5);
+
+
 //                PdfPTable nested4 = new PdfPTable(1);
-//                nested4.addCell("R: " + item[3]);
-//                nested4.addCell("A: " + gsco[1]);
+//                nested4.addCell("R: " + productInvoice.getQuantity());
+//                nested4.addCell("A: " + "gsco");
 //                PdfPCell nesthousing4 = new PdfPCell(nested4);
 //                innertable5.addCell(nesthousing4);
 //                PdfPTable nested5 = new PdfPTable(1);
-//                nested5.addCell("R: " + item[2]);
-//                nested5.addCell("A: " + gsco[0]);
+//                nested5.addCell("R: " + productInvoice.getProduct_name());
+//                nested5.addCell("A: " + "gsco");
 //                PdfPCell nesthousing5 = new PdfPCell(nested5);
 //                innertable5.addCell(nesthousing5);
-//                amtbefore=amtbefore+(Double.parseDouble(item[4])*Double.parseDouble(item[5]));
-//                cell5 = new PdfPCell(new Phrase("" + item[6]));
-//                cell5.setMinimumHeight(10f);
-//                innertable5.addCell(cell5);
-//            }
-//            doc.add(innertable5);
+//
+                amtbefore=amtbefore+(Double.parseDouble(productInvoice.getSale_rate())*Double.parseDouble(productInvoice.getSale_rate()));
+                cell5 = new PdfPCell(new Phrase("" + productInvoice.getUnit()));
+                cell5.setMinimumHeight(10f);
+                innertable5.addCell(cell5);
+            }
+            doc.add(innertable5);
 
             PdfPTable t = new PdfPTable(2);
             t.setWidthPercentage(100);
             t.setWidths(new int[]{50, 50});
             PdfPCell ce = new PdfPCell(new Phrase("Total"));
             t.addCell(ce);
-            ce = new PdfPCell(new Phrase("" + "total"));
+            ce = new PdfPCell(new Phrase("" + amtbefore));
             t.addCell(ce);
          /*   ce = new PdfPCell(new Phrase("0"));
             t.addCell(ce);
