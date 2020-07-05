@@ -75,7 +75,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                 startActivity(new Intent(getActivity(), OpeningActivity.class));
                 break;
             case R.id.txt_month:
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
+//                startActivity(new Intent(getActivity(), SettingsActivity.class));
                 break;
             case R.id.txt_credit:
 //                startActivity(new Intent(getActivity(), SettingsActivity.class));

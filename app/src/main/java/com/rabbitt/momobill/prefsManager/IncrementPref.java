@@ -1,5 +1,6 @@
 package com.rabbitt.momobill.prefsManager;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -19,15 +20,16 @@ public class IncrementPref {
     SharedPreferences product_shrp, client_shrp, invoice_shrp;
     SharedPreferences.Editor product_edit, client_edit, invoice_edit;
 
+    @SuppressLint("CommitPrefEdits")
     public IncrementPref(Context context) {
          product_shrp = context.getSharedPreferences(PRODUCT, Context.MODE_PRIVATE);
          product_edit = product_shrp.edit();
 
         client_shrp = context.getSharedPreferences(CLIENT, Context.MODE_PRIVATE);
-        client_edit = product_shrp.edit();
+        client_edit = client_shrp.edit();
 
         invoice_shrp = context.getSharedPreferences(INVOICE, Context.MODE_PRIVATE);
-        invoice_edit = product_shrp.edit();
+        invoice_edit = invoice_shrp.edit();
     }
 
 

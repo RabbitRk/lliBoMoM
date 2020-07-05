@@ -75,7 +75,7 @@ public class OtpActivity extends AppCompatActivity {
 
     private void goHomePage(String currentuser) {
         Intent intent = new Intent (OtpActivity.this, SignUpActivity.class);
-        intent.putExtra("phone_no", phone_no);
+        intent.putExtra("phone", phone_no);
         startActivity(intent);
         finish();
     }

@@ -45,7 +45,6 @@ public class OpenAdapter extends RecyclerView.Adapter<OpenAdapter.holder> {
 
         Product dataModel = dataModelArrayList.get(position);
         holder.product_name.setText(dataModel.getProduct_name());
-        holder.quantity.setText(dataModel.getQuantity()+" ml");
 
         //Load image
         Glide.with(context)

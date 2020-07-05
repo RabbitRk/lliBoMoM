@@ -94,11 +94,11 @@ public class ClientActivity extends AppCompatActivity {
 
     private boolean validate() {
         if (name.getText().toString().trim().equals("")) {
-            email.setError("Required");
+            name.setError("Required");
             return false;
         }
         if (phone.getText().toString().trim().equals("")) {
-            email.setError("Required");
+            phone.setError("Required");
             return false;
         }
         if (email.getText().toString().trim().equals("")) {
@@ -106,27 +106,27 @@ public class ClientActivity extends AppCompatActivity {
             return false;
         }
         if (add1.getText().toString().trim().equals("")) {
-            email.setError("Required");
+            add1.setError("Required");
             return false;
         }
         if (add2.getText().toString().trim().equals("")) {
-            email.setError("Required");
+            add2.setError("Required");
             return false;
         }
         if (city.getText().toString().trim().equals("")) {
-            email.setError("Required");
+            city.setError("Required");
             return false;
         }
         if (state.getText().toString().trim().equals("")) {
-            email.setError("Required");
+            state.setError("Required");
             return false;
         }
         if (pincode.getText().toString().trim().equals("")) {
-            email.setError("Required");
+            pincode.setError("Required");
             return false;
         }
         if (gst.getText().toString().trim().equals("")) {
-            email.setError("Required");
+            gst.setError("Required");
             return false;
         }
 

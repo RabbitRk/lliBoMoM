@@ -1,19 +1,20 @@
 package com.rabbitt.momobill;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.gauravk.bubblenavigation.BubbleNavigationLinearView;
 import com.gauravk.bubblenavigation.listener.BubbleNavigationChangeListener;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.rabbitt.momobill.activity.SettingsActivity;
 import com.rabbitt.momobill.fragment.ClientFrag;
 import com.rabbitt.momobill.fragment.DashFrag;
 import com.rabbitt.momobill.fragment.InventoryFrag;
@@ -21,7 +22,6 @@ import com.rabbitt.momobill.fragment.InvoiceFrag;
 import com.rabbitt.momobill.fragment.OrderFrag;
 import com.rabbitt.momobill.prefsManager.PrefsManager;
 
-import static com.rabbitt.momobill.prefsManager.PrefsManager.OWNER;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PREF;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,16 +38,26 @@ public class MainActivity extends AppCompatActivity {
         prefsManager.setFirstTimeLaunch(true);
 
         SharedPreferences shrp = getSharedPreferences(USER_PREF, MODE_PRIVATE);
-        bool = shrp.getBoolean(OWNER,true);
+//        bool = shrp.getBoolean(OWNER,false);
+        bool = true;
 
-        Log.i(TAG, "onCreate: Boolean:  "+shrp.getBoolean(OWNER,false));
         final Toolbar toolbar = findViewById(R.id.toolbar);
 
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if(item.getItemId()==R.id.settings)
+                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                return true;
+            }
+        });
+
+        BubbleNavigationLinearView bubbleNavigationLinearView = findViewById(R.id.bottom_navigation_view_linear);
         if (bool){
+            toolbar.inflateMenu(R.menu.main_menu_item);
             toolbar.setTitle(getString(R.string.home));
             loadFragment(new DashFrag());
 
-            BubbleNavigationLinearView bubbleNavigationLinearView = findViewById(R.id.bottom_navigation_view_linear);
             bubbleNavigationLinearView.setNavigationChangeListener(new BubbleNavigationChangeListener() {
                 @Override
                 public void onNavigationChanged(View view, int position) {
@@ -80,11 +90,10 @@ public class MainActivity extends AppCompatActivity {
         }
         else
         {
-            toolbar.setTitle("Order");
+            toolbar.setTitle("Santha agency - Order");
+            bubbleNavigationLinearView.setCurrentActiveItem(3);
             loadFragment(new OrderFrag());
         }
-
-
     }
 
     public Boolean loadFragment(final Fragment fragment) {

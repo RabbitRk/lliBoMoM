@@ -34,7 +34,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
+import com.rabbitt.momobill.activity.EditProductActivity;
 import com.rabbitt.momobill.activity.ProductActivity;
+import com.rabbitt.momobill.adapter.CartSheet;
+import com.rabbitt.momobill.adapter.DeleteSheet;
 import com.rabbitt.momobill.adapter.ProductAdapter;
 import com.rabbitt.momobill.model.Product;
 
@@ -107,7 +110,6 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
 
                     String img_url = snapshot.child("img_url").getValue(String.class);
                     String product_name = snapshot.child("product_name").getValue(String.class);
-                    String quantity = snapshot.child("quantity").getValue(String.class);
                     String sale_rate = snapshot.child("sale_rate").getValue(String.class);
                     String unit = snapshot.child("unit").getValue(String.class);
                     String product_id = snapshot.child("product_id").getValue(String.class);
@@ -115,10 +117,15 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
                     Product product = new Product();
                     product.setImg_url(img_url);
                     product.setProduct_name(product_name);
-                    product.setQuantity(quantity);
                     product.setSale_rate(sale_rate);
                     product.setUnit(unit);
                     product.setProduct_id(product_id);
+
+                    product.setGst(snapshot.child("cgst_sgst").getValue(String.class));
+                    product.setCess(snapshot.child("cess").getValue(String.class));
+                    product.setHsn(snapshot.child("hsn_code").getValue(String.class));
+                    product.setPuchase(snapshot.child("purchase_rate").getValue(String.class));
+                    product.setInc(snapshot.child("in_ex").getValue(String.class));
 
                     data.add(product);
                 }
@@ -148,6 +155,7 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
                 filter(s.toString());
             }
         });
+
         //Onclick listener
         fab.setOnClickListener(this);
     }
@@ -172,7 +180,6 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
     @Override
     public void onClick(View v) {
         startActivity(new Intent(getActivity(), ProductActivity.class));
-        Toast.makeText(getActivity(), "Fab clicked", Toast.LENGTH_SHORT).show();
     }
 
     private void filter(String text) {
@@ -193,26 +200,36 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
 
         String product_id = model.getProduct_id();
         String unit = model.getUnit();
-        String quantity = model.getQuantity();
         String name = model.getProduct_name();
 
-        Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  " + quantity + "  " + name);
+        Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  "  + "  " + name);
 
-        openDialog(unit, quantity, name, product_id);
+        openDialog(unit, name, product_id);
+    }
+
+    @Override
+    public void OnEditClick(int position) {
+        Log.i(TAG, "OnItemClick: " + position);
+        Log.i(TAG, "pos " + position);
+        Product model = data.get(position);
+
+        Intent intent = new Intent(getActivity(), EditProductActivity.class);
+        intent.putExtra("Pro", model);
+        startActivity(intent);
+
     }
 
     @SuppressLint("SetTextI18n")
-    public void openDialog(final String ex_unit, String quantity, String name_, final String product_id) {
+    public void openDialog(final String ex_unit, String name_, final String product_id) {
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.unit_dialog);
         dialog.setCancelable(true);
 
         TextView name = dialog.findViewById(R.id.text);
-        TextView quanitiy = dialog.findViewById(R.id.dia_quantity);
+        TextView quantity = dialog.findViewById(R.id.dia_quantity);
         final EditText units = dialog.findViewById(R.id.units);
 
         name.setText(name_);
-        quanitiy.setText(quantity + " ml");
 
         Button dialogButton = dialog.findViewById(R.id.ok_button);
         dialogButton.setOnClickListener(new View.OnClickListener() {
@@ -223,6 +240,15 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
                 } else {
                     updateFirebase(dialog, ex_unit, product_id, units.getText().toString().trim());
                 }
+            }
+        });
+
+        quantity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                DeleteSheet cartSheet = new DeleteSheet(product_id);
+                cartSheet.show(getParentFragmentManager(), "delete");
             }
         });
 

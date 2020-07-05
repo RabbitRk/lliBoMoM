@@ -5,8 +5,8 @@ import android.content.SharedPreferences;
 
 public class PrefsManager {
     // Shared preferences file name
-    private static final String PREF_NAME = "PREF_NAME";
-    private static final String LOGIN = "IsFirstTimeLaunch";
+    public static final String PREF_NAME = "PREF_NAME";
+    public static final String LOGIN = "IsFirstTimeLaunch";
 
     public static final String OWNER = "OWNER";
 
@@ -22,6 +22,7 @@ public class PrefsManager {
     public static final String USER_STATE = "USER_STATE";
     public static final String USER_PIN = "USER_PIN";
     public static final String USER_GST = "USER_GST";
+    public static final String KEY = "KEY";
 
     private SharedPreferences pref, userpref;
     private SharedPreferences.Editor editor, user_editor;
@@ -57,6 +58,7 @@ public class PrefsManager {
 
 
     public void userPreferences_(
+            String key,
             String name,
             String phone,
             String email,
@@ -66,6 +68,7 @@ public class PrefsManager {
             String state,
             String pincode,
             String gst) {
+        user_editor.putString(KEY,key);
         user_editor.putString(USER_NAME, name);
         user_editor.putString(USER_EMAIL, email);
         user_editor.putString(USER_PHONE, phone);

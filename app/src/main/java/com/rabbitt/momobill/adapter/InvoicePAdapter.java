@@ -46,7 +46,7 @@ public class InvoicePAdapter extends RecyclerView.Adapter<InvoicePAdapter.holder
 
         ProductInvoice dataModel = dataModelArrayList.get(position);
         holder.product_name.setText(dataModel.getProduct_name());
-        holder.quantity.setText(dataModel.getQuantity() + " ml");
+//        holder.quantity.setText(dataModel.getQuantity() + " ml");
 //        holder.units.setText("Units: " + dataModel.getUnit());
 //        holder.price.setText("Price: Rs. " + dataModel.getSale_rate());
 
@@ -63,7 +63,7 @@ public class InvoicePAdapter extends RecyclerView.Adapter<InvoicePAdapter.holder
 
     public class holder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView product_name, quantity;//, units, price;
+        TextView product_name;//, quantity;//, units, price;
         ImageView image;
         OnRecyleItemListener onRecyleItemListener;
 
@@ -72,7 +72,7 @@ public class InvoicePAdapter extends RecyclerView.Adapter<InvoicePAdapter.holder
             this.onRecyleItemListener = onRecyleItemListener;
 
             product_name = itemView.findViewById(R.id.grid_name);
-            quantity = itemView.findViewById(R.id.grid_quan);
+//            quantity = itemView.findViewById(R.id.grid_quan);
 //            units = itemView.findViewById(R.id.txt_units);
 //            price = itemView.findViewById(R.id.txt_price);
 

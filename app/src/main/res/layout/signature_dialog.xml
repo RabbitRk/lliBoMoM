@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <com.github.gcacace.signaturepad.views.SignaturePad
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/signature_pad"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:penColor="@android:color/black"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/clear_sign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear"/>
+
+        <Button
+            android:id="@+id/save_sign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"/>
+
+        <Button
+            android:id="@+id/cancel_sign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

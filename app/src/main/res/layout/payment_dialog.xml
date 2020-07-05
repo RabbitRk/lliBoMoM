@@ -75,9 +75,8 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/edx_bg"
+                android:inputType="numberDecimal"
                 android:hint="Units"
-                android:importantForAutofill="no"
-                android:inputType="number"
                 android:padding="10dp"
                 android:textSize="16sp" />
 

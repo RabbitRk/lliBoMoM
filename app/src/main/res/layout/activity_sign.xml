@@ -15,6 +15,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+
             <TextView
                 android:id="@+id/txt_shop_name"
                 android:layout_width="wrap_content"
@@ -28,6 +29,28 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
+            <RadioGroup
+                android:id="@+id/tax_ex_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radio_default"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimary"
+                    android:text="as Owner" />
+
+                <RadioButton
+                    android:id="@+id/radio_ex"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/colorPrimary"
+                    android:text="as Employee" />
+
+            </RadioGroup>
             <EditText
                 android:id="@+id/txt_name"
                 android:layout_width="match_parent"
@@ -141,30 +164,6 @@
                 android:hint="GSTIN"
                 android:padding="10dp"
                 android:textSize="16sp" />
-
-            <RadioGroup
-                android:id="@+id/tax_ex_in"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginBottom="20dp"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/radio_default"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:buttonTint="@color/colorPrimary"
-                    android:text="Owner" />
-
-                <RadioButton
-                    android:id="@+id/radio_ex"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:buttonTint="@color/colorPrimary"
-                    android:text="Employee" />
-
-            </RadioGroup>
 
             <Button
                 android:layout_width="match_parent"

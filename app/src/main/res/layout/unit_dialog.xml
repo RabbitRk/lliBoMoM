@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginStart="20dp"
                 android:text="Coke"
                 android:textColor="@color/textGrey"
@@ -34,13 +34,14 @@
 
             <TextView
                 android:id="@+id/dia_quantity"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/red_active"
                 android:layout_alignParentEnd="true"
-                android:layout_marginStart="20dp"
-                android:textColor="@color/textGrey"
-                android:layout_below="@+id/text"
-                android:text="Coke"
+                android:layout_alignParentTop="@+id/text"
+                android:text="Delete"
+                android:textStyle="bold"
+                android:padding="8dp"
                 android:textSize="16sp" />
 
             <EditText
@@ -54,7 +55,7 @@
                 android:background="@drawable/edx_bg"
                 android:hint="Units"
                 android:textSize="16sp"
-                android:layout_below="@+id/dia_quantity"
+                android:layout_below="@+id/text"
                 android:padding="10dp"
                 android:inputType="number"
                 android:importantForAutofill="no" />

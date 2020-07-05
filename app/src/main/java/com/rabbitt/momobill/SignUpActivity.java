@@ -30,6 +30,7 @@ import java.util.HashMap;
 public class SignUpActivity extends AppCompatActivity {
     private static final String TAG = "maluSign";
     EditText name, phone, email, add1, add2, city, state, pincode, gst;
+    String key;
 
     RadioGroup ex;
     RadioButton in_, ex_;
@@ -38,6 +39,7 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign);
+
 
         name = findViewById(R.id.txt_name);
         phone = findViewById(R.id.txt_phone);
@@ -53,6 +55,34 @@ public class SignUpActivity extends AppCompatActivity {
         in_ = findViewById(R.id.radio_default);
         ex_ = findViewById(R.id.radio_ex);
 
+        phone.setText(getIntent().getStringExtra("phone"));
+        phone.setEnabled(false);
+
+        ex.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (in_.isChecked())
+                {
+                    email.setVisibility(View.VISIBLE);
+                    add1.setVisibility(View.VISIBLE);
+                    add2.setVisibility(View.VISIBLE);
+                    city.setVisibility(View.VISIBLE);
+                    state.setVisibility(View.VISIBLE);
+                    pincode.setVisibility(View.VISIBLE);
+                    gst.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    email.setVisibility(View.GONE);
+                    add1.setVisibility(View.GONE);
+                    add2.setVisibility(View.GONE);
+                    city.setVisibility(View.GONE);
+                    state.setVisibility(View.GONE);
+                    pincode.setVisibility(View.GONE);
+                    gst.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     public void register(View view) {
@@ -79,37 +109,38 @@ public class SignUpActivity extends AppCompatActivity {
 
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Agency");
 
-
             HashMap<String, Object> hashMap = new HashMap<>();
-            hashMap.put("name", name.getText().toString().trim());
-            hashMap.put("designation", design);
-            hashMap.put("phone", phone.getText().toString().trim());
-            hashMap.put("email", email.getText().toString().trim());
-            hashMap.put("add1", add1.getText().toString().trim());
-            hashMap.put("add2", add2.getText().toString().trim());
-            hashMap.put("city", city.getText().toString().trim());
-            hashMap.put("state", state.getText().toString().trim());
-            hashMap.put("pincode", pincode.getText().toString().trim());
-            hashMap.put("gst", gst.getText().toString().trim());
 
+            if (in_.isChecked()) {
+                hashMap.put("name", name.getText().toString().trim());
+                hashMap.put("designation", design);
+                hashMap.put("phone", phone.getText().toString().trim());
+                hashMap.put("email", email.getText().toString().trim());
+                hashMap.put("add1", add1.getText().toString().trim());
+                hashMap.put("add2", add2.getText().toString().trim());
+                hashMap.put("city", city.getText().toString().trim());
+                hashMap.put("state", state.getText().toString().trim());
+                hashMap.put("pincode", pincode.getText().toString().trim());
+                hashMap.put("gst", gst.getText().toString().trim());
+            }
+            else
+            {
+                hashMap.put("name", name.getText().toString().trim());
+                hashMap.put("phone", phone.getText().toString().trim());
+            }
             Log.i(TAG, "addClient: " + hashMap.toString());
 
+            key = reference.child(design).push().getKey();
+
             final String finalDesign = design;
-            reference.child(design).push().setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+            reference.child(design).child(key).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "onComplete: " + task.toString());
-                    name.setText("");
-                    phone.setText("");
-                    email.setText("");
-                    add1.setText("");
-                    add2.setText("");
-                    city.setText("");
-                    state.setText("");
-                    pincode.setText("");
-                    gst.setText("");
 
                     storePreference(
+                            key,
                             name.getText().toString().trim(),
                             phone.getText().toString().trim(),
                             email.getText().toString().trim(),
@@ -120,6 +151,17 @@ public class SignUpActivity extends AppCompatActivity {
                             pincode.getText().toString().trim(),
                             gst.getText().toString().trim(),
                             finalDesign);
+
+                    name.setText("");
+                    phone.setText("");
+                    email.setText("");
+                    add1.setText("");
+                    add2.setText("");
+                    city.setText("");
+                    state.setText("");
+                    pincode.setText("");
+                    gst.setText("");
+
                     Toast.makeText(SignUpActivity.this, "Registered successfully", Toast.LENGTH_SHORT).show();
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -131,8 +173,9 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-    private void storePreference(String name, String phone, String email, String add1, String add2, String city, String state, String pincode, String gst, String d) {
+    private void storePreference(String myKey,String name, String phone, String email, String add1, String add2, String city, String state, String pincode, String gst, String d) {
         new PrefsManager(this).userPreferences_(
+                myKey,
                 name,
                 phone,
                 email,
@@ -153,7 +196,6 @@ public class SignUpActivity extends AppCompatActivity {
         }
 
         startActivity(new Intent(SignUpActivity.this, MainActivity.class));
-
     }
 
     private boolean checkOwner() {
@@ -189,39 +231,39 @@ public class SignUpActivity extends AppCompatActivity {
 
     private boolean validate() {
         if (name.getText().toString().trim().equals("")) {
-            email.setError("Required");
+            name.setError("Required");
             return false;
         }
         if (phone.getText().toString().trim().equals("")) {
+            phone.setError("Required");
+            return false;
+        }
+        if (email.getText().toString().trim().equals("") && email.getVisibility() == View.VISIBLE) {
             email.setError("Required");
             return false;
         }
-        if (email.getText().toString().trim().equals("")) {
-            email.setError("Required");
+        if (add1.getText().toString().trim().equals("") && add1.getVisibility() == View.VISIBLE) {
+            add1.setError("Required");
             return false;
         }
-        if (add1.getText().toString().trim().equals("")) {
-            email.setError("Required");
+        if (add2.getText().toString().trim().equals("") && add2.getVisibility() == View.VISIBLE) {
+            add2.setError("Required");
             return false;
         }
-        if (add2.getText().toString().trim().equals("")) {
-            email.setError("Required");
+        if (city.getText().toString().trim().equals("") && city.getVisibility() == View.VISIBLE) {
+            city.setError("Required");
             return false;
         }
-        if (city.getText().toString().trim().equals("")) {
-            email.setError("Required");
+        if (state.getText().toString().trim().equals("") && state.getVisibility() == View.VISIBLE) {
+            state.setError("Required");
             return false;
         }
-        if (state.getText().toString().trim().equals("")) {
-            email.setError("Required");
+        if (pincode.getText().toString().trim().equals("") && pincode.getVisibility() == View.VISIBLE) {
+            pincode.setError("Required");
             return false;
         }
-        if (pincode.getText().toString().trim().equals("")) {
-            email.setError("Required");
-            return false;
-        }
-        if (gst.getText().toString().trim().equals("")) {
-            email.setError("Required");
+        if (gst.getText().toString().trim().equals("") && gst.getVisibility() == View.VISIBLE) {
+            gst.setError("Required");
             return false;
         }
         if (!in_.isChecked() && !ex_.isChecked())

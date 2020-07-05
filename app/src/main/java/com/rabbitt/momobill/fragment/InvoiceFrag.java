@@ -270,7 +270,6 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                 {
                     updateOrder(order);
                 }
-//                Log.i(TAG, "onDataChange: "+order.remove(order.size()-1));
             }
 
             @Override
@@ -397,6 +396,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 //            }
 //        });
 //        dialog.dismiss();
+
     }
 
     @Override

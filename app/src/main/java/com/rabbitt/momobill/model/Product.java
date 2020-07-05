@@ -1,13 +1,59 @@
 package com.rabbitt.momobill.model;
 
-public class Product {
+import java.io.Serializable;
+
+public class Product implements Serializable {
 
     String img_url;
     String product_name;
-    String quantity;
     String sale_rate;
     String unit;
     String product_id;
+    String cess;
+    String gst;
+    String hsn;
+    String puchase;
+    String inc;
+
+    public String getCess() {
+        return cess;
+    }
+
+    public void setCess(String cess) {
+        this.cess = cess;
+    }
+
+    public String getGst() {
+        return gst;
+    }
+
+    public void setGst(String gst) {
+        this.gst = gst;
+    }
+
+    public String getHsn() {
+        return hsn;
+    }
+
+    public void setHsn(String hsn) {
+        this.hsn = hsn;
+    }
+
+    public String getPuchase() {
+        return puchase;
+    }
+
+    public void setPuchase(String puchase) {
+        this.puchase = puchase;
+    }
+
+    public String getInc() {
+        return inc;
+    }
+
+    public void setInc(String inc) {
+        this.inc = inc;
+    }
 
     public String getProduct_id() {
         return product_id;
@@ -31,14 +77,6 @@ public class Product {
 
     public void setProduct_name(String product_name) {
         this.product_name = product_name;
-    }
-
-    public String getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(String quantity) {
-        this.quantity = quantity;
     }
 
     public String getSale_rate() {

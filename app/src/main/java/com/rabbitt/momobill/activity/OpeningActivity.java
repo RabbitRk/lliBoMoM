@@ -75,7 +75,6 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
 
                     String img_url = snapshot.child("img_url").getValue(String.class);
                     String product_name = snapshot.child("product_name").getValue(String.class);
-                    String quantity = snapshot.child("quantity").getValue(String.class);
                     String sale_rate = snapshot.child("sale_rate").getValue(String.class);
                     String unit = snapshot.child("unit").getValue(String.class);
                     String product_id = snapshot.child("product_id").getValue(String.class);
@@ -83,7 +82,6 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
                     Product product = new Product();
                     product.setImg_url(img_url);
                     product.setProduct_name(product_name);
-                    product.setQuantity(quantity);
                     product.setSale_rate(sale_rate);
                     product.setUnit(unit);
                     product.setProduct_id(product_id);
@@ -167,10 +165,9 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
 
         String product_id = model.getProduct_id();
         String unit = model.getUnit();
-        String quantity = model.getQuantity();
         String name = model.getProduct_name();
 
-        Log.i(TAG, "OnItemClick: p: " + product_id + "  u: " + unit + "  q:" + quantity + "  n: " + name);
+        Log.i(TAG, "OnItemClick: p: " + product_id + "  u: " + unit  + "  n: " + name);
 
 
         final IncrementPref i = new IncrementPref(this);
@@ -220,7 +217,6 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
             HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put("product_name", name);
             hashMap.put("unit", s);
-            hashMap.put("quantity", quantity);
             Log.i(TAG, "addProduct: " + hashMap.toString());
             reference.child(getDate()).child(product_id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override

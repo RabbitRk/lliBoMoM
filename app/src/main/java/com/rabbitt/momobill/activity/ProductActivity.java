@@ -52,10 +52,11 @@ public class ProductActivity extends AppCompatActivity {
 
     private static final String TAG = "maluProduct";
     RoundedImageView imageView;
-    Uri imageUri, final_uri;
-    RadioGroup tax, ex;
+    Uri imageUri, final_uri = null, resultUri;
+    RadioGroup ex;
     RadioButton in_, ex_;
-    EditText cgst, sgst, cess, product_name, quantity, sale_rate, final_rate;
+    EditText cgst, sgst, cess, product_name, sale_rate, purchase_rate, hsn_code;
+
     double amount;
     private StorageReference storageRef;
 
@@ -68,17 +69,19 @@ public class ProductActivity extends AppCompatActivity {
 
         //initialization
         imageView = findViewById(R.id.product_image);
-        tax = findViewById(R.id.radioGroup_tax);
         ex = findViewById(R.id.tax_ex_in);
 
         cgst = findViewById(R.id.cgst_txt);
         sgst = findViewById(R.id.sgst_txt);
         cess = findViewById(R.id.cess_txt);
 
+        //  Newly added
+        purchase_rate = findViewById(R.id.txt_pur);
+        hsn_code = findViewById(R.id.txt_hsn);
+
         product_name = findViewById(R.id.txt_name);
-        quantity = findViewById(R.id.txt_quantity);
         sale_rate = findViewById(R.id.txt_sale);
-        final_rate = findViewById(R.id.final_rate);
+//        final_rate = findViewById(R.id.final_rate);
 
         in_ = findViewById(R.id.radio_default);
         ex_ = findViewById(R.id.radio_ex);
@@ -92,7 +95,28 @@ public class ProductActivity extends AppCompatActivity {
         //incrementation preference declaration
         incrementPref = new IncrementPref(this);
 
-        cess.addTextChangedListener(new TextWatcher() {
+//        cess.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                if (s.length() != 0) {
+//                    calculateCess(s);
+//                } else {
+//                    cess.setText("");
+//                }
+//            }
+//        });
+
+        cgst.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -106,139 +130,97 @@ public class ProductActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() != 0) {
-                    calculateCess(s);
+                    sgst.setText(s);
+//                    calculateTax(s);
                 } else {
-                    cess.setText("");
+                    cgst.setText("");
+                    sgst.setText("");
                 }
             }
         });
 
-        tax.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//        ex.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                Log.i(TAG, "onCheckedChanged: ");
+//
+////                cgst.setText("");
+////                sgst.setText("");
+////                cess.setText("");
+////                if (in_.isChecked())
+////                {
+////
+////                }
+////                else
+////                {
+////
+////                }
+//            }
+//        });
 
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                Log.i(TAG, "onCheckedChanged: " + checkedId);
-                switch (checkedId) {
-                    case 6:
-                        if (validate()) {
-                            cgst.setText("1.5");
-                            sgst.setText("1.5");
-                            calculateTax("1.5");
-
-
-                        } else {
-                            Toast.makeText(ProductActivity.this, "Please enter the previous values", Toast.LENGTH_SHORT).show();
-                        }
-                        break;
-                    case 7:
-                        if (validate()) {
-                            cgst.setText("2.5");
-                            sgst.setText("2.5");
-                            calculateTax("2.5");
-
-                        } else {
-                            Toast.makeText(ProductActivity.this, "Please enter the previous values", Toast.LENGTH_SHORT).show();
-                        }
-                        break;
-                    case 8:
-                        if (validate()) {
-                            cgst.setText("6");
-                            sgst.setText("6");
-                            calculateTax("6");
-
-                        } else {
-                            Toast.makeText(ProductActivity.this, "Please enter the previous values", Toast.LENGTH_SHORT).show();
-                        }
-                        break;
-                    case 9:
-                        if (validate()) {
-                            cgst.setText("9");
-                            sgst.setText("9");
-                            calculateTax("9");
-
-                        } else {
-                            Toast.makeText(ProductActivity.this, "Please enter the previous values", Toast.LENGTH_SHORT).show();
-                        }
-                        break;
-                    case 10:
-                        if (validate()) {
-                            cgst.setText("14");
-                            sgst.setText("14");
-                            calculateTax("14");
-                        } else {
-                            Toast.makeText(ProductActivity.this, "Please enter the previous values", Toast.LENGTH_SHORT).show();
-                        }
-                        break;
-                }
-            }
-        });
     }
 
-    private void calculateTax(String s) {
-
-        double gst = Double.parseDouble(s) * 2;
-        double sale_r = Integer.parseInt(sale_rate.getText().toString().trim());
-
-        //calulate GST
-        if (in_.isChecked()) {
-
-            double in_gst = gst + 100;
-            double av_val = sale_r * (100 / in_gst);//it gives the actual value without GST
-            double gst_val = (av_val * gst) / 100;//calculating the the tax
-
-            av_val = roundDecimals(av_val);
-            gst_val = roundDecimals(gst_val);
-
-            Log.i(TAG, "calculateTax: av: " + av_val + "   gst: " + gst_val);
-
-            amount = av_val + gst_val;
-
-            Log.i(TAG, "calculateTax: amount: " + Math.round(amount));
-        } else {
-            sale_r = (sale_r * (gst / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
-
-            amount = roundDecimals(sale_r);
-
-        }
-
-        final_rate.setText(String.valueOf(Math.round(amount)));
-        amount = 0.0;
-    }
-
-    private void calculateCess(CharSequence s) {
-
-        double cess = Double.parseDouble(String.valueOf(s));
-        double gst = Double.parseDouble(cgst.getText().toString().trim()) * 2;
-
-        double taxval = cess + gst;
-
-        double sale_r = Integer.parseInt(sale_rate.getText().toString().trim());
-
-        Log.i(TAG, "calculateCess: " + cess);
-
-        //calulate GST
-        if (in_.isChecked()) {
-
-            double in_gst = taxval + 100;
-            double av_val = sale_r * (100 / in_gst);//it gives the actual value without GST
-            double gst_val = (av_val * taxval) / 100;//calculating the the tax
-
-            av_val = roundDecimals(av_val);
-            gst_val = roundDecimals(gst_val);
-
-            Log.i(TAG, "calculateTax: av: "+av_val+"   gst: "+gst_val);
-            amount = av_val + gst_val;
-
-            Log.i(TAG, "calculateTax: amount: "+amount);
-        } else {
-            sale_r = (sale_r * (taxval / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
-            amount = roundDecimals(sale_r);
-        }
-
-        final_rate.setText(String.valueOf(Math.round(amount)));
-        amount = 0.0;
-    }
+//    private void calculateTax(CharSequence s) {
+//
+//        double gst = Double.parseDouble(String.valueOf(s)) * 2;
+//        double sale_r = Double.parseDouble(sale_rate.getText().toString().trim());
+//
+//        //calulate GST
+//        if (in_.isChecked()) {
+//
+//            double in_gst = gst + 100;
+//            double av_val = sale_r * (100 / in_gst);//it gives the actual value without GST
+//            double gst_val = (av_val * gst) / 100;//calculating the the tax
+//
+//            av_val = roundDecimals(av_val);
+//            gst_val = roundDecimals(gst_val);
+//
+//            Log.i(TAG, "calculateTax: av: " + av_val + "   gst: " + gst_val);
+//            amount = av_val + gst_val;
+//            Log.i(TAG, "calculateTax: amount: " + Math.round(amount));
+//
+//        } else {
+//            sale_r = (sale_r * (gst / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
+//            amount = roundDecimals(sale_r);
+//        }
+//
+////        final_rate.setText(String.valueOf(Math.round(amount)));
+//        amount = 0.0;
+//    }
+//
+//    private void calculateCess(CharSequence s) {
+//
+//        double cess = Double.parseDouble(String.valueOf(s));
+//        double gst = Double.parseDouble(cgst.getText().toString().trim()) * 2;
+//
+//        double taxval = cess + gst;
+//
+//        double sale_r = Double.parseDouble(sale_rate.getText().toString().trim());
+//
+//        Log.i(TAG, "calculateCess: " + cess);
+//
+//        //calulate GST
+//        if (in_.isChecked()) {
+//
+//            double in_gst = taxval + 100;
+//            double av_val = sale_r * (100 / in_gst);//it gives the actual value without GST
+//            double gst_val = (av_val * taxval) / 100;//calculating the the tax
+//
+//            av_val = roundDecimals(av_val);
+//            gst_val = roundDecimals(gst_val);
+//
+//            Log.i(TAG, "calculateTax: av: " + av_val + "   gst: " + gst_val);
+//            amount = av_val + gst_val;
+//
+//            Log.i(TAG, "calculateTax: amount: " + amount);
+//        } else {
+//            sale_r = (sale_r * (taxval / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
+//            amount = roundDecimals(sale_r);
+//        }
+//
+////        final_rate.setText(String.valueOf(Math.round(amount)));
+//        amount = 0.0;
+//    }
 
     double roundDecimals(double d) {
         DecimalFormat twoDForm = new DecimalFormat("#.###");
@@ -247,90 +229,81 @@ public class ProductActivity extends AppCompatActivity {
 
     public void add_product(View view) {
 
-        try
-        {
-            Log.i(TAG, "uploadImage_fire: " + getFileExtension(final_uri));
-            final StorageReference riversRef = storageRef.child("ProductImage/" + product_name.getText().toString().trim());
+        if (validate()) {
+            try {
+                Log.i(TAG, "uploadImage_fire: " + getFileExtension(final_uri));
+                final StorageReference riversRef = storageRef.child("ProductImage/" + product_name.getText().toString().trim());
 
-            assert final_uri != null;
+                assert final_uri != null;
 
-            riversRef.putFile(final_uri).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle unsuccessful uploads
-                    Log.i(TAG, "onFailure: " + exception.getMessage());
-                }
-            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    riversRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Log.i(TAG, "onSuccess: " + uri.toString());
-                            imageUri = uri;
-                            //Firebase functionality
-                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Product");
+                riversRef.putFile(final_uri).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        Log.i(TAG, "onFailure: " + exception.getMessage());
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        riversRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Log.i(TAG, "onSuccess: " + uri.toString());
+                                imageUri = uri;
+                                //Firebase functionality
+                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Product");
 
-                            final String newKey = incrementPref.getProductId();
+                                final String newKey = incrementPref.getProductId();
 
-                            HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("product_id", newKey);
-                            hashMap.put("img_url", String.valueOf(imageUri));
-                            hashMap.put("product_name", product_name.getText().toString().trim());
-                            hashMap.put("quantity", quantity.getText().toString().trim());
-                            hashMap.put("sale_rate", sale_rate.getText().toString().trim());
-                            hashMap.put("date_added", getDate());
-                            hashMap.put("cgst_sgst", cgst.getText().toString().trim());
-                            hashMap.put("cess", cess.getText().toString().trim());
-                            hashMap.put("in_ex", in_.isChecked() ? "inc" : "exc");
-                            hashMap.put("unit", "0");
+                                HashMap<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("product_id", newKey);
+                                hashMap.put("img_url", String.valueOf(imageUri));
+                                hashMap.put("product_name", product_name.getText().toString().trim());
+                                hashMap.put("sale_rate", sale_rate.getText().toString().trim());
+                                hashMap.put("purchase_rate", purchase_rate.getText().toString().trim());
+                                hashMap.put("hsn_code", hsn_code.getText().toString().trim());
+                                hashMap.put("date_added", getDate());
+                                hashMap.put("cgst_sgst", cgst.getText().toString().trim());
+                                hashMap.put("cess", cess.getText().toString().trim());
+                                hashMap.put("in_ex", in_.isChecked() ? "inc" : "exc");
+                                hashMap.put("unit", "0");
 
-                            Log.i(TAG, "addProduct: " + hashMap.toString());
-                            reference.child(newKey).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    Log.i(TAG, "onComplete: " + task.toString());
+                                Log.i(TAG, "addProduct: " + hashMap.toString());
+                                reference.child(newKey).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        Log.i(TAG, "onComplete: " + task.toString());
 
-                                    //  product_name.setText("");
-                                    //  quantity.setText("");
-                                    //  sale_rate.setText("");
-                                    //  cgst.setText("");
-                                    //  cess.setText("");
-                                    //  final_rate.setText("");
-                                    //  imageView.setImageBitmap(null);
+                                        //Updating product ID
+                                        incrementPref.setProductID(String.valueOf(Integer.parseInt(newKey) + 1));
 
-                                    //Updating product ID
-                                    incrementPref.setProductID(String.valueOf(Integer.parseInt(newKey) + 1));
-
-                                    Toast.makeText(ProductActivity.this, "Product added successfully", Toast.LENGTH_SHORT).show();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.i(TAG, "onFailure: " + e.toString());
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        }
-        catch(Exception e)
-        {
-            Toast.makeText(this, "Please check all the values", Toast.LENGTH_SHORT).show();
-            Log.i(TAG, "Exception: "+e.toString());
+                                        Toast.makeText(ProductActivity.this, "Product added successfully", Toast.LENGTH_SHORT).show();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.i(TAG, "onFailure: " + e.toString());
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            } catch (Exception e) {
+                Toast.makeText(this, "Please check all the values", Toast.LENGTH_SHORT).show();
+                Log.i(TAG, "Exception: " + e.toString());
+            }
         }
     }
 
-    public String IdFormattor(String string) {
-        string = string.toLowerCase();
-        string = string.replaceAll("-", "_");
-        return string;
-    }
+//    public String IdFormattor(String string) {
+//        string = string.toLowerCase();
+//        string = string.replaceAll("-", "_");
+//        return string;
+//    }
 
     public String getDate() {
         Date c = Calendar.getInstance().getTime();
-
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat df = new SimpleDateFormat(getString(R.string.date_format));
 
@@ -342,14 +315,41 @@ public class ProductActivity extends AppCompatActivity {
     }
 
     public boolean validate() {
+        if (final_uri == null) {
+            Toast.makeText(this, "Photo required", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         if (product_name.getText().toString().trim().equals("")) {
+            product_name.setError("Required");
             return false;
-        } else if (quantity.getText().toString().trim().equals("")) {
+        }
+        if (hsn_code.getText().toString().trim().equals("")) {
+            hsn_code.setError("Required"); 
             return false;
-        } else return !sale_rate.getText().toString().equals("");
-
+        }
+        if (sale_rate.getText().toString().equals("")) {
+            sale_rate.setError("Required"); 
+            return false;
+        }
+        if (purchase_rate.getText().toString().trim().equals("")) {
+            purchase_rate.setError("Required"); 
+            return false;
+        }
+        if (!in_.isChecked() && !ex_.isChecked())
+        {
+            Toast.makeText(this, "Select tax type", Toast.LENGTH_SHORT).show(); 
+            return false;
+        }
+        if (cgst.getText().toString().trim().equals("") || sgst.getText().toString().trim().equals("") || cess.getText().toString().trim().equals("") )
+        {
+            Toast.makeText(this, "GST Percentage required", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        
+        return true;
     }
 
+    //final_uri
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -383,7 +383,6 @@ public class ProductActivity extends AppCompatActivity {
 
             try {
                 if (resultCode == RESULT_OK) {
-                    Uri resultUri = null;
                     if (result != null) {
                         resultUri = result.getUri();
                     }

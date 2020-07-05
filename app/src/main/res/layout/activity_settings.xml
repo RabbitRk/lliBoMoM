@@ -70,18 +70,21 @@
             <TextView
                 style="@style/viewParent.headerText.settingsTextIcon"
                 android:drawableStart="@drawable/ic_image"
+                android:onClick="updateLogo"
                 android:text="Update Logo" />
 
             <TextView
                 style="@style/viewParent.headerText.settingsTextIcon"
                 android:drawableStart="@drawable/ic_mail"
                 android:drawableTint="@color/colorPrimaryDark"
+                android:onClick="updateEmail"
                 android:text="Update Email" />
 
             <TextView
                 style="@style/viewParent.headerText.settingsTextIcon"
                 android:drawableStart="@drawable/ic_call"
                 android:drawableTint="@color/colorPrimaryDark"
+                android:onClick="updatePhone"
                 android:text="Update Phone" />
 
             <TextView
@@ -106,6 +109,7 @@
             <TextView
                 style="@style/viewParent.headerText.settingsTextIcon"
                 android:drawableStart="@drawable/ic_pen"
+                android:onClick="getSign"
                 android:text="Signature" />
 
 

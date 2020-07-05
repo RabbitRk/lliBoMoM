@@ -146,10 +146,10 @@
             android:layout_marginTop="10dp"
             android:layout_width="150dp"
             app:cardBackgroundColor="@color/colorPrimary"
-
             android:layout_height="100dp">
+
             <TextView
-                android:text="Settings"
+                android:text="Orders"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:padding="10dp"

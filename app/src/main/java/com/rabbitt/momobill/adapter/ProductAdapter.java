@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,7 +44,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.holder> 
 
         Product dataModel = dataModelArrayList.get(position);
         holder.product_name.setText(dataModel.getProduct_name());
-        holder.quantity.setText("Quantity: " + dataModel.getQuantity() + " ml");
         holder.units.setText("Units: " + dataModel.getUnit());
         holder.price.setText("Price: Rs. " + dataModel.getSale_rate());
 
@@ -60,21 +60,30 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.holder> 
 
     public class holder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView product_name, quantity, units, price;
+        TextView product_name, units, price;
         ImageView image;
         OnRecyleItemListener onRecyleItemListener;
+        Button editBtn;
 
-        public holder(@NonNull View itemView, OnRecyleItemListener onRecyleItemListener) {
+        public holder(@NonNull View itemView, final OnRecyleItemListener onRecyleItemListener) {
             super(itemView);
             this.onRecyleItemListener = onRecyleItemListener;
 
-            product_name = itemView.findViewById(R.id.txt_pro_name);
-            quantity = itemView.findViewById(R.id.txt_quantity);
+            product_name = itemView.findViewById(R.id.txt_prodd_name);
             units = itemView.findViewById(R.id.txt_units);
             price = itemView.findViewById(R.id.txt_price);
 
+            editBtn = itemView.findViewById(R.id.pro_edit);
+
             image = itemView.findViewById(R.id.image_taken);
             itemView.setOnClickListener(this);
+
+            editBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onRecyleItemListener.OnEditClick(getAdapterPosition());
+                }
+            });
         }
 
         @Override
@@ -85,6 +94,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.holder> 
 
     public interface OnRecyleItemListener {
         void OnItemClick(int position);
+        void OnEditClick(int position);
     }
 
     public void filterList(List<Product> filterdNames) {
