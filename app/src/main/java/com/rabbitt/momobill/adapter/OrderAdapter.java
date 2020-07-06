@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.rabbitt.momobill.R;
@@ -42,17 +41,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.holder> {
 
         ProductInvoice dataModel = dataModelArrayList.get(position);
 
-        holder.product_name.setText(dataModel.getProduct_name()+"-"+dataModel.getQuantity() + " ml");
-//        holder.quantity.setText(dataModel.getQuantity() + " ml");
+        holder.product_name.setText(dataModel.getProduct_name());
         holder.units.setText(dataModel.getUnit());
         holder.price.setText(dataModel.getSale_rate());
         holder.cess.setText(dataModel.getCess());
         holder.cgst.setText(dataModel.getCgst());
-
-        //      Load image
-        //      Glide.with(context)
-        //           .load(dataModel.getImg_url())
-        //           .into(holder.image);
 
     }
 
@@ -63,7 +56,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.holder> {
 
     public class holder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView product_name, quantity, units, price, cess, cgst;
+        TextView product_name, units, price, cess, cgst;
         OnRecyleItemListener onRecyleItemListener;
 
         public holder(@NonNull View itemView, OnRecyleItemListener onRecyleItemListener) {
@@ -71,7 +64,6 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.holder> {
             this.onRecyleItemListener = onRecyleItemListener;
 
             product_name = itemView.findViewById(R.id.txt_product);
-//            quantity = itemView.findViewById(R.id.txt_quantity);
             units = itemView.findViewById(R.id.txt_units);
             price = itemView.findViewById(R.id.txt_price);
             cess = itemView.findViewById(R.id.tax_cess);

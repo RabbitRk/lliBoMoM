@@ -1,2 +1,3 @@
+include ':poi-3.7'
 include ':app'
 rootProject.name = "MomoBill"

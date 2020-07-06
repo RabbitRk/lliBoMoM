@@ -6,14 +6,6 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -27,9 +19,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -42,16 +38,14 @@ import com.rabbitt.momobill.adapter.CartSheet;
 import com.rabbitt.momobill.adapter.GridSpacingItemDecoration;
 import com.rabbitt.momobill.adapter.InvoicePAdapter;
 import com.rabbitt.momobill.model.ProductInvoice;
-import com.rabbitt.momobill.prefsManager.IncrementPref;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
-public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemListener, CartSheet.cartDelete, View.OnClickListener {
+public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemListener, View.OnClickListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -70,8 +64,6 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
     final ArrayList<String> clients = new ArrayList<>();
     final ArrayList<String> client_id = new ArrayList<>();
 
-    private DatePicker datePicker;
-    private Calendar calendar;
     private int mYear, mMonth, mDay, mHour, mMinute;
     private EditText dateTxt;
     public OrderFrag() {
@@ -132,7 +124,6 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
 
                     String img_url = snapshot.child("img_url").getValue(String.class);
                     String product_name = snapshot.child("product_name").getValue(String.class);
-                    String quantity = snapshot.child("quantity").getValue(String.class);
                     String sale_rate = snapshot.child("sale_rate").getValue(String.class);
                     String unit = snapshot.child("unit").getValue(String.class);
                     String product_id = snapshot.child("product_id").getValue(String.class);
@@ -143,7 +134,6 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     ProductInvoice product = new ProductInvoice();
                     product.setImg_url(img_url);
                     product.setProduct_name(product_name);
-                    product.setQuantity(quantity);
                     product.setSale_rate(sale_rate);
                     product.setUnit(unit);
                     product.setProduct_id(product_id);
@@ -246,12 +236,11 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
 
         String product_id = model.getProduct_id();
         String unit = model.getUnit();
-        String quantity = model.getQuantity();
         String name = model.getProduct_name();
 
-        Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  " + quantity + "  " + name);
+        Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  " + name);
 
-        openDialog(model, unit, quantity, name, product_id);
+        openDialog(model, unit, "quantity", name, product_id);
     }
 
     @SuppressLint("SetTextI18n")
@@ -262,11 +251,9 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
         dialog.setCancelable(true);
 
         TextView name = dialog.findViewById(R.id.text);
-        TextView quanitiy = dialog.findViewById(R.id.dia_quantity);
         final EditText units = dialog.findViewById(R.id.units);
 
         name.setText(name_);
-        quanitiy.setText(quantity + " ml");
 
         Button dialogButton = dialog.findViewById(R.id.ok_button);
         dialogButton.setOnClickListener(new View.OnClickListener() {
@@ -280,7 +267,6 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     double sale_ = Double.parseDouble(model.getSale_rate()) * Double.parseDouble(units.getText().toString().trim());
                     ProductInvoice product = new ProductInvoice();
                     product.setProduct_name(model.getProduct_name());
-                    product.setQuantity(model.getQuantity());
                     product.setSale_rate(String.valueOf(sale_));
                     product.setUnit(units.getText().toString().trim());
                     product.setProduct_id(model.getProduct_id());
@@ -315,11 +301,6 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
     }
 
     @Override
-    public void OnDelete(int position) {
-        cart.clear();
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId())
         {
@@ -339,7 +320,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     }
                     else
                     {
-                        CartSheet cartSheet = new CartSheet(cart, this, this, this, "order", client_id.get(spinner.getSelectedIndex()), dateTxt.getText().toString(), getContext());
+                        CartSheet cartSheet = new CartSheet(cart, this,  this, "order", client_id.get(spinner.getSelectedIndex()), dateTxt.getText().toString(), getContext());
                         cartSheet.show(getParentFragmentManager(), "cart");
                     }
                 }

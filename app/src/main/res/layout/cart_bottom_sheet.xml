@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -10,11 +11,20 @@
     app:behavior_peekHeight="120dp"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
+    <TextView
+        android:id="@+id/txt_shop_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Products in the cart"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:layout_margin="10dp"
+        android:textStyle="bold" />
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorAccent"
-        android:layout_marginTop="10dp"
         android:shrinkColumns="*"
         android:stretchColumns="*">
 
@@ -25,35 +35,27 @@
 
             <TextView
                 android:id="@+id/txt_product"
-                android:text="Product"
-                style="@style/textCart"/>
-
-            <TextView
-                android:id="@+id/txt_quantity"
-                android:text="Quan."
-                style="@style/textCart"/>
-
+                style="@style/textCart"
+                android:text="Product" />
             <TextView
                 android:id="@+id/txt_units"
                 style="@style/textCart"
-                android:text="Units"
-                />
+                android:text="Units" />
 
             <TextView
                 android:id="@+id/txt_tax"
-                android:text="GST"
-                style="@style/textCart"/>
+                style="@style/textCart"
+                android:text="GST" />
 
             <TextView
                 android:id="@+id/tax_cess"
-                android:text="CESS"
-                style="@style/textCart"/>
+                style="@style/textCart"
+                android:text="CESS" />
 
             <TextView
                 android:id="@+id/txt_price"
                 style="@style/textCart"
-                android:text="Price"
-                />
+                android:text="Price" />
 
         </TableRow>
 
@@ -62,42 +64,46 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_cart"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/ok_button"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/btn_bg"
-        android:backgroundTint="@color/colorPrimary"
-        android:drawablePadding="0dp"
-        android:gravity="center"
-        android:minWidth="150dp"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:text="Create Invoice"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white" />
-    <Button
-        android:id="@+id/clear_data"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:layout_marginEnd="30dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/btn_bg"
-        android:backgroundTint="@color/red_active"
-        android:drawablePadding="0dp"
-        android:gravity="center"
-        android:minWidth="150dp"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:text="Clear"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white" />
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/clear_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/btn_bg"
+            android:backgroundTint="@color/red_active"
+            android:drawablePadding="0dp"
+            android:gravity="center"
+            android:text="Clear"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:id="@+id/ok_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/btn_bg"
+            android:backgroundTint="@color/colorPrimary"
+            android:drawablePadding="0dp"
+            android:gravity="center"
+            android:layout_weight="4"
+            android:layout_margin="5dp"
+            android:text="Create Invoice"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            tools:ignore="ButtonStyle" />
+    </LinearLayout>
 </LinearLayout>

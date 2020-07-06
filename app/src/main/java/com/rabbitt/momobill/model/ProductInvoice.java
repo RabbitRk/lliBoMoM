@@ -4,7 +4,6 @@ public class ProductInvoice {
 
     String img_url;
     String product_name;
-    String quantity;
     String sale_rate;
     String unit;
     String product_id;
@@ -58,14 +57,6 @@ public class ProductInvoice {
 
     public void setProduct_name(String product_name) {
         this.product_name = product_name;
-    }
-
-    public String getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(String quantity) {
-        this.quantity = quantity;
     }
 
     public String getSale_rate() {

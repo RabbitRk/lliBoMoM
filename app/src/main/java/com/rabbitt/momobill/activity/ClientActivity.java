@@ -6,23 +6,37 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
+import com.rabbitt.momobill.adapter.LineAdapter;
+import com.rabbitt.momobill.model.Line;
 import com.rabbitt.momobill.prefsManager.IncrementPref;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ClientActivity extends AppCompatActivity {
 
     private static final String TAG = "maluClient";
     EditText name, phone, email, add1, add2, city, state, pincode, gst;
+
+    String[] ar;
+
+    AutoCompleteTextView line;
+    LineAdapter adapter ;
+    ArrayList<Line> linelist;
+    DatabaseReference lineReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +52,41 @@ public class ClientActivity extends AppCompatActivity {
         state = findViewById(R.id.txt_state);
         pincode = findViewById(R.id.txt_pincode);
         gst = findViewById(R.id.txt_gst);
+
+        line = findViewById(R.id.txt_line);
+
+        linelist = new ArrayList<>();
+        line.setEnabled(true);
+        line.setEms(15);
+
+        lineReference = FirebaseDatabase.getInstance().getReference("Line");
+        lineReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                int i = 0;
+                ar = new String[(int) dataSnapshot.getChildrenCount()];
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+
+                    ar[i] = child.getKey();
+
+                    //Updates to Customer on every single changes
+                    linelist.add(new Line(ar[i]));
+                    adapter = new LineAdapter(ClientActivity.this, linelist);
+                    line.setAdapter(adapter);
+                    i++;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
+
 
     public void add_client(View view) {
         if (validate()) {
@@ -60,7 +108,28 @@ public class ClientActivity extends AppCompatActivity {
             hashMap.put("city", city.getText().toString().trim());
             hashMap.put("state", state.getText().toString().trim());
             hashMap.put("pincode", pincode.getText().toString().trim());
+            hashMap.put("line", line.getText().toString().trim());
             hashMap.put("gst", gst.getText().toString().trim());
+
+
+            lineReference.child(line.getText().toString().trim()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    int lastkey = -1;
+                    for(DataSnapshot child : dataSnapshot.getChildren())
+                    {
+                        lastkey = Integer.parseInt(child.getKey());
+                    }
+                    lastkey++;
+                    lineReference.child(line.getText().toString().trim()).child(String.valueOf(lastkey)).setValue(name.getText().toString().trim());
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
 
             Log.i(TAG, "addClient: " + hashMap.toString());
 
@@ -73,6 +142,7 @@ public class ClientActivity extends AppCompatActivity {
                     email.setText("");
                     add1.setText("");
                     add2.setText("");
+                    line.setText("");
                     city.setText("");
                     state.setText("");
                     pincode.setText("");

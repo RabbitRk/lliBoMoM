@@ -57,7 +57,6 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     private List<ProductInvoice> data;
     private CartAdapter productAdapter;
     private Fragment invoiceFrag;
-    private cartDelete cartDelete;
     private Button button, clear;
     private String btn_val;
     private String client_id;
@@ -65,10 +64,9 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     Context context;
     View v;
 
-    public CartSheet(List<ProductInvoice> data, Fragment invoiceFrag, Fragment frag, cartDelete cartDelete, String value, String order, String s, Context context) {
+    public CartSheet(List<ProductInvoice> data, Fragment invoiceFrag, Fragment frag, String value, String order, String s, Context context) {
         this.data = data;
         this.invoiceFrag = invoiceFrag;
-        this.cartDelete = cartDelete;
         this.btn_val = value;
         this.client_id = order;
         this.date_of = s;
@@ -114,41 +112,103 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         Log.i(TAG, "OnItemClick: " + data.size());
         ProductInvoice model = data.get(position);
 
-//        String product_id = model.getProduct_id();
-//        String unit = model.getUnit();
-        String quantity = model.getQuantity();
+        String unit = model.getUnit();
         String name = model.getProduct_name();
 
-        Log.i(TAG, "OnItemClick: " + quantity + "  " + name);
+        Log.i(TAG, "OnItemClick: " + unit + "  " + name);
 
-//        openDialog(position, quantity, name);
-//        final Dialog dialog = new Dialog(getActivity());
-//        dialog.setContentView(R.layout.invoice_dialog);
-//        dialog.setCancelable(true);
+        editDialog(position, unit, name);
 
     }
+
+    private void editDialog(final int position, final String unit, String name) {
+
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.cart_edit_dialog);
+        dialog.setCancelable(true);
+
+        TextView credit = dialog.findViewById(R.id.text);
+        final EditText paid = dialog.findViewById(R.id.units);
+
+        credit.setText(name);
+
+        paid.setText(unit);
+
+        Button dialogButton = dialog.findViewById(R.id.ok_button);
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "onClick: ok");
+                if (paid.getText().toString().equals("") || paid.getText().toString().equals("0")) {
+                    Toast.makeText(context, "Please enter the unit properly", Toast.LENGTH_SHORT).show();
+                }
+
+                try
+                {
+                    ProductInvoice model = data.get(position);
+                    double amount = Double.parseDouble(model.getSale_rate()) * Double.parseDouble(paid.getText().toString());
+
+                    model.setUnit(paid.getText().toString());
+                    model.setSale_rate(String.valueOf(amount));
+
+                    data.set(position, model);
+                    productAdapter.notifyDataSetChanged();
+                    dialog.dismiss();
+                }
+                catch(Exception e)
+                {
+                    Log.i(TAG, "Exception: "+e.getMessage()+e.toString());
+                }
+
+
+            }
+        });
+
+        Button delButton = dialog.findViewById(R.id.delete_button);
+        delButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "onClick: del");
+
+                try {
+                    data.remove(position);
+                    productAdapter.notifyDataSetChanged();
+//                    productAdapter.notifyItemRemoved(position);
+//                    productAdapter.notifyItemRangeChanged(position, data.size());
+                    dialog.dismiss();
+                } catch (Exception e) {
+                    Log.i(TAG, "Exception: " + e.getMessage() + e.toString());
+                }
+
+            }
+
+        });
+
+        try {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
+        } catch (WindowManager.BadTokenException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     private void createOrder() {
 
         final ProgressDialog dialog = ProgressDialog.show(getActivity(), "Collecting Information", "Please wait...", false, true);
 
-        HashMap<String, Object> hashMap = new HashMap<>();
+        HashMap<String, Object> pro = new HashMap<>();
 
-        hashMap.put("client_id", client_id);
 
         for (ProductInvoice pv : data) {
-            HashMap<String, Object> pro = new HashMap<>();
             Log.i(TAG, "updateFirebase: " + pv.getProduct_id());
             pro.put("product_id", pv.getProduct_id());
             pro.put("product_name", pv.getProduct_name());
-            pro.put("quantity", pv.getQuantity());
             pro.put("sale_rate", pv.getSale_rate());
             pro.put("unit", pv.getUnit());
             pro.put("cgst", pv.getCgst());
             pro.put("cess", pv.getCess());
             pro.put("in_ex", pv.getIn());
-
-            hashMap.put(pv.getProduct_id(), pro);
         }
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Order");
@@ -156,8 +216,8 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         IncrementPref pref = new IncrementPref(getActivity());
         String order_num = pref.getOrderId();
 
-        Log.i(TAG, "addProduct: " + hashMap.toString());
-        reference.child(date_of).child(client_id).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+        Log.i(TAG, "addProduct: " + pro.toString());
+        reference.child(date_of).child(client_id).updateChildren(pro).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Log.i(TAG, "onComplete: " + task.toString());
@@ -326,7 +386,6 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                         Log.i(TAG, "updateFirebase: " + pv.getProduct_id());
                         pro.put("product_id", pv.getProduct_id());
                         pro.put("product_name", pv.getProduct_name());
-                        pro.put("quantity", pv.getQuantity());
                         pro.put("sale_rate", pv.getSale_rate());
                         pro.put("unit", pv.getUnit());
                         pro.put("cgst", pv.getCgst());
@@ -346,7 +405,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                             Toast.makeText(getActivity(), "Invoice created successfully", Toast.LENGTH_SHORT).show();
                             pref.setInvoiceId(String.valueOf(Integer.parseInt(invoice) + 1));
                             reduceCount(data);
-                          generateInvoice();
+                            generateInvoice();
                             dialog.dismiss();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -524,7 +583,4 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         createOrder();
     }
 
-    public interface cartDelete {
-        void OnDelete(int position);
-    }
 }

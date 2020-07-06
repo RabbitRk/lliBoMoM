@@ -61,12 +61,11 @@ public class LiveReport extends AppCompatActivity implements LiveAdapter.OnRecyl
                     int _sale = 0;
                     String product_name = snapshot.child("product_name").getValue(String.class);
                     String unit = snapshot.child("unit").getValue(String.class);
-                    String quantity = snapshot.child("quantity").getValue(String.class);
                     String sale = snapshot.child("sale").getValue(String.class);
 
                     //Updating modal
                     Opening product = new Opening();
-                    product.setProduct_name(product_name+" "+quantity+" ml");
+                    product.setProduct_name(product_name);
                     product.setUnit(unit);
 
                     if (sale!=null)

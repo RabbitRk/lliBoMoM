@@ -1,18 +1,41 @@
 package com.rabbitt.momobill.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
+import com.rabbitt.momobill.activity.CheckOrderActivity;
 import com.rabbitt.momobill.activity.OpeningActivity;
 import com.rabbitt.momobill.activity.SettingsActivity;
+
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DashFrag extends Fragment implements View.OnClickListener {
 
@@ -23,6 +46,10 @@ public class DashFrag extends Fragment implements View.OnClickListener {
     private String mParam2;
 
     CardView today, month, invoice, credit;
+
+    static ArrayList<String> namelist, gstinlist, datelist, basicvallist, taxlist, cesslist;
+
+    public static DatabaseReference myRef, clientRef, productRef;
 
     public DashFrag() {
         // Required empty public constructor
@@ -52,6 +79,18 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         View inflate = inflater.inflate(R.layout.fragment_dash, container, false);
         init(inflate);
+
+        namelist = new ArrayList<String>();
+        datelist = new ArrayList<String>();
+        gstinlist = new ArrayList<String>();
+        basicvallist = new ArrayList<String>();
+        taxlist = new ArrayList<String>();
+        cesslist = new ArrayList<String>();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("Order");
+        clientRef = database.getReference("Client");
+        productRef = database.getReference("Product");
+
         return inflate;
     }
 
@@ -69,21 +108,267 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        switch (v.getId())
-        {
+        switch (v.getId()) {
             case R.id.txt_today:
                 startActivity(new Intent(getActivity(), OpeningActivity.class));
                 break;
             case R.id.txt_month:
-//                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                startActivity(new Intent(getActivity(), CheckOrderActivity.class));
                 break;
             case R.id.txt_credit:
+                populateList();
 //                startActivity(new Intent(getActivity(), SettingsActivity.class));
                 break;
             case R.id.txt_invoice:
 //                startActivity(new Intent(getActivity(), SettingsActivity.class));
                 break;
         }
+    }
+
+
+    private void populateList() {
+
+        namelist.clear();
+        datelist.clear();
+        gstinlist.clear();
+        basicvallist.clear();
+        taxlist.clear();
+        cesslist.clear();
+
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                String date, productId;
+
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    final String fdate;
+                    date = child.getKey().trim();
+                    String dd, mm, yy;
+                    yy = date.substring(0, date.indexOf("_"));
+                    date = date.substring(date.indexOf("_") + 1);
+                    mm = date.substring(0, date.indexOf("_"));
+                    date = date.substring(date.indexOf("_") + 1);
+                    dd = date;
+
+
+                    fdate = dd + "-" + mm + "-" + yy;
+//                    datelist.add(date);
+
+                    Log.i("iteration", "1");
+                    for (DataSnapshot clientChild : child.getChildren()) {
+
+
+                        final String clientId = clientChild.getKey();
+                        Log.i("iteration", "2");
+                        for (DataSnapshot productChild : clientChild.getChildren()) {
+
+                            productId = productChild.getKey();
+
+
+                            Log.i("iteration", "3");
+
+                            if (productChild.hasChildren()) {
+
+                                final String basicval = productChild.child("sale_rate").getValue().toString();
+
+                                final String tax = productChild.child("cgst").getValue().toString();
+
+                                final String cess = productChild.child("cess").getValue().toString();
+
+
+                                clientRef.child(clientId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                        String gstin = dataSnapshot.child("gst").getValue().toString();
+
+                                        String name = dataSnapshot.child("name").getValue().toString();
+                                        Log.i("clientid", name);
+                                        gstinlist.add(gstin);
+                                        namelist.add(name);
+                                        datelist.add(fdate);
+                                        basicvallist.add(basicval);
+                                        taxlist.add(tax);
+                                        cesslist.add(cess);
+                                        saveExcelFile(getContext(), "myExcel.xls");
+
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+
+            }
+
+        });
+
+
+    }
+
+    private static boolean saveExcelFile(Context context, String fileName) {
+
+        // check if available and not read only
+//        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
+////            Log.e(TAG, "Storage not available or read only");
+//            return false;
+//        }
+
+        boolean success = false;
+
+        //New Workbook
+        Workbook wb = new HSSFWorkbook();
+
+        Cell c = null;
+
+
+        //New Sheet
+        final Sheet sheet1 = wb.createSheet("Orders");
+
+
+        // Generate column headings
+        final Row row = sheet1.createRow(0);
+
+
+        c = row.createCell(0);
+        c.setCellValue("Company Name");
+//        c.setCellStyle(cs);
+
+        c = row.createCell(1);
+        c.setCellValue("Export Date");
+//        c.setCellStyle(cs);
+
+        c = row.createCell(2);
+        c.setCellValue("GSTIN");
+//        c.setCellStyle(cs);
+
+        c = row.createCell(3);
+        c.setCellValue("Name");
+//        c.setCellStyle(cs);
+
+        c = row.createCell(4);
+        c.setCellValue("Inv No");
+
+        c = row.createCell(5);
+        c.setCellValue("Date");
+
+        c = row.createCell(6);
+        c.setCellValue("Basic Value");
+
+        c = row.createCell(7);
+        c.setCellValue("Tax");
+
+        c = row.createCell(8);
+        c.setCellValue("IGST");
+
+        c = row.createCell(9);
+        c.setCellValue("CGST");
+
+        c = row.createCell(10);
+        c.setCellValue("SGST");
+
+        c = row.createCell(11);
+        c.setCellValue("Cess");
+
+        c = row.createCell(12);
+        c.setCellValue("Total");
+
+        Log.i("clientid", String.valueOf(namelist.size()));
+        for (int i = 1; i <= datelist.size(); i++) {
+
+            Row row1 = sheet1.createRow(i);
+
+            Cell cell = null;
+
+            cell = row1.createCell(0);
+            cell.setCellValue("Santha Agencies");
+
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            String expdate = dateFormat.format(calendar.getTime());
+            cell = row1.createCell(1);
+            cell.setCellValue(expdate);
+
+            cell = row1.createCell(2);
+            cell.setCellValue(gstinlist.get(i - 1));
+
+            cell = row1.createCell(3);
+            cell.setCellValue(namelist.get(i - 1));
+
+            cell = row1.createCell(4);
+            cell.setCellValue(i);
+
+            cell = row1.createCell(5);
+            cell.setCellValue(datelist.get(i - 1));
+
+            cell = row1.createCell(6);
+            cell.setCellValue(basicvallist.get(i - 1));
+
+            cell = row1.createCell(7);
+            cell.setCellValue(taxlist.get(i - 1));
+
+            cell = row1.createCell(8);
+            cell.setCellValue(taxlist.get(i - 1));
+
+            cell = row1.createCell(9);
+            cell.setCellValue(taxlist.get(i - 1));
+
+            cell = row1.createCell(10);
+            cell.setCellValue(taxlist.get(i - 1));
+
+            cell = row1.createCell(11);
+            cell.setCellValue(cesslist.get(i - 1));
+
+            cell = row1.createCell(12);
+            cell.setCellValue(basicvallist.get(i - 1));
+
+        }
+
+
+//        c.setCellStyle(cs);
+
+        sheet1.setColumnWidth(0, (15 * 500));
+        sheet1.setColumnWidth(1, (15 * 500));
+        sheet1.setColumnWidth(2, (15 * 500));
+
+
+        // Create a path where we will place our List of objects on external storage
+        File file = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies", fileName);
+        FileOutputStream os = null;
+
+        try {
+            os = new FileOutputStream(file);
+            wb.write(os);
+            Log.w("FileUtils", "Writing file" + file);
+            success = true;
+        } catch (IOException e) {
+            Log.w("FileUtils", "Error writing " + file, e);
+        } catch (Exception e) {
+            Log.w("FileUtils", "Failed to save file", e);
+        } finally {
+            try {
+                if (null != os)
+                    os.close();
+            } catch (Exception ex) {
+            }
+        }
+
+        return success;
     }
 
 
