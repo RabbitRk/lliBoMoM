@@ -10,6 +10,15 @@ public class ProductInvoice {
     String cgst;
     String cess;
     String in;
+    String single;
+
+    public String getSingle() {
+        return single;
+    }
+
+    public void setSingle(String single) {
+        this.single = single;
+    }
 
     public String getIn() {
         return in;

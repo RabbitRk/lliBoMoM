@@ -7,6 +7,19 @@
     android:orientation="vertical"
     tools:context=".fragment.OrderFrag">
 
+    <AutoCompleteTextView
+        android:id="@+id/txt_line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/edx_bg"
+        android:hint="Line"
+        android:completionThreshold="1"
+        android:padding="10dp"
+        android:textSize="16sp" />
+
     <com.jaredrummler.materialspinner.MaterialSpinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"

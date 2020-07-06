@@ -28,8 +28,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -60,7 +63,7 @@ public class ProductActivity extends AppCompatActivity {
     double amount;
     private StorageReference storageRef;
 
-    IncrementPref incrementPref;
+//    IncrementPref incrementPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +96,7 @@ public class ProductActivity extends AppCompatActivity {
         storageRef = storage.getReference();
 
         //incrementation preference declaration
-        incrementPref = new IncrementPref(this);
+//        incrementPref = new IncrementPref(this);
 
 //        cess.addTextChangedListener(new TextWatcher() {
 //            @Override
@@ -227,6 +230,9 @@ public class ProductActivity extends AppCompatActivity {
         return Double.parseDouble(twoDForm.format(d));
     }
 
+    int lastkey = -1;
+    String pro_id = "";
+
     public void add_product(View view) {
 
         if (validate()) {
@@ -250,39 +256,53 @@ public class ProductActivity extends AppCompatActivity {
                             public void onSuccess(Uri uri) {
                                 Log.i(TAG, "onSuccess: " + uri.toString());
                                 imageUri = uri;
-                                //Firebase functionality
-                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Product");
 
-                                final String newKey = incrementPref.getProductId();
+                                final DatabaseReference pro_in = FirebaseDatabase.getInstance().getReference("Product");
 
-                                HashMap<String, Object> hashMap = new HashMap<>();
-                                hashMap.put("product_id", newKey);
-                                hashMap.put("img_url", String.valueOf(imageUri));
-                                hashMap.put("product_name", product_name.getText().toString().trim());
-                                hashMap.put("sale_rate", sale_rate.getText().toString().trim());
-                                hashMap.put("purchase_rate", purchase_rate.getText().toString().trim());
-                                hashMap.put("hsn_code", hsn_code.getText().toString().trim());
-                                hashMap.put("date_added", getDate());
-                                hashMap.put("cgst_sgst", cgst.getText().toString().trim());
-                                hashMap.put("cess", cess.getText().toString().trim());
-                                hashMap.put("in_ex", in_.isChecked() ? "inc" : "exc");
-                                hashMap.put("unit", "0");
-
-                                Log.i(TAG, "addProduct: " + hashMap.toString());
-                                reference.child(newKey).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                pro_in.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        Log.i(TAG, "onComplete: " + task.toString());
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                            lastkey = Integer.parseInt(child.getKey());
+                                        }
+                                        lastkey++;
+                                        pro_id = String.valueOf(lastkey);
 
-                                        //Updating product ID
-                                        incrementPref.setProductID(String.valueOf(Integer.parseInt(newKey) + 1));
 
-                                        Toast.makeText(ProductActivity.this, "Product added successfully", Toast.LENGTH_SHORT).show();
+                                        //Firebase functionality
+                                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Product");
+                                        HashMap<String, Object> hashMap = new HashMap<>();
+                                        hashMap.put("product_id", pro_id);
+                                        hashMap.put("img_url", String.valueOf(imageUri));
+                                        hashMap.put("product_name", product_name.getText().toString().trim());
+                                        hashMap.put("sale_rate", sale_rate.getText().toString().trim());
+                                        hashMap.put("purchase_rate", purchase_rate.getText().toString().trim());
+                                        hashMap.put("hsn_code", hsn_code.getText().toString().trim());
+                                        hashMap.put("date_added", getDate());
+                                        hashMap.put("cgst_sgst", cgst.getText().toString().trim());
+                                        hashMap.put("cess", cess.getText().toString().trim());
+                                        hashMap.put("in_ex", in_.isChecked() ? "inc" : "exc");
+                                        hashMap.put("unit", "0");
+
+                                        Log.i(TAG, "addProduct: " + hashMap.toString());
+                                        reference.child(pro_id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                Log.i(TAG, "onComplete: " + task.toString());
+                                                Toast.makeText(ProductActivity.this, "Product added successfully", Toast.LENGTH_SHORT).show();
+                                                onBackPressed();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.i(TAG, "onFailure: " + e.toString());
+                                            }
+                                        });
                                     }
-                                }).addOnFailureListener(new OnFailureListener() {
+
                                     @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.i(TAG, "onFailure: " + e.toString());
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                                     }
                                 });
                             }
@@ -324,28 +344,26 @@ public class ProductActivity extends AppCompatActivity {
             return false;
         }
         if (hsn_code.getText().toString().trim().equals("")) {
-            hsn_code.setError("Required"); 
+            hsn_code.setError("Required");
             return false;
         }
         if (sale_rate.getText().toString().equals("")) {
-            sale_rate.setError("Required"); 
+            sale_rate.setError("Required");
             return false;
         }
         if (purchase_rate.getText().toString().trim().equals("")) {
-            purchase_rate.setError("Required"); 
+            purchase_rate.setError("Required");
             return false;
         }
-        if (!in_.isChecked() && !ex_.isChecked())
-        {
-            Toast.makeText(this, "Select tax type", Toast.LENGTH_SHORT).show(); 
+        if (!in_.isChecked() && !ex_.isChecked()) {
+            Toast.makeText(this, "Select tax type", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (cgst.getText().toString().trim().equals("") || sgst.getText().toString().trim().equals("") || cess.getText().toString().trim().equals("") )
-        {
+        if (cgst.getText().toString().trim().equals("") || sgst.getText().toString().trim().equals("") || cess.getText().toString().trim().equals("")) {
             Toast.makeText(this, "GST Percentage required", Toast.LENGTH_SHORT).show();
             return false;
         }
-        
+
         return true;
     }
 

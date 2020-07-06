@@ -38,6 +38,8 @@ public class ClientActivity extends AppCompatActivity {
     ArrayList<Line> linelist;
     DatabaseReference lineReference;
 
+    int lastkey = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +89,6 @@ public class ClientActivity extends AppCompatActivity {
 
     }
 
-
     public void add_client(View view) {
         if (validate()) {
 
@@ -96,33 +97,70 @@ public class ClientActivity extends AppCompatActivity {
             // Client ID getting from the PrefsManager
             final String client_id = incrementPref.getClientId();
 
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Client");
+            final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Client");
 
-            HashMap<String, Object> hashMap = new HashMap<>();
-            hashMap.put("name", name.getText().toString().trim());
-            hashMap.put("client_id", client_id);
-            hashMap.put("phone", phone.getText().toString().trim());
-            hashMap.put("email", email.getText().toString().trim());
-            hashMap.put("add1", add1.getText().toString().trim());
-            hashMap.put("add2", add2.getText().toString().trim());
-            hashMap.put("city", city.getText().toString().trim());
-            hashMap.put("state", state.getText().toString().trim());
-            hashMap.put("pincode", pincode.getText().toString().trim());
-            hashMap.put("line", line.getText().toString().trim());
-            hashMap.put("gst", gst.getText().toString().trim());
-
-
-            lineReference.child(line.getText().toString().trim()).addListenerForSingleValueEvent(new ValueEventListener() {
+            reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    int lastkey = -1;
-                    for(DataSnapshot child : dataSnapshot.getChildren())
-                    {
+
+//                    Firebase auto increment
+
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
                         lastkey = Integer.parseInt(child.getKey());
+                        Log.i("client id",lastkey+"");
+
                     }
                     lastkey++;
+
+//                    Stores line value with client id in line tree
+
                     lineReference.child(line.getText().toString().trim()).child(String.valueOf(lastkey)).setValue(name.getText().toString().trim());
 
+
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put("name", name.getText().toString().trim());
+                    hashMap.put("client_id", String.valueOf(lastkey));
+                    hashMap.put("phone", phone.getText().toString().trim());
+                    hashMap.put("email", email.getText().toString().trim());
+                    hashMap.put("add1", add1.getText().toString().trim());
+                    hashMap.put("add2", add2.getText().toString().trim());
+                    hashMap.put("city", city.getText().toString().trim());
+                    hashMap.put("state", state.getText().toString().trim());
+                    hashMap.put("pincode", pincode.getText().toString().trim());
+                    hashMap.put("line", line.getText().toString().trim());
+                    hashMap.put("gst", gst.getText().toString().trim());
+
+
+                    Log.i(TAG, "addClient: " + hashMap.toString());
+
+                    reference.child(String.valueOf(lastkey)).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Log.i(TAG, "onComplete: " + task.toString());
+                            name.setText("");
+                            phone.setText("");
+                            email.setText("");
+                            add1.setText("");
+                            add2.setText("");
+                            line.setText("");
+                            city.setText("");
+                            state.setText("");
+                            pincode.setText("");
+                            gst.setText("");
+
+                            //Incrementing the Client ID and storing in the PrefsManager
+//                    incrementPref.setClientID(String.valueOf(Integer.parseInt(client_id) + 1));
+
+                            Toast.makeText(ClientActivity.this, "Client added successfully", Toast.LENGTH_SHORT).show();
+                            onBackPressed();
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.i(TAG, "onFailure: " + e.toString());
+                        }
+                    });
                 }
 
                 @Override
@@ -130,37 +168,84 @@ public class ClientActivity extends AppCompatActivity {
 
                 }
             });
-
-            Log.i(TAG, "addClient: " + hashMap.toString());
-
-            reference.child(client_id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    Log.i(TAG, "onComplete: " + task.toString());
-                    name.setText("");
-                    phone.setText("");
-                    email.setText("");
-                    add1.setText("");
-                    add2.setText("");
-                    line.setText("");
-                    city.setText("");
-                    state.setText("");
-                    pincode.setText("");
-                    gst.setText("");
-
-                    //Incrementing the Client ID and storing in the PrefsManager
-                    incrementPref.setClientID(String.valueOf(Integer.parseInt(client_id) + 1));
-
-                    Toast.makeText(ClientActivity.this, "Client added successfully", Toast.LENGTH_SHORT).show();
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.i(TAG, "onFailure: " + e.toString());
-                }
-            });
         }
     }
+
+
+//
+//    public void add_client(View view) {
+//        if (validate()) {
+//
+//            final IncrementPref incrementPref = new IncrementPref(this);
+//
+//            // Client ID getting from the PrefsManager
+//            final String client_id = incrementPref.getClientId();
+//
+//            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Client");
+//
+//            HashMap<String, Object> hashMap = new HashMap<>();
+//            hashMap.put("name", name.getText().toString().trim());
+//            hashMap.put("client_id", client_id);
+//            hashMap.put("phone", phone.getText().toString().trim());
+//            hashMap.put("email", email.getText().toString().trim());
+//            hashMap.put("add1", add1.getText().toString().trim());
+//            hashMap.put("add2", add2.getText().toString().trim());
+//            hashMap.put("city", city.getText().toString().trim());
+//            hashMap.put("state", state.getText().toString().trim());
+//            hashMap.put("pincode", pincode.getText().toString().trim());
+//            hashMap.put("line", line.getText().toString().trim());
+//            hashMap.put("gst", gst.getText().toString().trim());
+//
+//
+//            lineReference.child(line.getText().toString().trim()).addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                    int lastkey = -1;
+//                    for(DataSnapshot child : dataSnapshot.getChildren())
+//                    {
+//                        lastkey = Integer.parseInt(child.getKey());
+//                    }
+//                    lastkey++;
+//                    lineReference.child(line.getText().toString().trim()).child(String.valueOf(lastkey)).setValue(name.getText().toString().trim());
+//
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                }
+//            });
+//
+//            Log.i(TAG, "addClient: " + hashMap.toString());
+//
+//            reference.child(client_id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                @Override
+//                public void onComplete(@NonNull Task<Void> task) {
+//                    Log.i(TAG, "onComplete: " + task.toString());
+//                    name.setText("");
+//                    phone.setText("");
+//                    email.setText("");
+//                    add1.setText("");
+//                    add2.setText("");
+//                    line.setText("");
+//                    city.setText("");
+//                    state.setText("");
+//                    pincode.setText("");
+//                    gst.setText("");
+//
+//                    //Incrementing the Client ID and storing in the PrefsManager
+//                    incrementPref.setClientID(String.valueOf(Integer.parseInt(client_id) + 1));
+//
+//                    Toast.makeText(ClientActivity.this, "Client added successfully", Toast.LENGTH_SHORT).show();
+//                }
+//            }).addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception e) {
+//                    Log.i(TAG, "onFailure: " + e.toString());
+//                }
+//            });
+//        }
+//    }
 
     private boolean validate() {
         if (name.getText().toString().trim().equals("")) {

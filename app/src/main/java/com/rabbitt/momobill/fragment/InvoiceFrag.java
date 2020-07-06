@@ -198,6 +198,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                     product.setImg_url(img_url);
                     product.setProduct_name(product_name);
                     product.setSale_rate(sale_rate);
+                    product.setSingle(sale_rate);
                     product.setUnit(unit);
                     product.setProduct_id(product_id);
                     product.setCgst(gst);
@@ -278,9 +279,9 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
                 Log.i(TAG, "onItemSelected: "+client_id.get(position)+" Position "+position+" ClientName "+clients.get(position));
-                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
-                getOrder("1");
-//                getOrder(client_id.get(position));
+//                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
+//                getOrder("1");
+                getOrder(client_id.get(position));
             }
         });
     }
@@ -403,6 +404,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                     ProductInvoice product = new ProductInvoice();
                     product.setProduct_name(model.getProduct_name());
                     product.setSale_rate(String.valueOf(sale_));
+                    product.setSingle(model.getSingle());
                     product.setUnit(units.getText().toString().trim());
                     product.setProduct_id(model.getProduct_id());
                     product.setCgst(model.getCgst());

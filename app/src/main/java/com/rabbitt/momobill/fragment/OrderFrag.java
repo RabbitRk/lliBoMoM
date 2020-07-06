@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -37,6 +39,8 @@ import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.adapter.CartSheet;
 import com.rabbitt.momobill.adapter.GridSpacingItemDecoration;
 import com.rabbitt.momobill.adapter.InvoicePAdapter;
+import com.rabbitt.momobill.adapter.LineAdapter;
+import com.rabbitt.momobill.model.Line;
 import com.rabbitt.momobill.model.ProductInvoice;
 
 import java.text.SimpleDateFormat;
@@ -66,6 +70,15 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
 
     private int mYear, mMonth, mDay, mHour, mMinute;
     private EditText dateTxt;
+
+    //  Line Initializatoins
+    String[] ar;
+    String selectedLine;
+    AutoCompleteTextView line;
+    LineAdapter adapter ;
+    ArrayList<Line> linelist;
+    DatabaseReference lineReference;
+
     public OrderFrag() {
         // Required empty public constructor
     }
@@ -108,7 +121,52 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
         spinner = (MaterialSpinner) inflate.findViewById(R.id.spinner);
 
 
-        getClients();
+        line = inflate.findViewById(R.id.txt_line);
+
+        linelist = new ArrayList<>();
+        line.setEnabled(true);
+        line.setEms(15);
+
+        //        Fetch Lines from firebase and store in Autocomplete Adapter
+
+        lineReference = FirebaseDatabase.getInstance().getReference("Line");
+        lineReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                int i = 0;
+                ar = new String[(int) dataSnapshot.getChildrenCount()];
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+
+                    ar[i] = child.getKey();
+
+                    //Updates to Customer on every single changes
+                    linelist.add(new Line(ar[i]));
+                    adapter = new LineAdapter(getContext(), linelist);
+                    line.setAdapter(adapter);
+                    i++;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+//      Fetches the Selected line and gets the corresponding clients
+
+        line.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedLine = linelist.get(i).getLine();
+                getClients();
+            }
+        });
+
+
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                 .child("Product");
@@ -136,6 +194,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     product.setProduct_name(product_name);
                     product.setSale_rate(sale_rate);
                     product.setUnit(unit);
+                    product.setSingle(sale_rate);
                     product.setProduct_id(product_id);
                     product.setCgst(gst);
                     product.setCess(cess);
@@ -178,9 +237,9 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
 
         DatabaseReference reference = FirebaseDatabase.getInstance()
                 .getReference()
-                .child("Client");
+                .child("Line");
 
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.child(selectedLine).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
@@ -190,13 +249,16 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     //Getting string from the snapshot
-                    String name = snapshot.child("name").getValue(String.class);
-                    String client_id_ = snapshot.child("client_id").getValue(String.class);
+                    String name = snapshot.getValue(String.class);
+                    String client_id_ = snapshot.getKey();
                     //Arraylist for the spinner
                     clients.add(name);
                     //Arraylist for the ID
                     client_id.add(client_id_);
+
+                    Log.i(TAG, "onDataChange: "+name+"  "+client_id_);
                 }
+
                 spinner.setItems(clients);
             }
 
@@ -211,7 +273,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
                 Log.i(TAG, "onItemSelected: "+client_id.get(position)+" Position "+position+" ClientName "+clients.get(position));
-                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
+//                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
             }
         });
     }
@@ -268,6 +330,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     ProductInvoice product = new ProductInvoice();
                     product.setProduct_name(model.getProduct_name());
                     product.setSale_rate(String.valueOf(sale_));
+                    product.setSingle(model.getSingle());
                     product.setUnit(units.getText().toString().trim());
                     product.setProduct_id(model.getProduct_id());
                     product.setCgst(model.getCgst());
