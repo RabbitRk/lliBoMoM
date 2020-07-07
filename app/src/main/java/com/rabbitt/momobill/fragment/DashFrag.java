@@ -1,18 +1,18 @@
 package com.rabbitt.momobill.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
-
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,7 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.CheckOrderActivity;
 import com.rabbitt.momobill.activity.OpeningActivity;
-import com.rabbitt.momobill.activity.SettingsActivity;
+import com.rabbitt.momobill.model.CreditModel;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -47,9 +47,14 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
     CardView today, month, invoice, credit;
 
-    static ArrayList<String> namelist, gstinlist, datelist, basicvallist, taxlist, cesslist;
+    public static DatabaseReference myRef, clientRef, productRef, creditRef, invoiceRef;
+    static ArrayList<String> crnamelist, billlist, crdatelist, amntlist, paidlist, creditlist;
 
-    public static DatabaseReference myRef, clientRef, productRef;
+
+    static ArrayList<String> namelist, gstinlist, datelist, basicvallist, taxlist, cesslist;
+    ArrayList<CreditModel> list;
+    String date, billno, name, amnt, paid, cr, clientid;
+    ProgressDialog progressDialog;
 
     public DashFrag() {
         // Required empty public constructor
@@ -80,16 +85,28 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         View inflate = inflater.inflate(R.layout.fragment_dash, container, false);
         init(inflate);
 
-        namelist = new ArrayList<String>();
-        datelist = new ArrayList<String>();
-        gstinlist = new ArrayList<String>();
-        basicvallist = new ArrayList<String>();
-        taxlist = new ArrayList<String>();
-        cesslist = new ArrayList<String>();
+        namelist = new ArrayList<>();
+        datelist = new ArrayList<>();
+        gstinlist = new ArrayList<>();
+        basicvallist = new ArrayList<>();
+        taxlist = new ArrayList<>();
+        cesslist = new ArrayList<>();
+
+        crnamelist = new ArrayList<>();
+        crdatelist = new ArrayList<>();
+        billlist = new ArrayList<>();
+        amntlist = new ArrayList<>();
+        paidlist = new ArrayList<>();
+        creditlist = new ArrayList<>();
+
+        list = new ArrayList<>();
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         myRef = database.getReference("Order");
         clientRef = database.getReference("Client");
         productRef = database.getReference("Product");
+        creditRef = database.getReference("Credits");
+        invoiceRef = database.getReference("Invoice");
 
         return inflate;
     }
@@ -116,13 +133,169 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                 startActivity(new Intent(getActivity(), CheckOrderActivity.class));
                 break;
             case R.id.txt_credit:
+                progressDialog = ProgressDialog.show(getContext(), "Please wait", "Saving", true);
                 populateList();
 //                startActivity(new Intent(getActivity(), SettingsActivity.class));
                 break;
             case R.id.txt_invoice:
+                progressDialog = ProgressDialog.show(getContext(), "Please wait", "Saving", true);
+                populateCreditList();
 //                startActivity(new Intent(getActivity(), SettingsActivity.class));
                 break;
         }
+    }
+
+    private void populateCreditList() {
+
+
+        crnamelist.clear();
+        crdatelist.clear();
+        billlist.clear();
+        creditlist.clear();
+        amntlist.clear();
+        paidlist.clear();
+
+        creditRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (final DataSnapshot child : dataSnapshot.getChildren()) {
+
+                    clientid = child.getKey();
+                    Log.i("Invoice Values", clientid);
+
+
+                    for (final DataSnapshot clientChild : child.getChildren()) {
+
+
+                        billno = clientChild.getKey();
+                        cr = clientChild.child("balance").getValue().toString();
+                        amnt = clientChild.child("amount").getValue().toString();
+                        date = clientChild.child("date_of").getValue().toString();
+                        name = clientChild.child("client_name").getValue().toString();
+                        paid = clientChild.child("paid").getValue().toString();
+
+                        list.add(new CreditModel(billno, cr, amnt, date, name, paid));
+                        Log.i("Invoice Values", billno + "  " + cr);
+                    }
+
+                }
+                saveInvoiceExcel();
+
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
+//    private String getClientName(String clientid) {
+//
+//
+//        return name;
+//    }
+
+    private boolean saveInvoiceExcel() {
+
+        boolean success = false;
+
+        //New Workbook
+        Workbook wb = new HSSFWorkbook();
+
+        Cell c = null;
+
+
+        //New Sheet
+        final Sheet sheet1 = wb.createSheet("Orders");
+
+
+        // Generate column headings
+        final Row row = sheet1.createRow(0);
+
+
+        c = row.createCell(0);
+        c.setCellValue("Date");
+//        c.setCellStyle(cs);
+
+        c = row.createCell(1);
+        c.setCellValue("Bill No");
+//        c.setCellStyle(cs);
+
+        c = row.createCell(2);
+        c.setCellValue("Name");
+//        c.setCellStyle(cs);
+
+        c = row.createCell(3);
+        c.setCellValue("Total Amount");
+
+        c = row.createCell(4);
+        c.setCellValue("Paid Amount");
+
+        c = row.createCell(5);
+        c.setCellValue("Credit");
+
+
+        for (int i = 1; i <= list.size(); i++) {
+
+            Row row1 = sheet1.createRow(i);
+
+            Cell cell = null;
+
+            cell = row1.createCell(0);
+            cell.setCellValue(list.get(i - 1).getDate());
+
+
+            cell = row1.createCell(1);
+            cell.setCellValue(list.get(i - 1).getBill());
+
+            cell = row1.createCell(2);
+            cell.setCellValue(list.get(i - 1).getName());
+
+            cell = row1.createCell(3);
+            cell.setCellValue(list.get(i - 1).getAmnt());
+
+            cell = row1.createCell(4);
+            cell.setCellValue(list.get(i - 1).getPaid());
+
+            cell = row1.createCell(5);
+            cell.setCellValue(list.get(i - 1).getCr());
+
+
+        }
+
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String filename = dateFormat.format(calendar.getTime()) + "_credit.xls";
+
+        // Create a path where we will place our List of objects on external storage
+        File file = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies", "Invoice.xls");
+        FileOutputStream os = null;
+
+        try {
+            os = new FileOutputStream(file);
+            wb.write(os);
+            Log.w("FileUtils", "Writing file" + file);
+            success = true;
+            progressDialog.dismiss();
+        } catch (IOException e) {
+            Log.w("FileUtils", "Error writing " + file, e);
+        } catch (Exception e) {
+            Log.w("FileUtils", "Failed to save file", e);
+        } finally {
+            try {
+                if (null != os)
+                    os.close();
+            } catch (Exception ex) {
+            }
+        }
+
+        return success;
     }
 
 
@@ -143,6 +316,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                 String date, productId;
 
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
+
                     final String fdate;
                     date = child.getKey().trim();
                     String dd, mm, yy;
@@ -221,7 +395,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
     }
 
-    private static boolean saveExcelFile(Context context, String fileName) {
+    private boolean saveExcelFile(Context context, String fileName) {
 
         // check if available and not read only
 //        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
@@ -347,8 +521,11 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         sheet1.setColumnWidth(2, (15 * 500));
 
 
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String filename = dateFormat.format(calendar.getTime()) + "_Order.xls";
         // Create a path where we will place our List of objects on external storage
-        File file = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies", fileName);
+        File file = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies", filename);
         FileOutputStream os = null;
 
         try {
@@ -356,6 +533,9 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             wb.write(os);
             Log.w("FileUtils", "Writing file" + file);
             success = true;
+
+            progressDialog.dismiss();
+
         } catch (IOException e) {
             Log.w("FileUtils", "Error writing " + file, e);
         } catch (Exception e) {

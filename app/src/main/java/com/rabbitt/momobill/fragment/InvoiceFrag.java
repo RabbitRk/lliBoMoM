@@ -33,13 +33,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.adapter.CartSheet;
+import com.rabbitt.momobill.adapter.ClientAutoAdapter;
 import com.rabbitt.momobill.adapter.GridSpacingItemDecoration;
 import com.rabbitt.momobill.adapter.InvoicePAdapter;
 import com.rabbitt.momobill.adapter.LineAdapter;
 import com.rabbitt.momobill.adapter.OrderAdapter;
+import com.rabbitt.momobill.model.ClientModel;
 import com.rabbitt.momobill.model.Line;
 import com.rabbitt.momobill.model.ProductInvoice;
 
@@ -55,6 +56,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "maluInvoice";
 
+    final ArrayList<ClientModel> clientList = new ArrayList<>();
     private String mParam1;
     private String mParam2;
 
@@ -62,10 +64,11 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     private List<ProductInvoice> data = new ArrayList<>();
     private List<ProductInvoice> cart = new ArrayList<>();
     private InvoicePAdapter productAdapter;
-    private MaterialSpinner spinner;
+//    private MaterialSpinner spinner;
 
     final ArrayList<String> clients = new ArrayList<>();
     final ArrayList<String> client_id = new ArrayList<>();
+
 
     private LinearLayout order_layout;
     private RecyclerView order_recycler;
@@ -76,11 +79,13 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
     private Button cart_btn_order;
 
+
     String[] ar;
-    String selectedLine;
-    AutoCompleteTextView line;
-    LineAdapter adapter ;
+    String clientId;
+    String selectedLine, selectedClient;
+    LineAdapter adapter;
     ArrayList<Line> linelist;
+    AutoCompleteTextView line, clientAutoTV;
     DatabaseReference lineReference;
 
     public InvoiceFrag() {
@@ -115,6 +120,9 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         linelist = new ArrayList<>();
         line.setEnabled(true);
         line.setEms(15);
+
+        clientAutoTV.setEnabled(true);
+        clientAutoTV.setEms(15);
 
         lineReference = FirebaseDatabase.getInstance().getReference("Line");
         lineReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -154,9 +162,10 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         Button cart = inflate.findViewById(R.id.cart_btn);
         cart_btn_order = inflate.findViewById(R.id.cart_btn_order);
 
-        spinner = (MaterialSpinner) inflate.findViewById(R.id.spinner);
+//        spinner = (MaterialSpinner) inflate.findViewById(R.id.spinner);
 
         line = inflate.findViewById(R.id.txt_line);
+        clientAutoTV = inflate.findViewById(R.id.txt_client);
 
         line.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -247,7 +256,9 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+
                 Log.i(TAG, "onDataChange: " + dataSnapshot);
+                clientList.clear();
                 clients.clear();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -256,15 +267,20 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
                     String name = snapshot.getValue().toString();
 
-                    Log.i(TAG, "onDataChange: "+client_id_);
+                    Log.i(TAG, "onDataChange: " + client_id_);
                     //Arraylist for the spinner
+                    clientList.add(new ClientModel(name, client_id_));
+
+                    ClientAutoAdapter autoAdapter = new ClientAutoAdapter(getContext(), clientList);
+                    clientAutoTV.setAdapter(autoAdapter);
+
                     clients.add(name);
                     //Arraylist for the ID
                     client_id.add(client_id_);
                 }
 
                 Log.i(TAG, "onDataChange: "+client_id);
-                spinner.setItems(clients);
+//                spinner.setItems(clients);
             }
 
             @Override
@@ -273,16 +289,30 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             }
         });
 
-        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 
+        clientAutoTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                Log.i(TAG, "onItemSelected: "+client_id.get(position)+" Position "+position+" ClientName "+clients.get(position));
-                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                selectedClient = clientList.get(i).getClient();
+                clientId = clientList.get(i).getClientid();
+                Log.i(TAG, "onItemSelected: " + client_id.get(i) + " Position " + i + " ClientName " + clients.get(i));
+                Snackbar.make(view, "Clicked " + clients.get(i), Snackbar.LENGTH_LONG).show();
                 getOrder("1");
-//                getOrder(client_id.get(position));
             }
         });
+
+//        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+//
+//            @Override
+//            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+//
+//                Log.i(TAG, "onItemSelected: "+client_id.get(position)+" Position "+position+" ClientName "+clients.get(position));
+//                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
+//                getOrder("1");
+////                getOrder(client_id.get(position));
+//            }
+//        });
     }
 
     private void getOrder(String s) {
@@ -468,7 +498,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
             if (cart != null)
             {
-                CartSheet cartSheet = new CartSheet(cart, this, this, "invoice",  client_id.get(spinner.getSelectedIndex()), getDate(), getContext());
+                CartSheet cartSheet = new CartSheet(cart, this, this, "invoice", clientId, getDate(), getContext());
                 cartSheet.show(getParentFragmentManager(), "cart");
             }
             else

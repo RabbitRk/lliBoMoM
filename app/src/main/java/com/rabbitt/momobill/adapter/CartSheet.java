@@ -59,7 +59,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     private Fragment invoiceFrag;
     private Button button, clear;
     private String btn_val;
-    private String client_id;
+    private String client_id, client_name;
     private String date_of;
     Context context;
     View v;
@@ -78,6 +78,22 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.cart_bottom_sheet, container, false);
         init(v);
+
+//        Gets Client name for credit
+        DatabaseReference clientReference = FirebaseDatabase.getInstance().getReference("Client");
+        clientReference.child(client_id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                client_name = dataSnapshot.child("name").getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         return v;
     }
 
@@ -206,6 +222,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
             pro.put("product_name", pv.getProduct_name());
             pro.put("sale_rate", pv.getSale_rate());
             pro.put("unit", pv.getUnit());
+            pro.put("client_name", client_name);
             pro.put("cgst", pv.getCgst());
             pro.put("cess", pv.getCess());
             pro.put("in_ex", pv.getIn());
@@ -364,13 +381,18 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                     String balance = String.valueOf(Double.parseDouble(total_amount.getText().toString()) - Double.parseDouble(paid.getText().toString()));
 
                     if (!(Double.parseDouble(balance) <= 0.0)) {
-                        createCredit(balance, invoice, client_id);
+                        String paidTxt = paid.getText().toString();
+                        String tot = String.valueOf(total);
+                        createCredit(balance, invoice, client_id, client_name, paidTxt, tot);
                     }
 
                     final ProgressDialog dialog = ProgressDialog.show(getActivity(), "Generating Invoice", "Please wait...", false, true);
 
 
                     Log.i(TAG, "onClick: " + invoice);
+
+                    HashMap<String, HashMap<String, Object>> main = new HashMap<>();
+
 
                     HashMap<String, Object> hashMap = new HashMap<>();
 
@@ -380,6 +402,9 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                     hashMap.put("amount", total);
                     hashMap.put("paid", paid.getText().toString().trim());
                     hashMap.put("balance", balance);
+
+
+                    HashMap<String, Object> product = new HashMap<>();
 
                     for (ProductInvoice pv : data) {
                         HashMap<String, Object> pro = new HashMap<>();
@@ -392,21 +417,39 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                         pro.put("cess", pv.getCess());
                         pro.put("in_ex", pv.getIn());
 
-                        hashMap.put(pv.getProduct_id(), pro);
+                        product.put(pv.getProduct_id(), pro);
                     }
 
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Invoice");
+                    main.put("Details", hashMap);
+                    main.put("Product", product);
+
+                    final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Invoice");
+                    final DatabaseReference reference2 = FirebaseDatabase.getInstance().getReference("Invoice_Single");
 
                     Log.i(TAG, "addProduct: " + hashMap.toString());
-                    reference.child(invoice).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+
+                    reference.child(getDate()).child(invoice).setValue(main).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            Log.i(TAG, "onComplete: " + task.toString());
-                            Toast.makeText(getActivity(), "Invoice created successfully", Toast.LENGTH_SHORT).show();
-                            pref.setInvoiceId(String.valueOf(Integer.parseInt(invoice) + 1));
-                            reduceCount(data);
-                            generateInvoice();
-                            dialog.dismiss();
+
+                            reference2.child(invoice).child("date").setValue(getDate()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    Log.i(TAG, "onComplete: " + task.toString());
+                                    Toast.makeText(getActivity(), "Invoice created successfully", Toast.LENGTH_SHORT).show();
+                                    pref.setInvoiceId(String.valueOf(Integer.parseInt(invoice) + 1));
+                                    reduceCount(data);
+                                    generateInvoice();
+                                    dialog.dismiss();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.i(TAG, "onFailure: " + e.toString());
+                                }
+                            });
+
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -488,15 +531,19 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         }
     }
 
-    private void createCredit(String balance, String invoice, String client_id) {
+    private void createCredit(String balance, String invoice, String client_id, String client_name, String paidTxt, String amnt) {
         Log.i(TAG, "createCredit: ");
 
         HashMap<String, Object> hashMap = new HashMap<>();
 
+        hashMap.put("client_name", client_name);
         hashMap.put("client_id", client_id);
+        hashMap.put("paid", paidTxt);
+        hashMap.put("amount", amnt);
         hashMap.put("invoice_id", invoice);
         hashMap.put("date_of", getDate());
         hashMap.put("balance", balance);
+
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Credits");
 
