@@ -11,24 +11,29 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.rabbitt.momobill.R;
 
 public class DeleteSheet extends BottomSheetDialogFragment {
 
     private static final String TAG = "maluDelete";
-    View v;
-    String product_id;
 
-    public DeleteSheet(String product_id)
+    View v;
+    String product_id, imgUrl;
+
+    public DeleteSheet(String product_id, String imgUrl)
     {
         this.product_id = product_id;
+        this.imgUrl = imgUrl;
     }
 
     @Nullable
@@ -42,8 +47,6 @@ public class DeleteSheet extends BottomSheetDialogFragment {
     private void init(View v) {
         TextView textView = v.findViewById(R.id.product_name);
         Button btn = v.findViewById(R.id.clear_data);
-
-
         textView.setText(product_id);
 
         btn.setOnClickListener(new View.OnClickListener() {
@@ -55,6 +58,8 @@ public class DeleteSheet extends BottomSheetDialogFragment {
     }
 
     private void deleteData(String product_id) {
+
+        final StorageReference photoRef = FirebaseStorage.getInstance().getReferenceFromUrl(imgUrl);
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Product").child(product_id);
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -63,6 +68,20 @@ public class DeleteSheet extends BottomSheetDialogFragment {
                 for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
                     appleSnapshot.getRef().removeValue();
                 }
+
+                photoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // File deleted successfully
+                        Log.d(TAG, "onSuccess: deleted file");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Uh-oh, an error occurred!
+                        Log.d(TAG, "onFailure: did not delete file");
+                    }
+                });
             }
 
             @Override

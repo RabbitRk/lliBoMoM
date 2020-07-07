@@ -1,28 +1,30 @@
 package com.rabbitt.momobill.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
-
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.CheckOrderActivity;
 import com.rabbitt.momobill.activity.OpeningActivity;
-import com.rabbitt.momobill.activity.SettingsActivity;
+import com.rabbitt.momobill.model.Product;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -36,11 +38,13 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class DashFrag extends Fragment implements View.OnClickListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = "maluDash";
 
     private String mParam1;
     private String mParam2;
@@ -50,6 +54,8 @@ public class DashFrag extends Fragment implements View.OnClickListener {
     static ArrayList<String> namelist, gstinlist, datelist, basicvallist, taxlist, cesslist;
 
     public static DatabaseReference myRef, clientRef, productRef;
+
+    double amount = 0.0;
 
     public DashFrag() {
         // Required empty public constructor
@@ -80,12 +86,12 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         View inflate = inflater.inflate(R.layout.fragment_dash, container, false);
         init(inflate);
 
-        namelist = new ArrayList<String>();
-        datelist = new ArrayList<String>();
-        gstinlist = new ArrayList<String>();
-        basicvallist = new ArrayList<String>();
-        taxlist = new ArrayList<String>();
-        cesslist = new ArrayList<String>();
+        namelist = new ArrayList<>();
+        datelist = new ArrayList<>();
+        gstinlist = new ArrayList<>();
+        basicvallist = new ArrayList<>();
+        taxlist = new ArrayList<>();
+        cesslist = new ArrayList<>();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         myRef = database.getReference("Order");
         clientRef = database.getReference("Client");
@@ -104,6 +110,82 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         month.setOnClickListener(this);
         credit.setOnClickListener(this);
         invoice.setOnClickListener(this);
+
+
+        getTotalmonth(getDate());
+    }
+
+    private void getTotalmonth(String date) {
+
+        Log.i(TAG, "getTotalmonth: " + date.substring(4, 8));
+
+        final String month = date.substring(4, 8);
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child("Invoice");
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.i(TAG, "onDataChange: " + dataSnapshot);
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Log.i(TAG, "onDataChange: Key" + snapshot.getKey());
+
+
+                    for (DataSnapshot in : snapshot.getChildren()) {
+
+//                        Log.i(TAG, "Inside: ########Amount#########"+in.child("amount").getValue(String.class));
+//                        Log.i(TAG, "Inside: >>>>>>>>>>>>>>>>>>>>>" + in.getKey());
+                        Log.i(TAG, "Inside: >>>>>>>>>>>>>>>>>>>>>" + in.getKey() + "   " + in.getValue().toString());
+
+                        try
+                        {
+                            if(!in.getKey().matches("\\\\d+(?:\\\\.\\\\d+)?"))
+                            {
+
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            Log.i(TAG, "Exception: "+e.toString());
+                        }
+
+//                        if (in.getKey().is("amount")) {
+//                            amount += Double.parseDouble(in.getValue().toString());
+//                        }
+
+//                        if (in.getKey().contains("date_of")) {
+//                            if (in.getValue().toString().contains(month)) {
+//                                amount += in.getKey().contains("date_of");
+//                            }
+//                        }
+//                        for (DataSnapshot inc : in.getChildren()) {
+//                            Log.i(TAG, "Inside: ===================>" + inc.getKey());
+////                            Log.i(TAG, "onDataChange: val"+inc.child("amount").getValue(String.class));
+//                        }
+//
+//
+                    }
+                }
+
+                Log.i(TAG, "Amount: Key"+String.valueOf(amount));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public String getDate() {
+        Date c = Calendar.getInstance().getTime();
+
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat df = new SimpleDateFormat(getString(R.string.short_format));
+
+        return df.format(c);
     }
 
     @Override
@@ -193,8 +275,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                                         taxlist.add(tax);
                                         cesslist.add(cess);
                                         saveExcelFile(getContext(), "myExcel.xls");
-
-
                                     }
 
                                     @Override
@@ -202,12 +282,10 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
                                     }
                                 });
-
                             }
                         }
                     }
                 }
-
             }
 
             @Override
@@ -215,10 +293,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
 
             }
-
         });
-
-
     }
 
     private static boolean saveExcelFile(Context context, String fileName) {
@@ -235,7 +310,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         Workbook wb = new HSSFWorkbook();
 
         Cell c = null;
-
 
         //New Sheet
         final Sheet sheet1 = wb.createSheet("Orders");

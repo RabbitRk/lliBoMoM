@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottom_sheet"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="150dp"
     android:background="@color/blue_bg_light"
     android:orientation="vertical"
     app:behavior_hideable="true"
@@ -12,20 +12,33 @@
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
     <TextView
+        android:text="Do you want to delete this product from the inventory ?"
+        android:textSize="16sp"
+        android:layout_margin="10dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
         android:id="@+id/product_name"
         android:text="sdfasdfasdfsadfsadfasdfas"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+
     <Button
         android:id="@+id/clear_data"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginEnd="30dp"
         android:layout_marginStart="30dp"
         android:layout_marginBottom="20dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/btn_bg"
+        android:backgroundTint="@color/red_active"
         android:gravity="center"
         android:minWidth="150dp"
         android:textStyle="bold"

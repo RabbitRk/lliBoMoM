@@ -2,6 +2,7 @@ package com.rabbitt.momobill.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -27,19 +28,25 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.adapter.CartSheet;
+import com.rabbitt.momobill.adapter.CreditAdapter;
 import com.rabbitt.momobill.adapter.GridSpacingItemDecoration;
 import com.rabbitt.momobill.adapter.InvoicePAdapter;
 import com.rabbitt.momobill.adapter.LineAdapter;
 import com.rabbitt.momobill.adapter.OrderAdapter;
+import com.rabbitt.momobill.model.Credit;
 import com.rabbitt.momobill.model.Line;
 import com.rabbitt.momobill.model.ProductInvoice;
 
@@ -47,9 +54,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
-public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleItemListener, View.OnClickListener, OrderAdapter.OnRecyleItemListener {
+public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleItemListener, View.OnClickListener, OrderAdapter.OnRecyleItemListener, CreditAdapter.OnRecyleItemListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -69,17 +77,19 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
     private LinearLayout order_layout;
     private RecyclerView order_recycler;
-
     private List<ProductInvoice> order = new ArrayList<>();
-    private List<ProductInvoice> credit = new ArrayList<>();
-    private OrderAdapter OrderAdapter;
+
+    private List<Credit> credit = new ArrayList<>();
+    private CreditAdapter creditAdapter;
+    private LinearLayout credit_layout;
+    private RecyclerView credit_recycler;
 
     private Button cart_btn_order;
 
     String[] ar;
     String selectedLine;
     AutoCompleteTextView line;
-    LineAdapter adapter ;
+    LineAdapter adapter;
     ArrayList<Line> linelist;
     DatabaseReference lineReference;
 
@@ -143,7 +153,6 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         });
 
 
-
         return inflate;
     }
 
@@ -162,7 +171,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedLine = linelist.get(i).getLine();
-                Toast.makeText(getContext(),selectedLine, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), selectedLine, Toast.LENGTH_SHORT).show();
                 getClients();
             }
         });
@@ -171,7 +180,8 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         order_layout = inflate.findViewById(R.id.order_layout);
         order_recycler = inflate.findViewById(R.id.recycler_order_invoice);
 
-//        getClients();
+        credit_layout = inflate.findViewById(R.id.credit_layout);
+        credit_recycler = inflate.findViewById(R.id.recycler_credit_invoice);
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                 .child("Product");
@@ -257,14 +267,14 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
                     String name = snapshot.getValue().toString();
 
-                    Log.i(TAG, "onDataChange: "+client_id_);
+                    Log.i(TAG, "onDataChange: " + client_id_);
                     //Arraylist for the spinner
                     clients.add(name);
                     //Arraylist for the ID
                     client_id.add(client_id_);
                 }
 
-                Log.i(TAG, "onDataChange: "+client_id);
+                Log.i(TAG, "onDataChange: " + client_id);
                 spinner.setItems(clients);
             }
 
@@ -278,10 +288,54 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                Log.i(TAG, "onItemSelected: "+client_id.get(position)+" Position "+position+" ClientName "+clients.get(position));
+                Log.i(TAG, "onItemSelected: " + client_id.get(position) + " Position " + position + " ClientName " + clients.get(position));
 //                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
 //                getOrder("1");
                 getOrder(client_id.get(position));
+                getCredit(client_id.get(position));
+            }
+        });
+    }
+
+    private void getCredit(String s) {
+        DatabaseReference reference = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("Credits").child(s);
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                Log.i(TAG, "onDataChange: " + dataSnapshot);
+
+                if (credit.size() != 0) {
+                    credit.clear();
+                }
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Log.i(TAG, "invoice_id: " + snapshot.getKey());
+                    Log.i(TAG, "invoice_id: " + snapshot.child("balance").getValue(String.class));
+
+                    Credit cre = new Credit();
+                    cre.setBalance(snapshot.child("balance").getValue(String.class));
+                    cre.setDate_on(snapshot.child("date_of").getValue(String.class));
+                    cre.setClient_id(snapshot.child("client_id").getValue(String.class));
+                    cre.setInvoice_id(snapshot.getKey());
+
+                    if (!snapshot.child("balance").getValue(String.class).equals("0")) {
+                        credit.add(cre);
+                    }
+                }
+                Log.i(TAG, "onDataChange: " + credit.size());
+
+                if (credit.size() != 0) {
+                    Log.i(TAG, "onDataChange: Ready for Recycler update");
+                    updateCredit(credit);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
@@ -296,8 +350,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
                 Log.i(TAG, "onDataChange: " + dataSnapshot);
 
-                if (order.size() != 0)
-                {
+                if (order.size() != 0) {
                     order.clear();
                 }
 
@@ -324,10 +377,9 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
                     order.add(product);
                 }
-                Log.i(TAG, "onDataChange: "+order.size());
+                Log.i(TAG, "onDataChange: " + order.size());
 
-                if (order.size() != 0)
-                {
+                if (order.size() != 0) {
                     updateOrder(order);
                 }
             }
@@ -339,16 +391,26 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         });
     }
 
-    public void updateOrder(List<ProductInvoice> data)
-    {
+    public void updateOrder(List<ProductInvoice> data) {
         order_layout.setVisibility(View.VISIBLE);
-        OrderAdapter = new OrderAdapter(data, this, this);
+        OrderAdapter orderAdapter = new OrderAdapter(data, this, this);
         LinearLayoutManager reLayout = new LinearLayoutManager(getActivity());
         order_recycler.setLayoutManager(reLayout);
         reLayout.setOrientation(RecyclerView.VERTICAL);
-        order_recycler.setAdapter(OrderAdapter);
-        OrderAdapter.notifyDataSetChanged();
+        order_recycler.setAdapter(orderAdapter);
+        orderAdapter.notifyDataSetChanged();
         order_recycler.setVisibility(View.VISIBLE);
+    }
+
+    private void updateCredit(List<Credit> credit) {
+        credit_layout.setVisibility(View.VISIBLE);
+        creditAdapter = new CreditAdapter(credit, this, this);
+        LinearLayoutManager reLayout = new LinearLayoutManager(getActivity());
+        credit_recycler.setLayoutManager(reLayout);
+        reLayout.setOrientation(RecyclerView.VERTICAL);
+        credit_recycler.setAdapter(creditAdapter);
+        creditAdapter.notifyDataSetChanged();
+        credit_recycler.setVisibility(View.VISIBLE);
     }
 
     private void updateRecycler(List<ProductInvoice> data) {
@@ -379,7 +441,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
     @SuppressLint("SetTextI18n")
     public void openDialog(final ProductInvoice model, final String ex_unit, String name_, final String product_id) {
-        
+
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.invoice_dialog);
         dialog.setCancelable(true);
@@ -397,9 +459,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             public void onClick(View v) {
                 if (units.getText().toString().trim().equals("")) {
                     Toast.makeText(getActivity(), "Please enter units", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
+                } else {
                     double sale_ = Double.parseDouble(model.getSale_rate()) * Double.parseDouble(units.getText().toString().trim());
                     ProductInvoice product = new ProductInvoice();
                     product.setProduct_name(model.getProduct_name());
@@ -458,26 +518,19 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.cart_btn_order)
-        {
+        if (v.getId() == R.id.cart_btn_order) {
             Toast.makeText(getActivity(), "Buttonclicked", Toast.LENGTH_SHORT).show();
             cart = order;
             order_layout.setVisibility(View.GONE);
-        }
-        else
-        {
+        } else {
             Toast.makeText(getActivity(), "cart", Toast.LENGTH_SHORT).show();
 
-            if (cart != null)
-            {
-                CartSheet cartSheet = new CartSheet(cart, this, this, "invoice",  client_id.get(spinner.getSelectedIndex()), getDate(), getContext());
+            if (cart != null) {
+                CartSheet cartSheet = new CartSheet(cart, this, this, "invoice", client_id.get(spinner.getSelectedIndex()), getDate(), getContext());
                 cartSheet.show(getParentFragmentManager(), "cart");
-            }
-            else
-            {
+            } else {
                 Toast.makeText(getActivity(), "Add product to the cart", Toast.LENGTH_SHORT).show();
             }
-
         }
     }
 
@@ -491,8 +544,6 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         productAdapter.filterList(filteredList);
     }
 
-
-
     public String getDate() {
         Date c = Calendar.getInstance().getTime();
 
@@ -505,5 +556,79 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     @Override
     public void OrderAdd(int position) {
         Toast.makeText(getActivity(), "Add", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void OnSettle(int position) {
+        Log.i(TAG, "OnSettle: " + position);
+
+        Credit crea = credit.get(position);
+
+        if (!crea.getBalance().equals("0.0")) {
+            addCreditDialog(position, crea.getInvoice_id(), crea.getBalance(), crea.getClient_id());
+        } else {
+            Toast.makeText(getActivity(), "No credit value found", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    public void addCreditDialog(final int position, final String invoice_id, final String balance, final String client_id_) {
+
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.credit_dialog);
+        dialog.setCancelable(true);
+
+        TextView name = dialog.findViewById(R.id.dia_quantity);
+        final EditText units = dialog.findViewById(R.id.units);
+
+        name.setText(balance);
+
+        Button dialogButton = dialog.findViewById(R.id.ok_button);
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (units.getText().toString().trim().equals("")) {
+                    Toast.makeText(getActivity(), "Please enter units", Toast.LENGTH_SHORT).show();
+                } else {
+                    final ProgressDialog pdialog = ProgressDialog.show(getActivity(), "Updating credits", "Please wait...", false, true);
+
+                    Credit model = credit.get(position);
+
+                    double amount = Double.parseDouble(model.getBalance()) - Double.parseDouble(units.getText().toString());
+                    model.setBalance(String.valueOf(amount));
+                    credit.set(position, model);
+                    creditAdapter.notifyDataSetChanged();
+
+
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Credits");
+
+                    HashMap<String, Object> main = new HashMap<>();
+                    main.put("balance", String.valueOf(amount));
+
+                    reference.child(client_id_).child(invoice_id).updateChildren(main).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Log.i(TAG, "onComplete: " + task.toString());
+                            Toast.makeText(getActivity(), "Units added successfully", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                            pdialog.dismiss();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.i(TAG, "onFailure: " + e.toString());
+                        }
+                    });
+                }
+            }
+        });
+
+        try {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
+        } catch (WindowManager.BadTokenException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -201,10 +201,11 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
         String product_id = model.getProduct_id();
         String unit = model.getUnit();
         String name = model.getProduct_name();
+        String imgUrl = model.getImg_url();
 
-        Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  "  + "  " + name);
+        Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  "+imgUrl  + "  " + name);
 
-        openDialog(unit, name, product_id);
+        openDialog(unit, name, product_id, imgUrl);
     }
 
     @Override
@@ -220,7 +221,7 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
     }
 
     @SuppressLint("SetTextI18n")
-    public void openDialog(final String ex_unit, String name_, final String product_id) {
+    public void openDialog(final String ex_unit, String name_, final String product_id, final String imgUrl) {
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.unit_dialog);
         dialog.setCancelable(true);
@@ -247,7 +248,7 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
-                DeleteSheet cartSheet = new DeleteSheet(product_id);
+                DeleteSheet cartSheet = new DeleteSheet(product_id, imgUrl);
                 cartSheet.show(getParentFragmentManager(), "delete");
             }
         });
