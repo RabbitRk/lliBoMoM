@@ -61,6 +61,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     private String btn_val;
     private String client_id, client_name;
     private String date_of;
+    int invkey = -1, orderkey = -1;
     Context context;
     View v;
 
@@ -213,10 +214,10 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
         final ProgressDialog dialog = ProgressDialog.show(getActivity(), "Collecting Information", "Please wait...", false, true);
 
-        HashMap<String, Object> pro = new HashMap<>();
-
+        HashMap<String, Object> main = new HashMap<>();
 
         for (ProductInvoice pv : data) {
+            HashMap<String, Object> pro = new HashMap<>();
             Log.i(TAG, "updateFirebase: " + pv.getProduct_id());
             pro.put("product_id", pv.getProduct_id());
             pro.put("product_name", pv.getProduct_name());
@@ -226,6 +227,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
             pro.put("cgst", pv.getCgst());
             pro.put("cess", pv.getCess());
             pro.put("in_ex", pv.getIn());
+            main.put(pv.getProduct_id(), pro);
         }
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Order");
@@ -233,8 +235,8 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         IncrementPref pref = new IncrementPref(getActivity());
         String order_num = pref.getOrderId();
 
-        Log.i(TAG, "addProduct: " + pro.toString());
-        reference.child(date_of).child(client_id).updateChildren(pro).addOnCompleteListener(new OnCompleteListener<Void>() {
+        Log.i(TAG, "addProduct: " + main.toString());
+        reference.child(date_of).child(client_id).updateChildren(main).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Log.i(TAG, "onComplete: " + task.toString());
@@ -358,6 +360,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         final TextView total_amount = dialog.findViewById(R.id.dia_quantity);
         final EditText paid = dialog.findViewById(R.id.units);
 
+
         credit.setText(credit_);
         total_amount.setText(String.valueOf(total));
 
@@ -370,78 +373,96 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                     double t_amount = Double.parseDouble(total_amount.getText().toString());
                     double _paid = Double.parseDouble(paid.getText().toString());
 
-                    final IncrementPref pref = new IncrementPref(getActivity());
-                    final String invoice = pref.getInvoiceId();
-
                     if (_paid > t_amount) {
                         Toast.makeText(context, "You are getting more than the total amount", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
-                    String balance = String.valueOf(Double.parseDouble(total_amount.getText().toString()) - Double.parseDouble(paid.getText().toString()));
+                    final DatabaseReference invoiceSingle = FirebaseDatabase.getInstance().getReference("Invoice_Single");
 
-                    if (!(Double.parseDouble(balance) <= 0.0)) {
-                        String paidTxt = paid.getText().toString();
-                        String tot = String.valueOf(total);
-                        createCredit(balance, invoice, client_id, client_name, paidTxt, tot);
-                    }
-
-                    final ProgressDialog dialog = ProgressDialog.show(getActivity(), "Generating Invoice", "Please wait...", false, true);
-
-
-                    Log.i(TAG, "onClick: " + invoice);
-
-                    HashMap<String, HashMap<String, Object>> main = new HashMap<>();
-
-
-                    HashMap<String, Object> hashMap = new HashMap<>();
-
-                    hashMap.put("client_id", client_id);
-                    hashMap.put("invoice_id", invoice);
-                    hashMap.put("date_of", getDate());
-                    hashMap.put("amount", total);
-                    hashMap.put("paid", paid.getText().toString().trim());
-                    hashMap.put("balance", balance);
-
-
-                    HashMap<String, Object> product = new HashMap<>();
-
-                    for (ProductInvoice pv : data) {
-                        HashMap<String, Object> pro = new HashMap<>();
-                        Log.i(TAG, "updateFirebase: " + pv.getProduct_id());
-                        pro.put("product_id", pv.getProduct_id());
-                        pro.put("product_name", pv.getProduct_name());
-                        pro.put("sale_rate", pv.getSale_rate());
-                        pro.put("unit", pv.getUnit());
-                        pro.put("cgst", pv.getCgst());
-                        pro.put("cess", pv.getCess());
-                        pro.put("in_ex", pv.getIn());
-
-                        product.put(pv.getProduct_id(), pro);
-                    }
-
-                    main.put("Details", hashMap);
-                    main.put("Product", product);
-
-                    final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Invoice");
-                    final DatabaseReference reference2 = FirebaseDatabase.getInstance().getReference("Invoice_Single");
-
-                    Log.i(TAG, "addProduct: " + hashMap.toString());
-
-
-                    reference.child(getDate()).child(invoice).setValue(main).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    invoiceSingle.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onComplete(@NonNull Task<Void> task) {
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                invkey = Integer.parseInt(child.getKey());
+                            }
+                            invkey++;
 
-                            reference2.child(invoice).child("date").setValue(getDate()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            //                    final IncrementPref pref = new IncrementPref(getActivity());
+                            final String invoice = String.valueOf(invkey);
+
+                            String balance = String.valueOf(Double.parseDouble(total_amount.getText().toString()) - Double.parseDouble(paid.getText().toString()));
+
+                            if (!(Double.parseDouble(balance) <= 0.0)) {
+                                String paidTxt = paid.getText().toString();
+                                String tot = String.valueOf(total);
+                                createCredit(balance, invoice, client_id, client_name, paidTxt, tot);
+                            }
+
+                            final ProgressDialog dialog = ProgressDialog.show(getActivity(), "Generating Invoice", "Please wait...", false, true);
+
+
+                            Log.i(TAG, "onClick: " + invoice);
+
+                            HashMap<String, HashMap<String, Object>> main = new HashMap<>();
+
+
+                            HashMap<String, Object> hashMap = new HashMap<>();
+
+                            hashMap.put("client_id", client_id);
+                            hashMap.put("invoice_id", invoice);
+                            hashMap.put("date_of", getDate());
+                            hashMap.put("amount", total);
+                            hashMap.put("paid", paid.getText().toString().trim());
+                            hashMap.put("balance", balance);
+
+
+                            HashMap<String, Object> product = new HashMap<>();
+
+                            for (ProductInvoice pv : data) {
+                                HashMap<String, Object> pro = new HashMap<>();
+                                Log.i(TAG, "updateFirebase: " + pv.getProduct_id());
+                                pro.put("product_id", pv.getProduct_id());
+                                pro.put("product_name", pv.getProduct_name());
+                                pro.put("sale_rate", pv.getSale_rate());
+                                pro.put("unit", pv.getUnit());
+                                pro.put("cgst", pv.getCgst());
+                                pro.put("cess", pv.getCess());
+                                pro.put("in_ex", pv.getIn());
+
+                                product.put(pv.getProduct_id(), pro);
+                            }
+
+                            main.put("Details", hashMap);
+                            main.put("Product", product);
+
+                            final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Invoice");
+                            final DatabaseReference reference2 = FirebaseDatabase.getInstance().getReference("Invoice_Single");
+
+                            Log.i(TAG, "addProduct: " + hashMap.toString());
+
+
+                            reference.child(getDate()).child(invoice).setValue(main).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    Log.i(TAG, "onComplete: " + task.toString());
-                                    Toast.makeText(getActivity(), "Invoice created successfully", Toast.LENGTH_SHORT).show();
-                                    pref.setInvoiceId(String.valueOf(Integer.parseInt(invoice) + 1));
-                                    reduceCount(data);
-                                    generateInvoice();
-                                    dialog.dismiss();
+
+                                    reference2.child(invoice).child("date").setValue(getDate()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Log.i(TAG, "onComplete: " + task.toString());
+                                            Toast.makeText(getActivity(), "Invoice created successfully", Toast.LENGTH_SHORT).show();
+//                                    pref.setInvoiceId(String.valueOf(Integer.parseInt(invoice) + 1));
+                                            reduceCount(data);
+                                            generateInvoice();
+                                            dialog.dismiss();
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.i(TAG, "onFailure: " + e.toString());
+                                        }
+                                    });
+
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
@@ -449,14 +470,14 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                                     Log.i(TAG, "onFailure: " + e.toString());
                                 }
                             });
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
                         }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.i(TAG, "onFailure: " + e.toString());
-                        }
                     });
+
                 } else {
                     Toast.makeText(context, "Please enter the value", Toast.LENGTH_SHORT).show();
                 }

@@ -1,7 +1,6 @@
 package com.rabbitt.momobill.fragment;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -270,11 +269,11 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
 
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
         String filename = dateFormat.format(calendar.getTime()) + "_credit.xls";
 
         // Create a path where we will place our List of objects on external storage
-        File file = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies", "Invoice.xls");
+        File file = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies", filename);
         FileOutputStream os = null;
 
         try {
@@ -366,7 +365,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                                         basicvallist.add(basicval);
                                         taxlist.add(tax);
                                         cesslist.add(cess);
-                                        saveExcelFile(getContext(), "myExcel.xls");
+                                        saveExcelFile();
 
 
                                     }
@@ -395,7 +394,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
     }
 
-    private boolean saveExcelFile(Context context, String fileName) {
+    private boolean saveExcelFile() {
 
         // check if available and not read only
 //        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
@@ -522,7 +521,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
 
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
         String filename = dateFormat.format(calendar.getTime()) + "_Order.xls";
         // Create a path where we will place our List of objects on external storage
         File file = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies", filename);
