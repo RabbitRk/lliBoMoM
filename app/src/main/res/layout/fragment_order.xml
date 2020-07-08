@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,21 +14,35 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/edx_bg"
-        android:hint="Line"
         android:completionThreshold="1"
+        android:hint="Line"
         android:padding="10dp"
         android:textSize="16sp" />
 
-    <com.jaredrummler.materialspinner.MaterialSpinner
-        android:id="@+id/spinner"
+    <!--    <com.jaredrummler.materialspinner.MaterialSpinner-->
+    <!--        android:id="@+id/spinner"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="20dp"-->
+    <!--        android:layout_marginTop="20dp"-->
+    <!--        android:layout_marginEnd="20dp"-->
+    <!--        android:text="Client"-->
+    <!--        android:textSize="16sp"-->
+    <!--        app:ms_text_color="@color/textGrey" />-->
+
+    <AutoCompleteTextView
+        android:id="@+id/txt_client"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:text="Client"
-        android:textSize="16sp"
-        app:ms_text_color="@color/textGrey" />
+        android:background="@drawable/edx_bg"
+        android:completionThreshold="1"
+        android:hint="Client"
+        android:padding="10dp"
+        android:textSize="16sp" />
+
     <LinearLayout
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"

@@ -28,17 +28,19 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.adapter.CartSheet;
+import com.rabbitt.momobill.adapter.ClientAutoAdapter;
 import com.rabbitt.momobill.adapter.GridSpacingItemDecoration;
 import com.rabbitt.momobill.adapter.InvoicePAdapter;
 import com.rabbitt.momobill.adapter.LineAdapter;
+import com.rabbitt.momobill.model.ClientModel;
 import com.rabbitt.momobill.model.Line;
 import com.rabbitt.momobill.model.ProductInvoice;
 
@@ -59,24 +61,24 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
     private String mParam1;
     private String mParam2;
 
+
     private RecyclerView invoice_recycler;
     private List<ProductInvoice> data = new ArrayList<>();
     private List<ProductInvoice> cart = new ArrayList<>();
     private InvoicePAdapter productAdapter;
-    private MaterialSpinner spinner;
+    //    private MaterialSpinner spinner;
     final ArrayList<String> clients = new ArrayList<>();
     final ArrayList<String> client_id = new ArrayList<>();
+    final ArrayList<ClientModel> clientList = new ArrayList<>();
+    String[] ar;
+    String selectedLine, selectedClient, clientId;
+    AutoCompleteTextView line, clientAutoTV;
+    LineAdapter adapter;
+    ArrayList<Line> linelist;
+    DatabaseReference lineReference;
 
     private int mYear, mMonth, mDay, mHour, mMinute;
     private EditText dateTxt;
-
-    //  Line Initializatoins
-    String[] ar;
-    String selectedLine;
-    AutoCompleteTextView line;
-    LineAdapter adapter ;
-    ArrayList<Line> linelist;
-    DatabaseReference lineReference;
 
     public OrderFrag() {
         // Required empty public constructor
@@ -106,27 +108,13 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
         // Inflate the layout for this fragment
         View inflate = inflater.inflate(R.layout.fragment_order, container, false);
         init(inflate);
-        return inflate;
-    }
-
-    private void init(View inflate) {
-
-        invoice_recycler = inflate.findViewById(R.id.recycler_product_invoice);
-
-        Button cart = inflate.findViewById(R.id.cart_btn);
-        Button date_ = inflate.findViewById(R.id.date_btn);
-        dateTxt = inflate.findViewById(R.id.txt_date);
-
-        spinner = (MaterialSpinner) inflate.findViewById(R.id.spinner);
-
-
-        line = inflate.findViewById(R.id.txt_line);
 
         linelist = new ArrayList<>();
         line.setEnabled(true);
         line.setEms(15);
 
-        //        Fetch Lines from firebase and store in Autocomplete Adapter
+        clientAutoTV.setEnabled(true);
+        clientAutoTV.setEms(15);
 
         lineReference = FirebaseDatabase.getInstance().getReference("Line");
         lineReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -155,17 +143,34 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
         });
 
 
-//      Fetches the Selected line and gets the corresponding clients
+        return inflate;
+    }
+
+    private void init(View inflate) {
+
+        invoice_recycler = inflate.findViewById(R.id.recycler_product_invoice);
+
+        Button cart = inflate.findViewById(R.id.cart_btn);
+        Button date_ = inflate.findViewById(R.id.date_btn);
+        dateTxt = inflate.findViewById(R.id.txt_date);
+
+//        spinner = (MaterialSpinner) inflate.findViewById(R.id.spinner);
+
+
+        line = inflate.findViewById(R.id.txt_line);
+        clientAutoTV = inflate.findViewById(R.id.txt_client);
 
         line.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedLine = linelist.get(i).getLine();
+                Toast.makeText(getContext(), selectedLine, Toast.LENGTH_SHORT).show();
                 getClients();
             }
         });
 
 
+//        getClients();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                 .child("Product");
@@ -193,7 +198,6 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     product.setProduct_name(product_name);
                     product.setSale_rate(sale_rate);
                     product.setUnit(unit);
-                    product.setSingle(sale_rate);
                     product.setProduct_id(product_id);
                     product.setCgst(gst);
                     product.setCess(cess);
@@ -242,23 +246,31 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                Log.i(TAG, "onDataChange: " + dataSnapshot);
 
+                Log.i(TAG, "onDataChange: " + dataSnapshot);
+                clientList.clear();
                 clients.clear();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     //Getting string from the snapshot
-                    String name = snapshot.getValue(String.class);
                     String client_id_ = snapshot.getKey();
+
+                    String name = snapshot.getValue().toString();
+
+                    Log.i(TAG, "onDataChange: " + client_id_);
                     //Arraylist for the spinner
+                    clientList.add(new ClientModel(name, client_id_));
+
+                    ClientAutoAdapter autoAdapter = new ClientAutoAdapter(getContext(), clientList);
+                    clientAutoTV.setAdapter(autoAdapter);
+
                     clients.add(name);
                     //Arraylist for the ID
                     client_id.add(client_id_);
-
-                    Log.i(TAG, "onDataChange: "+name+"  "+client_id_);
                 }
 
-                spinner.setItems(clients);
+                Log.i(TAG, "onDataChange: " + client_id);
+//                spinner.setItems(clients);
             }
 
             @Override
@@ -267,14 +279,26 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
             }
         });
 
-        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
 
+        clientAutoTV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-                Log.i(TAG, "onItemSelected: "+client_id.get(position)+" Position "+position+" ClientName "+clients.get(position));
-//                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                selectedClient = clientList.get(i).getClient();
+                clientId = clientList.get(i).getClientid();
+                Log.i(TAG, "onItemSelected: " + client_id.get(i) + " Position " + i + " ClientName " + clients.get(i));
+                Snackbar.make(view, "Clicked " + clients.get(i), Snackbar.LENGTH_LONG).show();
             }
         });
+
+//        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+//
+//            @Override
+//            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+//                Log.i(TAG, "onItemSelected: "+client_id.get(position)+" Position "+position+" ClientName "+clients.get(position));
+//                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
+//            }
+//        });
     }
 
     private void updateRecycler(List<ProductInvoice> data) {
@@ -329,7 +353,6 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     ProductInvoice product = new ProductInvoice();
                     product.setProduct_name(model.getProduct_name());
                     product.setSale_rate(String.valueOf(sale_));
-                    product.setSingle(model.getSingle());
                     product.setUnit(units.getText().toString().trim());
                     product.setProduct_id(model.getProduct_id());
                     product.setCgst(model.getCgst());
@@ -380,9 +403,9 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                     {
                         Toast.makeText(getActivity(), "Please add products to the cart", Toast.LENGTH_SHORT).show();
                     }
-                    else
-                    {
-                        CartSheet cartSheet = new CartSheet(cart, this,  this, "order", client_id.get(spinner.getSelectedIndex()), dateTxt.getText().toString(), getContext());
+                    else {
+                        CartSheet cartSheet = new CartSheet(cart, this, this, "order", clientId, dateTxt.getText().toString(), getContext());
+//                        CartSheet cartSheet = new CartSheet(cart, this,  this, "order", client_id.get(spinner.getSelectedIndex()), dateTxt.getText().toString(), getContext());
                         cartSheet.show(getParentFragmentManager(), "cart");
                     }
                 }

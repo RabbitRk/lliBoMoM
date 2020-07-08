@@ -58,12 +58,13 @@ public class ProductActivity extends AppCompatActivity {
     Uri imageUri, final_uri = null, resultUri;
     RadioGroup ex;
     RadioButton in_, ex_;
+    int producKey = -1;
     EditText cgst, sgst, cess, product_name, sale_rate, purchase_rate, hsn_code;
 
     double amount;
     private StorageReference storageRef;
 
-//    IncrementPref incrementPref;
+    IncrementPref incrementPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +97,7 @@ public class ProductActivity extends AppCompatActivity {
         storageRef = storage.getReference();
 
         //incrementation preference declaration
-//        incrementPref = new IncrementPref(this);
+        incrementPref = new IncrementPref(this);
 
 //        cess.addTextChangedListener(new TextWatcher() {
 //            @Override
@@ -230,9 +231,6 @@ public class ProductActivity extends AppCompatActivity {
         return Double.parseDouble(twoDForm.format(d));
     }
 
-    int lastkey = -1;
-    String pro_id = "";
-
     public void add_product(View view) {
 
         if (validate()) {
@@ -256,23 +254,24 @@ public class ProductActivity extends AppCompatActivity {
                             public void onSuccess(Uri uri) {
                                 Log.i(TAG, "onSuccess: " + uri.toString());
                                 imageUri = uri;
+                                //Firebase functionality
+                                final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Product");
 
-                                final DatabaseReference pro_in = FirebaseDatabase.getInstance().getReference("Product");
+//                                final String newKey = incrementPref.getProductId();
 
-                                pro_in.addListenerForSingleValueEvent(new ValueEventListener() {
+                                reference.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        for (DataSnapshot child : dataSnapshot.getChildren()) {
-                                            lastkey = Integer.parseInt(child.getKey());
-                                        }
-                                        lastkey++;
-                                        pro_id = String.valueOf(lastkey);
 
+                                        for (DataSnapshot child : dataSnapshot.getChildren())
+                                            producKey = Integer.parseInt(child.getKey());
 
-                                        //Firebase functionality
-                                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Product");
+                                        producKey++;
+
+                                        final String newKey = String.valueOf(producKey);
+
                                         HashMap<String, Object> hashMap = new HashMap<>();
-                                        hashMap.put("product_id", pro_id);
+                                        hashMap.put("product_id", newKey);
                                         hashMap.put("img_url", String.valueOf(imageUri));
                                         hashMap.put("product_name", product_name.getText().toString().trim());
                                         hashMap.put("sale_rate", sale_rate.getText().toString().trim());
@@ -285,12 +284,15 @@ public class ProductActivity extends AppCompatActivity {
                                         hashMap.put("unit", "0");
 
                                         Log.i(TAG, "addProduct: " + hashMap.toString());
-                                        reference.child(pro_id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        reference.child(newKey).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 Log.i(TAG, "onComplete: " + task.toString());
+
+                                                //Updating product ID
+                                                incrementPref.setProductID(String.valueOf(Integer.parseInt(newKey) + 1));
+
                                                 Toast.makeText(ProductActivity.this, "Product added successfully", Toast.LENGTH_SHORT).show();
-                                                onBackPressed();
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override
@@ -298,6 +300,8 @@ public class ProductActivity extends AppCompatActivity {
                                                 Log.i(TAG, "onFailure: " + e.toString());
                                             }
                                         });
+
+
                                     }
 
                                     @Override
@@ -305,6 +309,7 @@ public class ProductActivity extends AppCompatActivity {
 
                                     }
                                 });
+
                             }
                         });
                     }
