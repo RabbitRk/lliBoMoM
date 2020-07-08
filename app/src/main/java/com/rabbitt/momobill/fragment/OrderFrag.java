@@ -3,6 +3,8 @@ package com.rabbitt.momobill.fragment;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -77,12 +79,33 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
     ArrayList<Line> linelist;
     DatabaseReference lineReference;
 
+    SharedPreferences preferences;
+
     private int mYear, mMonth, mDay, mHour, mMinute;
     private EditText dateTxt;
 
     public OrderFrag() {
         // Required empty public constructor
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        preferences.edit().putString("orderLine", selectedLine).apply();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        preferences.edit().putString("orderLine", selectedLine).apply();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        preferences.edit().putString("orderLine", selectedLine).apply();
+    }
+
 
     public static OrderFrag newInstance(String param1, String param2) {
         OrderFrag fragment = new OrderFrag();
@@ -160,10 +183,23 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
         line = inflate.findViewById(R.id.txt_line);
         clientAutoTV = inflate.findViewById(R.id.txt_client);
 
+        //        Retrieve last selectedLine
+
+        try {
+
+            preferences = getContext().getSharedPreferences("orderFrag", Context.MODE_PRIVATE);
+            final String lineTxt = preferences.getString("orderLine", "");
+            selectedLine = lineTxt;
+            line.setText(lineTxt);
+            getClients();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         line.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedLine = linelist.get(i).getLine();
+                preferences.edit().putString("orderLine", selectedLine).apply();
                 Toast.makeText(getContext(), selectedLine, Toast.LENGTH_SHORT).show();
                 getClients();
             }

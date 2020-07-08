@@ -2,6 +2,8 @@ package com.rabbitt.momobill.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -82,14 +84,34 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
     String[] ar;
     String clientId;
-    String selectedLine, selectedClient;
+    String selectedLine, selectedClient, lineTxt;
     LineAdapter adapter;
     ArrayList<Line> linelist;
     AutoCompleteTextView line, clientAutoTV;
     DatabaseReference lineReference;
 
+    SharedPreferences preferences;
+
     public InvoiceFrag() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        preferences.edit().putString("invoiceLine", selectedLine).apply();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        preferences.edit().putString("invoiceLine", selectedLine).apply();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        preferences.edit().putString("invoiceLine", selectedLine).apply();
     }
 
     public static InvoiceFrag newInstance(String param1, String param2) {
@@ -167,14 +189,32 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         line = inflate.findViewById(R.id.txt_line);
         clientAutoTV = inflate.findViewById(R.id.txt_client);
 
+
+//        Retrieve last selectedLine
+        try {
+
+            preferences = getContext().getSharedPreferences("invoicefrag", Context.MODE_PRIVATE);
+            lineTxt = preferences.getString("invoiceLine", "");
+            selectedLine = lineTxt;
+            getClients();
+            line.setText(lineTxt);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         line.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedLine = linelist.get(i).getLine();
-                Toast.makeText(getContext(),selectedLine, Toast.LENGTH_SHORT).show();
+
+//                Write Selected Line in Shared Preferences
+                preferences.edit().putString("invoiceLine", selectedLine).apply();
+
+                Toast.makeText(getContext(), selectedLine, Toast.LENGTH_SHORT).show();
                 getClients();
             }
         });
+
 
         //Layout Initialization
         order_layout = inflate.findViewById(R.id.order_layout);
