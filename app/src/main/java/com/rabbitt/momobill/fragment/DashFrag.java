@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +18,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.CheckOrderActivity;
 import com.rabbitt.momobill.activity.OpeningActivity;
-import com.rabbitt.momobill.model.Product;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -130,41 +127,44 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                 Log.i(TAG, "onDataChange: " + dataSnapshot);
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Log.i(TAG, "onDataChange: Key" + snapshot.getKey());
+                    Log.i(TAG, "onDataChange: Key" + snapshot.toString());
 
 
                     for (DataSnapshot in : snapshot.getChildren()) {
 
-//                        Log.i(TAG, "Inside: ########Amount#########"+in.child("amount").getValue(String.class));
+                        Log.i(TAG, "onDataChange: "+in.toString());
+//
+////
+//////                        Log.i(TAG, "Inside: ########Amount#########"+in.child("amount").getValue(String.class));
 //                        Log.i(TAG, "Inside: >>>>>>>>>>>>>>>>>>>>>" + in.getKey());
-                        Log.i(TAG, "Inside: >>>>>>>>>>>>>>>>>>>>>" + in.getKey() + "   " + in.getValue().toString());
-
-                        try
-                        {
-                            if(!in.getKey().matches("\\\\d+(?:\\\\.\\\\d+)?"))
-                            {
-
-                            }
-                        }
-                        catch(Exception e)
-                        {
-                            Log.i(TAG, "Exception: "+e.toString());
-                        }
-
-//                        if (in.getKey().is("amount")) {
-//                            amount += Double.parseDouble(in.getValue().toString());
-//                        }
-
-//                        if (in.getKey().contains("date_of")) {
-//                            if (in.getValue().toString().contains(month)) {
-//                                amount += in.getKey().contains("date_of");
+//                        Log.i(TAG, "Inside: >>>>>>>>>>>>>>>>>>>>>" + in.getKey() + "   " + in.getValue().toString());
+//
+//                        try
+//                        {
+//                            if(!in.getKey().matches("\\\\d+(?:\\\\.\\\\d+)?"))
+//                            {
+//
 //                            }
 //                        }
-//                        for (DataSnapshot inc : in.getChildren()) {
-//                            Log.i(TAG, "Inside: ===================>" + inc.getKey());
-////                            Log.i(TAG, "onDataChange: val"+inc.child("amount").getValue(String.class));
+//                        catch(Exception e)
+//                        {
+//                            Log.i(TAG, "Exception: "+e.toString());
 //                        }
 //
+////                        if (in.getKey().is("amount")) {
+////                            amount += Double.parseDouble(in.getValue().toString());
+////                        }
+//
+////                        if (in.getKey().contains("date_of")) {
+////                            if (in.getValue().toString().contains(month)) {
+////                                amount += in.getKey().contains("date_of");
+////                            }
+////                        }
+////                        for (DataSnapshot inc : in.getChildren()) {
+////                            Log.i(TAG, "Inside: ===================>" + inc.getKey());
+//////                            Log.i(TAG, "onDataChange: val"+inc.child("amount").getValue(String.class));
+////                        }
+////
 //
                     }
                 }
