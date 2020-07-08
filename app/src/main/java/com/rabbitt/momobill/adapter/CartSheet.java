@@ -252,67 +252,6 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         dialog.dismiss();
     }
 
-//    @SuppressLint("SetTextI18n")
-//    public void openDialog(final int position, String quantity, String name_) {
-//
-//        final Dialog dialog = new Dialog(getActivity());
-//        dialog.setContentView(R.layout.delete_dialog);
-//        dialog.setCancelable(true);
-//
-//        TextView name = dialog.findViewById(R.id.text);
-//        TextView quanitiy = dialog.findViewById(R.id.dia_quantity);
-////        TextView unit = dialog.findViewById(R.id.dia_lbl);
-//
-//        name.setText(name_);
-//        quanitiy.setText(quantity + " ml");
-////        unit.setText(ex_unit);
-//
-//        Button dialogButton = dialog.findViewById(R.id.ok_button);
-//        dialogButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v_) {
-//
-//                try {
-//                    Log.i(TAG, "Sheeeeeetttt: " + position);
-//                    data.clear();
-////                    cartDelete.OnDelete(position);
-//
-//                    productAdapter.notifyDataSetChanged();
-//                } catch (Exception e) {
-////                    v.setVisibility(View.GONE);
-//                    Log.i(TAG, "Exception: " + e.getMessage() + "    " + e.toString());
-//                }
-//
-////                if (units.getText().toString().trim().equals("")) {
-////                    Toast.makeText(getActivity(), "Please enter units", Toast.LENGTH_SHORT).show();
-////                }
-////                else
-////                {
-////                    double sale_ = Double.parseDouble(model.getSale_rate()) * Double.parseDouble(units.getText().toString().trim());
-////                    ProductInvoice product = new ProductInvoice();
-////                    product.setProduct_name(model.getProduct_name());
-////                    product.setQuantity(model.getQuantity());
-////                    product.setSale_rate(String.valueOf(sale_));
-////                    product.setUnit(units.getText().toString().trim());
-////                    product.setProduct_id(model.getProduct_id());
-////                    product.setCgst(model.getCgst());
-////                    product.setCess(model.getCess());
-////
-////                    cart.add(product);
-//                dialog.dismiss();
-//////                     createInvoice(dialog, ex_unit, product_id, units.getText().toString().trim());
-////                }
-//            }
-//        });
-//
-//        try {
-//            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//            dialog.show();
-//        } catch (WindowManager.BadTokenException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public String getDate() {
         Date c = Calendar.getInstance().getTime();
 
@@ -351,7 +290,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     }
 
     private void paymentPopup(final double total) {
-        String credit_ = String.valueOf(getCredit(client_id));
+//        String credit_ = String.valueOf(getCredit(client_id));
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.payment_dialog);
         dialog.setCancelable(true);
@@ -361,7 +300,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         final EditText paid = dialog.findViewById(R.id.units);
 
 
-        credit.setText(credit_);
+//        credit.setText(credit_);
         total_amount.setText(String.valueOf(total));
 
         Button dialogButton = dialog.findViewById(R.id.ok_button);
@@ -583,34 +522,6 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         });
     }
 
-    private double getCredit(String client_id) {
-//        DatabaseReference reference = FirebaseDatabase.getInstance()
-//                .getReference()
-//                .child("Credit").child(client_id);
-//
-//        Query gameQuery = reference.orderByChild("gameID").equalTo(getArgument);
-//        gameQuery.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//                Log.i(TAG, "onDataChange: " + dataSnapshot);
-//
-////                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-////                    //Getting string from the snapshot
-////                    String name = snapshot.child("name").getValue(String.class);
-////                    String client_id_ = snapshot.child("client_id").getValue(String.class);
-////                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//
-        return 0.0;
-    }
-
     private double calculate(String inc, double gst, double ces, double rat) {
 
         double return_value;
@@ -640,14 +551,13 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         Uri uri = null;
         String path1 = Environment.getExternalStorageDirectory() + File.separator + "INV" + "temp.pdf";
         file = new File(path1);
-//        Invoice in = new Invoice(num_to_words,invoice.getText().toString(), dateString.getText().toString(), companyname, ad, user_gst, cp, user_phone, Name, Address, state, zip, Gstin, items, GST, total.getText().toString(), accno, ifsccode);
+
         Invoice in = new Invoice();
         in.pdfcreate(file, uri, uri, uri, context, data);
         startActivity(new Intent(getActivity(), pdfreader.class).putExtra("inv", "INV").putExtra("from", "genrate"));
     }
 
     private void updateFirebase(List<ProductInvoice> data) {
-
         createOrder();
     }
 
