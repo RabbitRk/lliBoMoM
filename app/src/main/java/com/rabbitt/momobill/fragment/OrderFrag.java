@@ -393,13 +393,14 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                 showDialog();
                 break;
             case R.id.cart_btn:
-                if (dateTxt.getText().toString().equals(""))
-                {
-                    Toast.makeText(getActivity(),   "Please select date", Toast.LENGTH_SHORT).show();
-                }
-                else {
+//                if (dateTxt.getText().toString().equals(""))
+//                {
+//                    Toast.makeText(getActivity(),   "Please select date", Toast.LENGTH_SHORT).show();
+//                }
+//                else {
 
-                    if (cart.size() == 0)
+
+                    if (validate())
                     {
                         Toast.makeText(getActivity(), "Please add products to the cart", Toast.LENGTH_SHORT).show();
                     }
@@ -408,9 +409,32 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
 //                        CartSheet cartSheet = new CartSheet(cart, this,  this, "order", client_id.get(spinner.getSelectedIndex()), dateTxt.getText().toString(), getContext());
                         cartSheet.show(getParentFragmentManager(), "cart");
                     }
-                }
+//                }
                 break;
         }
+    }
+
+
+    private boolean validate() {
+        if (cart.size() == 0) {
+            Toast.makeText(getActivity(), "Cart is empty", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (selectedLine.equals("")) {
+            Toast.makeText(getActivity(), "Please select the Line", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (selectedClient.equals("")) {
+            Toast.makeText(getActivity(), "Please select the client", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (dateTxt.getText().toString().equals(""))
+        {
+            Toast.makeText(getActivity(),   "Please select date", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
     }
 
     private void showDialog() {
