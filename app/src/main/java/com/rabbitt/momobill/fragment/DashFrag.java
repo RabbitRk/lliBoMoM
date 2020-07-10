@@ -8,8 +8,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
@@ -18,6 +23,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.CheckOrderActivity;
 import com.rabbitt.momobill.activity.OpeningActivity;
@@ -32,9 +38,11 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class DashFrag extends Fragment implements View.OnClickListener {
 
@@ -44,7 +52,13 @@ public class DashFrag extends Fragment implements View.OnClickListener {
     private String mParam1;
     private String mParam2;
 
-    CardView today, month, invoice, credit;
+    int selectedItem = 0, selectedMonth = 0;
+    DataSnapshot fulSnapShot;
+
+    CardView today, month, invoice, credit, invoiceReport;
+
+    AlertDialog invoiceDialogBuilder;
+    String monthName;
 
     public static DatabaseReference myRef, clientRef, productRef, creditRef, invoiceRef;
     static ArrayList<String> crnamelist, billlist, crdatelist, amntlist, paidlist, creditlist;
@@ -115,11 +129,13 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         month = view.findViewById(R.id.txt_month);
         credit = view.findViewById(R.id.txt_credit);
         invoice = view.findViewById(R.id.txt_invoice);
+        invoiceReport = view.findViewById(R.id.invoice_report);
 
         today.setOnClickListener(this);
         month.setOnClickListener(this);
         credit.setOnClickListener(this);
         invoice.setOnClickListener(this);
+        invoiceReport.setOnClickListener(this);
     }
 
     @Override
@@ -141,8 +157,550 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                 populateCreditList();
 //                startActivity(new Intent(getActivity(), SettingsActivity.class));
                 break;
+
+            case R.id.invoice_report:
+                selectedItem = 0;
+                selectMethod();
+                break;
         }
     }
+
+    private void selectMethod() {
+
+        final AlertDialog dialogBuilder = new AlertDialog.Builder(getContext()).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.invoice_report_dialog, null);
+
+        final MaterialSpinner spinner = dialogView.findViewById(R.id.invoice_spinner);
+        final Button button = dialogView.findViewById(R.id.nxt_btn);
+
+        String[] spinnerItems = {"Date", "Month", "Date Range"};
+        spinner.setItems(spinnerItems);
+
+        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                selectedItem = position;
+            }
+        });
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                dialogBuilder.dismiss();
+                reportMethod(selectedItem);
+
+
+            }
+        });
+
+        dialogBuilder.setView(dialogView);
+        dialogBuilder.show();
+
+    }
+
+    private void reportMethod(final int method) {
+
+        final ArrayList<String> datesOfInvoice = new ArrayList<>();
+        invoiceDialogBuilder = new AlertDialog.Builder(getContext()).create();
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.invoice_report_method, null);
+
+        LinearLayout date, month, range;
+        date = dialogView.findViewById(R.id.date_layout);
+        month = dialogView.findViewById(R.id.month_layout);
+        range = dialogView.findViewById(R.id.date_range_layout);
+
+
+        switch (method) {
+            case 0:
+                date.setVisibility(View.VISIBLE);
+                month.setVisibility(View.GONE);
+                range.setVisibility(View.GONE);
+                break;
+
+            case 1:
+                date.setVisibility(View.GONE);
+                month.setVisibility(View.VISIBLE);
+                range.setVisibility(View.GONE);
+
+                MaterialSpinner spinner = dialogView.findViewById(R.id.spinner);
+                String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+                monthName = "January";
+                selectedMonth = 0;
+                spinner.setItems(months);
+
+                spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
+                    @Override
+                    public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
+                        selectedMonth = position + 1;
+                        monthName = item;
+                        Log.i("month", item);
+                    }
+                });
+                break;
+
+            case 2:
+                date.setVisibility(View.GONE);
+                month.setVisibility(View.GONE);
+                range.setVisibility(View.VISIBLE);
+
+                invoiceRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            datesOfInvoice.add(child.getKey());
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+                break;
+        }
+        Button okBtn = dialogView.findViewById(R.id.ok_btn);
+        okBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (method == 0) {
+                    EditText dateTxt = dialogView.findViewById(R.id.date);
+                    String selDate;
+                    selDate = dateTxt.getText().toString();
+                    SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+                    Date myDate;
+                    try {
+
+                        myDate = df.parse(selDate);
+
+                        SimpleDateFormat dbformat = new SimpleDateFormat("yyyy_MM_dd");
+                        final String dbDate = dbformat.format(myDate);
+
+                        invoiceRef.child(dbDate).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (!dataSnapshot.exists()) {
+                                    Toast.makeText(getContext(), "No Invoice found on that date", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    invoiceDialogBuilder.dismiss();
+                                    getDateData(dbDate);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+//                        invoiceDialogBuilder.dismiss();
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                } else if (method == 1) {
+
+                    SimpleDateFormat df = new SimpleDateFormat("MM");
+                    Date dbDate = null;
+
+                    try {
+                        dbDate = df.parse(String.valueOf(selectedMonth));
+                        String selMonth = df.format(dbDate);
+                        Log.i("month_selected", selMonth);
+                        getMonthData(selMonth, monthName);
+//                        invoiceDialogBuilder.dismiss();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+
+                } else if (method == 2) {
+
+                    EditText fromDateTxt = dialogView.findViewById(R.id.from_date);
+                    EditText toDateTxt = dialogView.findViewById(R.id.to_date);
+                    String fromDate, toDate;
+                    fromDate = fromDateTxt.getText().toString();
+                    toDate = toDateTxt.getText().toString();
+
+                    SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+                    SimpleDateFormat dbformat = new SimpleDateFormat("yyyy_MM_dd");
+                    Date myFromDate, myToDate;
+
+
+                    try {
+
+                        myFromDate = df.parse(fromDate);
+                        myToDate = df.parse(toDate);
+                        fromDate = dbformat.format(myFromDate);
+                        toDate = dbformat.format(myToDate);
+
+                        ArrayList<String> newDatesList = new ArrayList<>();
+                        newDatesList = getDateRange(datesOfInvoice, fromDate, toDate);
+                        if (newDatesList.isEmpty()) {
+                            Toast.makeText(getContext(), "No Dates Found between the given range", Toast.LENGTH_SHORT).show();
+                        } else
+                            getRangedDate(newDatesList, fromDate, toDate);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+        });
+
+        invoiceDialogBuilder.setView(dialogView);
+        invoiceDialogBuilder.show();
+
+        Button cancelBtn = dialogView.findViewById(R.id.cancel_btn);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                invoiceDialogBuilder.dismiss();
+            }
+        });
+    }
+
+    private void getRangedDate(ArrayList<String> newDatesList, final String fromDate, final String toDate) {
+
+        progressDialog = ProgressDialog.show(getContext(), "Please wait", "Loading", true);
+        final ArrayList<String> c_nameList, inv_dateList, inv_noList, amountList, gst_inList;
+
+        c_nameList = new ArrayList<>();
+        inv_dateList = new ArrayList<>();
+        inv_noList = new ArrayList<>();
+        amountList = new ArrayList<>();
+        gst_inList = new ArrayList<>();
+
+        for (final String dbDate : newDatesList) {
+
+            DatabaseReference rootref = FirebaseDatabase.getInstance().getReference();
+            rootref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                    for (DataSnapshot child : dataSnapshot.child("Invoice").child(dbDate).getChildren()) {
+
+                        String inv_no = child.getKey();
+                        DataSnapshot details_child = child.child("Details");
+                        String clientId_ = details_child.child("client_id").getValue().toString();
+                        String total = details_child.child("amount").getValue().toString();
+
+
+                        DataSnapshot client_child = dataSnapshot.child("Client").child(clientId_);
+                        String client_name = client_child.child("name").getValue().toString();
+                        String gstin = client_child.child("gst").getValue().toString();
+
+
+                        c_nameList.add(client_name);
+                        inv_dateList.add(dbDate);
+                        inv_noList.add(inv_no);
+                        amountList.add(total);
+                        gst_inList.add(gstin);
+                    }
+
+                    invoiceDialogBuilder.dismiss();
+                    progressDialog.dismiss();
+                    invoiceExcel(gst_inList, c_nameList, inv_noList, inv_dateList, amountList, "Invoice_between" + fromDate + "_to_" + toDate);
+
+                }
+
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    private ArrayList<String> getDateRange(ArrayList<String> datesOfInvoice, String fromDate, String toDate) throws ParseException {
+
+        ArrayList<String> newList = new ArrayList<>();
+        Date d1 = null, d2 = null, d3 = null, d4 = null;
+        SimpleDateFormat dbformat = new SimpleDateFormat("yyyy_MM_dd");
+
+        d1 = dbformat.parse(fromDate);
+        d2 = dbformat.parse(toDate);
+
+
+        for (int i = 0; i < datesOfInvoice.size(); i++) {
+            String b = datesOfInvoice.get(i);
+            d3 = dbformat.parse(b);
+            if (d3.compareTo(d1) >= 0 && d3.compareTo(d2) <= 0) {
+                Log.i("newDates", datesOfInvoice.get(i));
+                newList.add(datesOfInvoice.get(i));
+            }
+
+        }
+
+        return newList;
+    }
+
+
+    private void getMonthData(final String selMonth, final String month_name) {
+
+        progressDialog = ProgressDialog.show(getContext(), "Please wait", "Loading", true);
+        final ArrayList<String> c_nameList, inv_dateList, inv_noList, amountList, gst_inList;
+
+        c_nameList = new ArrayList<>();
+        inv_dateList = new ArrayList<>();
+        inv_noList = new ArrayList<>();
+        amountList = new ArrayList<>();
+        gst_inList = new ArrayList<>();
+
+        DatabaseReference rootref = FirebaseDatabase.getInstance().getReference();
+        rootref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot child : dataSnapshot.child("Invoice").getChildren()) {
+                    SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy_MM_dd");
+                    SimpleDateFormat df = new SimpleDateFormat("MM");
+
+                    Date dbMonth = null;
+                    try {
+                        dbMonth = dbFormat.parse(String.valueOf(child.getKey()));
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    String dbDate = dbFormat.format(dbMonth);
+                    String retrievedMonth = df.format(dbMonth);
+                    if (retrievedMonth.equals(selMonth)) {
+
+                        for (DataSnapshot invoice_child : child.getChildren()) {
+
+                            String inv_no = invoice_child.getKey();
+
+                            DataSnapshot details_child = invoice_child.child("Details");
+                            String clientId_ = details_child.child("client_id").getValue().toString();
+                            String total = details_child.child("amount").getValue().toString();
+
+
+                            DataSnapshot client_child = dataSnapshot.child("Client").child(clientId_);
+                            String client_name = client_child.child("name").getValue().toString();
+                            String gstin = client_child.child("gst").getValue().toString();
+
+
+                            c_nameList.add(client_name);
+                            inv_dateList.add(dbDate);
+                            inv_noList.add(inv_no);
+                            amountList.add(total);
+                            gst_inList.add(gstin);
+
+                        }
+
+                    }
+
+                }
+
+                if (c_nameList.isEmpty()) {
+                    Toast.makeText(getContext(), "No Invoiced Found On that month", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                } else {
+                    invoiceDialogBuilder.dismiss();
+                    progressDialog.dismiss();
+
+
+                    invoiceExcel(gst_inList, c_nameList, inv_noList, inv_dateList, amountList, "Invoice for " + month_name);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void getDateData(final String dbDate) {
+
+        progressDialog = ProgressDialog.show(getContext(), "Please wait", "Loading", true);
+        final ArrayList<String> c_nameList, inv_dateList, inv_noList, amountList, gst_inList;
+
+        c_nameList = new ArrayList<>();
+        inv_dateList = new ArrayList<>();
+        inv_noList = new ArrayList<>();
+        amountList = new ArrayList<>();
+        gst_inList = new ArrayList<>();
+
+        DatabaseReference rootref = FirebaseDatabase.getInstance().getReference();
+        rootref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                for (DataSnapshot child : dataSnapshot.child("Invoice").child(dbDate).getChildren()) {
+
+                    String inv_no = child.getKey();
+                    DataSnapshot details_child = child.child("Details");
+                    String clientId_ = details_child.child("client_id").getValue().toString();
+                    String total = details_child.child("amount").getValue().toString();
+
+
+                    DataSnapshot client_child = dataSnapshot.child("Client").child(clientId_);
+                    String client_name = client_child.child("name").getValue().toString();
+                    String gstin = client_child.child("gst").getValue().toString();
+
+
+                    c_nameList.add(client_name);
+                    inv_dateList.add(dbDate);
+                    inv_noList.add(inv_no);
+                    amountList.add(total);
+                    gst_inList.add(gstin);
+                }
+
+                progressDialog.dismiss();
+                invoiceExcel(gst_inList, c_nameList, inv_noList, inv_dateList, amountList, "Invoice for " + dbDate);
+
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private boolean invoiceExcel(ArrayList<String> gst_inList, ArrayList<String> c_nameList, ArrayList<String> inv_noList, ArrayList<String> inv_dateList, ArrayList<String> amountList, String filename) {
+
+        progressDialog = ProgressDialog.show(getContext(), "Please wait", "Saving", true);
+        boolean success = false;
+
+        //New Workbook
+        Workbook wb = new HSSFWorkbook();
+
+        Cell c = null;
+
+        //New Sheet
+        final Sheet sheet1 = wb.createSheet("Invoice");
+
+        // Generate column headings
+        final Row row = sheet1.createRow(0);
+
+
+        c = row.createCell(0);
+        c.setCellValue("GSTIN");
+//        c.setCellStyle(cs);
+
+        c = row.createCell(1);
+        c.setCellValue("Name");
+//        c.setCellStyle(cs);
+
+        c = row.createCell(2);
+        c.setCellValue("Inv No");
+
+        c = row.createCell(3);
+        c.setCellValue("Date");
+
+        c = row.createCell(4);
+        c.setCellValue("Basic Value");
+
+        c = row.createCell(5);
+        c.setCellValue("Tax");
+
+        c = row.createCell(6);
+        c.setCellValue("IGST");
+
+        c = row.createCell(7);
+        c.setCellValue("CGST");
+
+        c = row.createCell(8);
+        c.setCellValue("SGST");
+
+        c = row.createCell(9);
+        c.setCellValue("Cess");
+
+        c = row.createCell(10);
+        c.setCellValue("Total");
+
+
+        for (int i = 1; i <= c_nameList.size(); i++) {
+
+            Row row1 = sheet1.createRow(i);
+
+            Cell cell = null;
+
+            cell = row1.createCell(0);
+            cell.setCellValue(gst_inList.get(i - 1));
+
+            cell = row1.createCell(1);
+            cell.setCellValue(c_nameList.get(i - 1));
+
+            cell = row1.createCell(2);
+            cell.setCellValue(inv_noList.get(i - 1));
+
+            cell = row1.createCell(3);
+            cell.setCellValue(inv_dateList.get(i - 1));
+
+            cell = row1.createCell(4);
+            cell.setCellValue(amountList.get(i - 1));
+
+            cell = row1.createCell(5);
+            cell.setCellValue(amountList.get(i - 1));
+
+            cell = row1.createCell(6);
+            cell.setCellValue(amountList.get(i - 1));
+
+            cell = row1.createCell(7);
+            cell.setCellValue(amountList.get(i - 1));
+
+            cell = row1.createCell(8);
+            cell.setCellValue(amountList.get(i - 1));
+
+            cell = row1.createCell(9);
+            cell.setCellValue(amountList.get(i - 1));
+
+            cell = row1.createCell(10);
+            cell.setCellValue(amountList.get(i - 1));
+
+        }
+
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
+//        String filename = dateFormat.format(calendar.getTime()) + "_Invoice_by_" + method + ".xls";
+        // Create a path where we will place our List of objects on external storage
+        File file = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies", filename + ".xls");
+
+        FileOutputStream os = null;
+
+        try {
+            os = new FileOutputStream(file);
+            wb.write(os);
+            Log.w("FileUtils", "Writing file" + file);
+            success = true;
+            Toast.makeText(getContext(), "Saved Successfully", Toast.LENGTH_SHORT).show();
+
+            progressDialog.dismiss();
+
+        } catch (IOException e) {
+            Log.w("FileUtils", "Error writing " + file, e);
+        } catch (Exception e) {
+            Log.w("FileUtils", "Failed to save file", e);
+        } finally {
+            try {
+                if (null != os)
+                    os.close();
+            } catch (Exception ex) {
+            }
+        }
+
+        return success;
+    }
+
 
     private void populateCreditList() {
 
@@ -177,7 +735,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                         list.add(new CreditModel(billno, cr, amnt, date, name, paid));
                         Log.i("Invoice Values", billno + "  " + cr);
                     }
-
                 }
                 saveInvoiceExcel();
 
@@ -210,7 +767,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
 
         //New Sheet
-        final Sheet sheet1 = wb.createSheet("Orders");
+        final Sheet sheet1 = wb.createSheet("Credit");
 
 
         // Generate column headings
@@ -281,6 +838,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             wb.write(os);
             Log.w("FileUtils", "Writing file" + file);
             success = true;
+            Toast.makeText(getContext(), "Saved Successfully", Toast.LENGTH_SHORT).show();
             progressDialog.dismiss();
         } catch (IOException e) {
             Log.w("FileUtils", "Error writing " + file, e);
@@ -532,7 +1090,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             wb.write(os);
             Log.w("FileUtils", "Writing file" + file);
             success = true;
-
+            Toast.makeText(getContext(), "Saved Successfully", Toast.LENGTH_SHORT).show();
             progressDialog.dismiss();
 
         } catch (IOException e) {
