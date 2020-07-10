@@ -1,16 +1,16 @@
 package com.rabbitt.momobill.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,8 +36,8 @@ public class CheckOrderActivity extends AppCompatActivity {
 
     public static DatabaseReference orderRef;
 
-    String date,dd,mm,yy,fdate;
     ProgressDialog progressDialog;
+    String date,dd,mm,yy,fdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,23 +74,19 @@ public class CheckOrderActivity extends AppCompatActivity {
                     date = child.getKey();
                     fdate  = date;
 
-                    yy = fdate.substring(0,fdate.indexOf("_"));
-                    fdate = fdate.substring(fdate.indexOf("_")+1);
-                    mm = fdate.substring(0,fdate.indexOf("_"));
-                    fdate = fdate.substring(fdate.indexOf("_")+1);
+                    yy = fdate.substring(0, fdate.indexOf("_"));
+                    fdate = fdate.substring(fdate.indexOf("_") + 1);
+                    mm = fdate.substring(0, fdate.indexOf("_"));
+                    fdate = fdate.substring(fdate.indexOf("_") + 1);
                     dd = fdate;
 
-                    fdate = dd+"/"+mm+"/"+yy;
+                    fdate = dd + "/" + mm + "/" + yy;
 
-
-
-                    data.add(new OrderDate(fdate,date));
-
-                    adapter = new OrderDateAdapter(data);
-                    recyclerView.setAdapter(adapter);
+                    data.add(new OrderDate(fdate, date));
 
                 }
-
+                adapter = new OrderDateAdapter(data);
+                recyclerView.setAdapter(adapter);
                 progressDialog.dismiss();
 
             }
@@ -116,10 +112,9 @@ public class CheckOrderActivity extends AppCompatActivity {
         public void onClick(View v) {
 
             int selectedItemPosition = recyclerView.getChildPosition(v);
-            Intent intent = new Intent(context,OrderDetailsActivity.class);
+            Intent intent = new Intent(context, OrderNameActivity.class);
             intent.putExtra("date",data.get(selectedItemPosition).getDate());
             context.startActivity(intent);
-//            Toast.makeText(context, data.get(selectedItemPosition).getDate(), Toast.LENGTH_SHORT).show();
 
         }
 
