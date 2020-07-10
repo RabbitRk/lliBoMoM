@@ -1,14 +1,15 @@
 package com.rabbitt.momobill.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -34,9 +35,11 @@ public class ClientActivity extends AppCompatActivity {
     String[] ar;
 
     AutoCompleteTextView line;
-    LineAdapter adapter ;
+    LineAdapter adapter;
     ArrayList<Line> linelist;
     DatabaseReference lineReference;
+
+    ProgressDialog progressDialog;
 
     int lastkey = -1;
 
@@ -62,6 +65,13 @@ public class ClientActivity extends AppCompatActivity {
         line.setEms(15);
 
         lineReference = FirebaseDatabase.getInstance().getReference("Line");
+
+        updateLine();
+    }
+
+    private void updateLine() {
+
+        linelist.clear();
         lineReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -91,6 +101,10 @@ public class ClientActivity extends AppCompatActivity {
 
     public void add_client(View view) {
         if (validate()) {
+
+            progressDialog = ProgressDialog.show(ClientActivity.this, "Please wait", "Saving", true);
+
+            updateLine();
 
             final IncrementPref incrementPref = new IncrementPref(this);
 
@@ -151,6 +165,7 @@ public class ClientActivity extends AppCompatActivity {
                             //Incrementing the Client ID and storing in the PrefsManager
 //                    incrementPref.setClientID(String.valueOf(Integer.parseInt(client_id) + 1));
 
+                            progressDialog.dismiss();
                             Toast.makeText(ClientActivity.this, "Client added successfully", Toast.LENGTH_SHORT).show();
                             onBackPressed();
 
@@ -158,6 +173,8 @@ public class ClientActivity extends AppCompatActivity {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            progressDialog.dismiss();
+                            Toast.makeText(ClientActivity.this, "Failed ! Please Check your Internet Connection and retry", Toast.LENGTH_SHORT).show();
                             Log.i(TAG, "onFailure: " + e.toString());
                         }
                     });

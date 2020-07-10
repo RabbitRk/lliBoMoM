@@ -151,6 +151,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         });
 
 
+
         return inflate;
     }
 
@@ -170,7 +171,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedLine = linelist.get(i).getLine();
-                Toast.makeText(getContext(), selectedLine, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),selectedLine, Toast.LENGTH_SHORT).show();
                 getClients();
             }
         });
@@ -278,7 +279,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                     client_id.add(client_id_);
                 }
 
-                Log.i(TAG, "onDataChange: " + client_id);
+                Log.i(TAG, "onDataChange: "+client_id);
 //                spinner.setItems(clients);
             }
 
@@ -324,7 +325,8 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
                 Log.i(TAG, "onDataChange: " + dataSnapshot);
 
-                if (order.size() != 0) {
+                if (order.size() != 0)
+                {
                     order.clear();
                 }
 
@@ -351,9 +353,10 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
                     order.add(product);
                 }
-                Log.i(TAG, "onDataChange: " + order.size());
+                Log.i(TAG, "onDataChange: "+order.size());
 
-                if (order.size() != 0) {
+                if (order.size() != 0)
+                {
                     updateOrder(order);
                 }
             }
@@ -365,7 +368,8 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         });
     }
 
-    public void updateOrder(List<ProductInvoice> data) {
+    public void updateOrder(List<ProductInvoice> data)
+    {
         order_layout.setVisibility(View.VISIBLE);
         OrderAdapter = new OrderAdapter(data, this, this);
         LinearLayoutManager reLayout = new LinearLayoutManager(getActivity());
@@ -404,7 +408,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
     @SuppressLint("SetTextI18n")
     public void openDialog(final ProductInvoice model, final String ex_unit, String name_, final String product_id) {
-
+        
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.invoice_dialog);
         dialog.setCancelable(true);
@@ -422,7 +426,9 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             public void onClick(View v) {
                 if (units.getText().toString().trim().equals("")) {
                     Toast.makeText(getActivity(), "Please enter units", Toast.LENGTH_SHORT).show();
-                } else {
+                }
+                else
+                {
                     double sale_ = Double.parseDouble(model.getSale_rate()) * Double.parseDouble(units.getText().toString().trim());
                     ProductInvoice product = new ProductInvoice();
                     product.setProduct_name(model.getProduct_name());
@@ -480,39 +486,27 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.cart_btn_order) {
-//            Toast.makeText(getActivity(), "Buttonclicked", Toast.LENGTH_SHORT).show();
+        if (v.getId() == R.id.cart_btn_order)
+        {
+            Toast.makeText(getActivity(), "Buttonclicked", Toast.LENGTH_SHORT).show();
             cart = order;
             order_layout.setVisibility(View.GONE);
-        } else {
+        }
+        else
+        {
             Toast.makeText(getActivity(), "cart", Toast.LENGTH_SHORT).show();
 
-            try {
-                if (validate()) {
-                    CartSheet cartSheet = new CartSheet(cart, this, this, "invoice", clientId, getDate(), getContext());
-                    cartSheet.show(getParentFragmentManager(), "cart");
-                }
-            } catch (Exception e) {
-                Toast.makeText(getActivity(), "Please enter all the values", Toast.LENGTH_SHORT).show();
-                Log.i(TAG, "Exception: " + e.getMessage() + e.toString());
+            if (cart != null)
+            {
+                CartSheet cartSheet = new CartSheet(cart, this, this, "invoice", clientId, getDate(), getContext());
+                cartSheet.show(getParentFragmentManager(), "cart");
             }
-        }
-    }
+            else
+            {
+                Toast.makeText(getActivity(), "Add product to the cart", Toast.LENGTH_SHORT).show();
+            }
 
-    private boolean validate() {
-        if (cart == null) {
-            Toast.makeText(getActivity(), "Cart is empty", Toast.LENGTH_SHORT).show();
-            return false;
         }
-        if (selectedLine.equals("")) {
-            Toast.makeText(getActivity(), "Please select the Line", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        if (selectedClient.equals("")) {
-            Toast.makeText(getActivity(), "Please select the client", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        return true;
     }
 
     private void filter(String text) {
@@ -524,6 +518,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         }
         productAdapter.filterList(filteredList);
     }
+
 
 
     public String getDate() {

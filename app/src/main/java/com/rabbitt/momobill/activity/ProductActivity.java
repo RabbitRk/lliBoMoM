@@ -2,6 +2,7 @@ package com.rabbitt.momobill.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -63,6 +64,8 @@ public class ProductActivity extends AppCompatActivity {
 
     double amount;
     private StorageReference storageRef;
+
+    ProgressDialog progressDialog;
 
     IncrementPref incrementPref;
 
@@ -235,6 +238,8 @@ public class ProductActivity extends AppCompatActivity {
 
         if (validate()) {
             try {
+
+                progressDialog = ProgressDialog.show(ProductActivity.this, "Please wait", "Saving", true);
                 Log.i(TAG, "uploadImage_fire: " + getFileExtension(final_uri));
                 final StorageReference riversRef = storageRef.child("ProductImage/" + product_name.getText().toString().trim());
 
@@ -244,6 +249,8 @@ public class ProductActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
+                        progressDialog.dismiss();
+                        Toast.makeText(ProductActivity.this, "Failed ! Please Check your Internet Connection and retry", Toast.LENGTH_SHORT).show();
                         Log.i(TAG, "onFailure: " + exception.getMessage());
                     }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -291,12 +298,14 @@ public class ProductActivity extends AppCompatActivity {
 
                                                 //Updating product ID
                                                 incrementPref.setProductID(String.valueOf(Integer.parseInt(newKey) + 1));
+                                                progressDialog.dismiss();
 
                                                 Toast.makeText(ProductActivity.this, "Product added successfully", Toast.LENGTH_SHORT).show();
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(ProductActivity.this, "Failed ! Please Check your Internet Connection and retry", Toast.LENGTH_SHORT).show();
                                                 Log.i(TAG, "onFailure: " + e.toString());
                                             }
                                         });

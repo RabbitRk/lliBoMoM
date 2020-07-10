@@ -65,6 +65,8 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     Context context;
     View v;
 
+    ProgressDialog progressDialog;
+
     public CartSheet(List<ProductInvoice> data, Fragment invoiceFrag, Fragment frag, String value, String order, String s, Context context) {
         this.data = data;
         this.invoiceFrag = invoiceFrag;
