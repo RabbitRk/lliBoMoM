@@ -2,18 +2,23 @@ package com.rabbitt.momobill.model;
 
 public class OrderDetails {
 
-    String name,product;
+    String product, unit, amount;
 
-    public OrderDetails(String name, String product) {
-        this.name = name;
+    public OrderDetails(String product, String unit, String amount) {
         this.product = product;
-    }
-
-    public String getName() {
-        return name;
+        this.unit = unit;
+        this.amount = amount;
     }
 
     public String getProduct() {
         return product;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public String getAmount() {
+        return amount;
     }
 }

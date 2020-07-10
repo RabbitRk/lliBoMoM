@@ -1,15 +1,14 @@
 
 package com.rabbitt.momobill.activity;
 
+import android.app.ProgressDialog;
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.app.ProgressDialog;
-import android.os.Bundle;
-import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,14 +30,16 @@ public class OrderDetailsActivity extends AppCompatActivity {
 
     ProgressDialog progressDialog;
 
-    String date,name,product;
-    DatabaseReference orderRef,clientRef;
+    String date, c_id, product, units, amount;
+    DatabaseReference orderRef, clientRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_details);
 
         date = getIntent().getStringExtra("date");
+        c_id = getIntent().getStringExtra("c_id");
 
         recyclerView = findViewById(R.id.recycler_view);
 
@@ -52,7 +53,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         orderRef = database.getReference("Order");
-        clientRef = database.getReference("Client");
+
 
         populateRecycler();
     }
@@ -61,52 +62,29 @@ public class OrderDetailsActivity extends AppCompatActivity {
 
         data.clear();
 
-            orderRef.child(date).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+        orderRef.child(date).child(c_id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    for(final DataSnapshot clientChild : dataSnapshot.getChildren()) {
-
-
-                        final String clientId = clientChild.getKey();
-
-                        clientRef.child(clientId).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                name = dataSnapshot.child("name").getValue().toString();
-
-                                for (DataSnapshot productChild : clientChild.getChildren()) {
-
-//                        String productId = productChild.getKey();
-
-                                    if (productChild.hasChildren()) {
-
-                                        product = productChild.child("product_name").getValue().toString();
-                                        Log.i("clientid",name + product);
-                                        data.add(new OrderDetails(name,product));
-                                        adapter = new OrderDetailsAdapter(data);
-                                        recyclerView.setAdapter(adapter);
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-
-                        }
-
-                    progressDialog.dismiss();
+                for (final DataSnapshot clientChild : dataSnapshot.getChildren()) {
+                    final String p_id = clientChild.getKey();
+                    DataSnapshot product_child = dataSnapshot.child(p_id);
+                    product = product_child.child("product_name").getValue().toString();
+                    units = product_child.child("unit").getValue().toString();
+                    amount = product_child.child("sale_rate").getValue().toString();
+                    data.add(new OrderDetails(product, units, amount));
                 }
+                adapter = new OrderDetailsAdapter(data);
+                recyclerView.setAdapter(adapter);
+                progressDialog.dismiss();
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                }
+            }
 
-            });
+        });
     }
 }
+
