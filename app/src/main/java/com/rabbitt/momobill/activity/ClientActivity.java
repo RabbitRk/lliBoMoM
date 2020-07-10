@@ -130,7 +130,6 @@ public class ClientActivity extends AppCompatActivity {
 
                     lineReference.child(line.getText().toString().trim()).child(String.valueOf(lastkey)).setValue(name.getText().toString().trim());
 
-
                     HashMap<String, Object> hashMap = new HashMap<>();
                     hashMap.put("name", name.getText().toString().trim());
                     hashMap.put("client_id", String.valueOf(lastkey));
