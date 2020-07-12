@@ -1,5 +1,6 @@
 package com.rabbitt.momobill;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,8 +22,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.rabbitt.momobill.activity.ClientActivity;
-import com.rabbitt.momobill.model.Client;
 import com.rabbitt.momobill.prefsManager.PrefsManager;
 
 import java.util.HashMap;
@@ -31,6 +30,8 @@ public class SignUpActivity extends AppCompatActivity {
     private static final String TAG = "maluSign";
     EditText name, phone, email, add1, add2, city, state, pincode, gst;
     String key;
+
+    ProgressDialog progressDialog;
 
     RadioGroup ex;
     RadioButton in_, ex_;
@@ -86,15 +87,14 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     public void register(View view) {
+
+        progressDialog = ProgressDialog.show(SignUpActivity.this, "Please wait", "Loading", true);
         String design = "";
 
-        if (validate())
-        {
-            if (in_.isChecked())
-            {
+        if (validate()) {
+            if (in_.isChecked()) {
                 design = "Owner";
-            }
-            else{
+            } else {
                 design = "Employee";
             }
 
@@ -162,6 +162,7 @@ public class SignUpActivity extends AppCompatActivity {
                     pincode.setText("");
                     gst.setText("");
 
+                    progressDialog.dismiss();
                     Toast.makeText(SignUpActivity.this, "Registered successfully", Toast.LENGTH_SHORT).show();
                 }
             }).addOnFailureListener(new OnFailureListener() {

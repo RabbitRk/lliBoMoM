@@ -2,6 +2,8 @@ package com.rabbitt.momobill.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -87,10 +89,30 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     ArrayList<Line> linelist;
     AutoCompleteTextView line, clientAutoTV;
     DatabaseReference lineReference;
+    SharedPreferences preferences;
 
     public InvoiceFrag() {
         // Required empty public constructor
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        preferences.edit().putString("invoiceLine", selectedLine).apply();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        preferences.edit().putString("invoiceLine", selectedLine).apply();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        preferences.edit().putString("invoiceLine", selectedLine).apply();
+    }
+
 
     public static InvoiceFrag newInstance(String param1, String param2) {
         InvoiceFrag fragment = new InvoiceFrag();
@@ -166,11 +188,24 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         line = inflate.findViewById(R.id.txt_line);
         clientAutoTV = inflate.findViewById(R.id.txt_client);
 
+
+        try {
+
+            preferences = getContext().getSharedPreferences("invoiceFrag", Context.MODE_PRIVATE);
+            final String lineTxt = preferences.getString("invoiceLine", "");
+            selectedLine = lineTxt;
+            line.setText(lineTxt);
+            getClients();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         line.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedLine = linelist.get(i).getLine();
-                Toast.makeText(getContext(), selectedLine, Toast.LENGTH_SHORT).show();
+                preferences.edit().putString("orderLine", selectedLine).apply();
+//                Toast.makeText(getContext(), selectedLine, Toast.LENGTH_SHORT).show();
                 getClients();
             }
         });

@@ -264,6 +264,11 @@ public class ClientActivity extends AppCompatActivity {
 //    }
 
     private boolean validate() {
+
+        if (line.getText().toString().trim().equals("")) {
+            line.setError("Required");
+            return false;
+        }
         if (name.getText().toString().trim().equals("")) {
             name.setError("Required");
             return false;

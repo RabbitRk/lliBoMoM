@@ -84,18 +84,24 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
 //        Gets Client name for credit
         DatabaseReference clientReference = FirebaseDatabase.getInstance().getReference("Client");
-        clientReference.child(client_id).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+        try {
 
-                client_name = dataSnapshot.child("name").getValue().toString();
-            }
+            clientReference.child(client_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                    client_name = dataSnapshot.child("name").getValue().toString();
+                }
 
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+        } catch (NullPointerException e) {
+            Toast.makeText(context, "Please enter valid line and Client Name", Toast.LENGTH_SHORT).show();
+        }
 
         return v;
     }
@@ -458,7 +464,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             Log.i(TAG, "onComplete: " + task.toString());
-                            Toast.makeText(getActivity(), "Invoice complete", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getActivity(), "Invoice complete", Toast.LENGTH_SHORT).show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -514,7 +520,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Log.i(TAG, "onComplete: " + task.toString());
-                Toast.makeText(getActivity(), "Purchased on credit", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity(), "Purchased on credit", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

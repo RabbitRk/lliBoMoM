@@ -200,7 +200,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedLine = linelist.get(i).getLine();
                 preferences.edit().putString("orderLine", selectedLine).apply();
-                Toast.makeText(getContext(), selectedLine, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), selectedLine, Toast.LENGTH_SHORT).show();
                 getClients();
             }
         });
