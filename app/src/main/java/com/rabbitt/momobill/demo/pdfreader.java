@@ -3,6 +3,7 @@ package com.rabbitt.momobill.demo;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -39,19 +40,10 @@ public class pdfreader extends AppCompatActivity {
 
     private void openPDF() throws IOException {
 
-        if(getIntent().getStringExtra("from").equals("genrate")) {
-            File file = new File(Environment.getExternalStorageDirectory() + File.separator + getIntent().getStringExtra("inv") + "temp.pdf");
-            imageView.fromFile(file);
-            imageView.fromFile(file)
-                    .defaultPage(1)
-                    .showMinimap(false)
-                    .enableSwipe(true)
-                    .swipeVertical(true)
-                    .load();
-        }
-        else {
-            File file = new File(Environment.getExternalStorageDirectory() + File.separator + getIntent().getStringExtra("inv") + ".pdf");
-            if(file.exists()) {
+        try
+        {
+            if(getIntent().getStringExtra("from").equals("genrate")) {
+                File file = new File(Environment.getExternalStorageDirectory() + File.separator + getIntent().getStringExtra("inv") + "temp.pdf");
                 imageView.fromFile(file);
                 imageView.fromFile(file)
                         .defaultPage(1)
@@ -60,11 +52,28 @@ public class pdfreader extends AppCompatActivity {
                         .swipeVertical(true)
                         .load();
             }
-            else
-            {
-                Toast.makeText(this, "File Not Found", Toast.LENGTH_SHORT).show();
+            else {
+                File file = new File(Environment.getExternalStorageDirectory() + File.separator + getIntent().getStringExtra("inv") + ".pdf");
+                if(file.exists()) {
+                    imageView.fromFile(file);
+                    imageView.fromFile(file)
+                            .defaultPage(1)
+                            .showMinimap(false)
+                            .enableSwipe(true)
+                            .swipeVertical(true)
+                            .load();
+                }
+                else
+                {
+                    Toast.makeText(this, "File Not Found", Toast.LENGTH_SHORT).show();
+                }
             }
         }
+        catch(Exception e)
+        {
+            Log.i("maluPdf", "Exception: "+e.toString());
+        }
+
     }
 
     /**
