@@ -309,7 +309,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 //                Log.i(TAG, "onItemSelected: "+client_id.get(position)+" Position "+position+" ClientName "+clients.get(position));
 //                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
 //                getOrder("1");
-////                getOrder(client_id.get(position));
+//                getOrder(client_id.get(position));
 //            }
 //        });
     }

@@ -48,6 +48,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = "maluDash";
 
     private String mParam1;
     private String mParam2;
@@ -547,11 +548,9 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                     String clientId_ = details_child.child("client_id").getValue().toString();
                     String total = details_child.child("amount").getValue().toString();
 
-
                     DataSnapshot client_child = dataSnapshot.child("Client").child(clientId_);
                     String client_name = client_child.child("name").getValue().toString();
                     String gstin = client_child.child("gst").getValue().toString();
-
 
                     c_nameList.add(client_name);
                     inv_dateList.add(dbDate);
@@ -723,8 +722,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
 
                     for (final DataSnapshot clientChild : child.getChildren()) {
-
-
+                        Log.i(TAG, "onDataChange: "+clientChild);
                         billno = clientChild.getKey();
                         cr = clientChild.child("balance").getValue().toString();
                         amnt = clientChild.child("amount").getValue().toString();
@@ -736,10 +734,8 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                         Log.i("Invoice Values", billno + "  " + cr);
                     }
                 }
-                saveInvoiceExcel();
-
+                saveCreditExcel();
             }
-
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -750,13 +746,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
     }
 
-//    private String getClientName(String clientid) {
-//
-//
-//        return name;
-//    }
-
-    private boolean saveInvoiceExcel() {
+    private boolean saveCreditExcel() {
 
         boolean success = false;
 
@@ -776,15 +766,12 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
         c = row.createCell(0);
         c.setCellValue("Date");
-//        c.setCellStyle(cs);
 
         c = row.createCell(1);
         c.setCellValue("Bill No");
-//        c.setCellStyle(cs);
 
         c = row.createCell(2);
         c.setCellValue("Name");
-//        c.setCellStyle(cs);
 
         c = row.createCell(3);
         c.setCellValue("Total Amount");
@@ -820,10 +807,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
             cell = row1.createCell(5);
             cell.setCellValue(list.get(i - 1).getCr());
-
-
         }
-
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
@@ -855,7 +839,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         return success;
     }
 
-
     private void populateList() {
 
         namelist.clear();
@@ -868,7 +851,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
 
                 String date, productId;
 
@@ -883,9 +865,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                     date = date.substring(date.indexOf("_") + 1);
                     dd = date;
 
-
                     fdate = dd + "-" + mm + "-" + yy;
-//                    datelist.add(date);
 
                     Log.i("iteration", "1");
                     for (DataSnapshot clientChild : child.getChildren()) {
@@ -923,9 +903,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                                         basicvallist.add(basicval);
                                         taxlist.add(tax);
                                         cesslist.add(cess);
-                                        saveExcelFile();
-
-
+                                        saveOrdersFile();
                                     }
 
                                     @Override
@@ -952,7 +930,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
     }
 
-    private boolean saveExcelFile() {
+    private boolean saveOrdersFile() {
 
         // check if available and not read only
 //        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
