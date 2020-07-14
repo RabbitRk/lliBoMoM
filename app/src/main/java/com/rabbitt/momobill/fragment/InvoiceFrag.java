@@ -2,6 +2,7 @@ package com.rabbitt.momobill.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -29,6 +30,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,11 +42,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.adapter.CartSheet;
 import com.rabbitt.momobill.adapter.ClientAutoAdapter;
+import com.rabbitt.momobill.adapter.CreditAdapter;
 import com.rabbitt.momobill.adapter.GridSpacingItemDecoration;
 import com.rabbitt.momobill.adapter.InvoicePAdapter;
 import com.rabbitt.momobill.adapter.LineAdapter;
 import com.rabbitt.momobill.adapter.OrderAdapter;
 import com.rabbitt.momobill.model.ClientModel;
+import com.rabbitt.momobill.model.Credit;
 import com.rabbitt.momobill.model.Line;
 import com.rabbitt.momobill.model.ProductInvoice;
 
@@ -50,9 +56,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
-public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleItemListener, View.OnClickListener, OrderAdapter.OnRecyleItemListener {
+public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleItemListener, View.OnClickListener, OrderAdapter.OnRecyleItemListener, CreditAdapter.OnRecyleItemListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -76,11 +83,14 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     private RecyclerView order_recycler;
 
     private List<ProductInvoice> order = new ArrayList<>();
-    private List<ProductInvoice> credit = new ArrayList<>();
     private OrderAdapter OrderAdapter;
 
     private Button cart_btn_order;
 
+    private List<Credit> credit = new ArrayList<>();
+    private CreditAdapter creditAdapter;
+    private LinearLayout credit_layout;
+    private RecyclerView credit_recycler;
 
     String[] ar;
     String clientId;
@@ -90,7 +100,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     AutoCompleteTextView line, clientAutoTV;
     DatabaseReference lineReference;
     SharedPreferences preferences;
-
+    EditText edx;
     public InvoiceFrag() {
         // Required empty public constructor
     }
@@ -188,7 +198,6 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         line = inflate.findViewById(R.id.txt_line);
         clientAutoTV = inflate.findViewById(R.id.txt_client);
 
-
         try {
 
             preferences = getContext().getSharedPreferences("invoiceFrag", Context.MODE_PRIVATE);
@@ -214,6 +223,8 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         order_layout = inflate.findViewById(R.id.order_layout);
         order_recycler = inflate.findViewById(R.id.recycler_order_invoice);
 
+        credit_layout = inflate.findViewById(R.id.credit_layout);
+        credit_recycler = inflate.findViewById(R.id.recycler_credit_invoice);
 //        getClients();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
@@ -236,6 +247,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                     String gst = snapshot.child("cgst_sgst").getValue(String.class);
                     String cess = snapshot.child("cess").getValue(String.class);
                     String in_ex = snapshot.child("in_ex").getValue(String.class);
+                    String hsn = snapshot.child("hsn").getValue(String.class);
 
                     ProductInvoice product = new ProductInvoice();
                     product.setImg_url(img_url);
@@ -246,6 +258,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                     product.setCgst(gst);
                     product.setCess(cess);
                     product.setIn(in_ex);
+                    product.setHsn(hsn);
 
                     data.add(product);
                 }
@@ -258,7 +271,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             }
         });
 
-        EditText edx = inflate.findViewById(R.id.txt_name);
+        edx = inflate.findViewById(R.id.txt_name);
         edx.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -330,23 +343,66 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
                 selectedClient = clientList.get(i).getClient();
                 clientId = clientList.get(i).getClientid();
+                Log.i(TAG, "TextOfCredit: "+selectedClient+"   "+clientId);
                 Log.i(TAG, "onItemSelected: " + client_id.get(i) + " Position " + i + " ClientName " + clients.get(i));
-                Snackbar.make(view, "Clicked " + clients.get(i), Snackbar.LENGTH_LONG).show();
-                getOrder("1");
+                getOrder(clientId);
+                getCredit(clientId);
             }
         });
+    }
 
-//        spinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener<String>() {
-//
-//            @Override
-//            public void onItemSelected(MaterialSpinner view, int position, long id, String item) {
-//
-//                Log.i(TAG, "onItemSelected: "+client_id.get(position)+" Position "+position+" ClientName "+clients.get(position));
-//                Snackbar.make(view, "Clicked " + item, Snackbar.LENGTH_LONG).show();
-//                getOrder("1");
-////                getOrder(client_id.get(position));
-//            }
-//        });
+    private void getCredit(String s) {
+        DatabaseReference reference = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("Credits").child(s);
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                Log.i(TAG, "onDataChange: " + dataSnapshot);
+
+                if (credit.size() != 0) {
+                    credit.clear();
+                }
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Log.i(TAG, "invoice_id: " + snapshot.getKey());
+                    Log.i(TAG, "invoice_id: " + snapshot.child("balance").getValue(String.class));
+
+                    Credit cre = new Credit();
+                    cre.setBalance(snapshot.child("balance").getValue(String.class));
+                    cre.setDate_on(snapshot.child("date_of").getValue(String.class));
+                    cre.setClient_id(snapshot.child("client_id").getValue(String.class));
+                    cre.setInvoice_id(snapshot.getKey());
+
+                    if (!snapshot.child("balance").getValue(String.class).equals("0")) {
+                        credit.add(cre);
+                    }
+                }
+                Log.i(TAG, "onDataChange: " + credit.size());
+
+                if (credit.size() != 0) {
+                    Log.i(TAG, "onDataChange: Ready for Recycler update");
+                    updateCredit(credit);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void updateCredit(List<Credit> credit) {
+        credit_layout.setVisibility(View.VISIBLE);
+        creditAdapter = new CreditAdapter(credit, this, this);
+        LinearLayoutManager reLayout = new LinearLayoutManager(getActivity());
+        credit_recycler.setLayoutManager(reLayout);
+        reLayout.setOrientation(RecyclerView.VERTICAL);
+        credit_recycler.setAdapter(creditAdapter);
+        creditAdapter.notifyDataSetChanged();
+        credit_recycler.setVisibility(View.VISIBLE);
     }
 
     private void getOrder(String s) {
@@ -426,7 +482,17 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     public void OnItemClick(int position) {
         Log.i(TAG, "OnItemClick: " + position);
         Log.i(TAG, "pos " + position);
-        ProductInvoice model = data.get(position);
+
+        ProductInvoice model;
+
+        if (edx.getText().toString().equals(""))
+        {
+            model = data.get(position);
+        }
+        else
+        {
+            model = filteredList.get(position);
+        }
 
         String product_id = model.getProduct_id();
         String unit = model.getUnit();
@@ -548,9 +614,9 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         }
         return true;
     }
-
+    List<ProductInvoice> filteredList;
     private void filter(String text) {
-        List<ProductInvoice> filteredList = new ArrayList<>();
+        filteredList = new ArrayList<>();
         for (ProductInvoice item : data) {
             if (item.getProduct_name().toLowerCase().contains(text.toLowerCase())) {
                 filteredList.add(item);
@@ -572,5 +638,76 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     @Override
     public void OrderAdd(int position) {
         Toast.makeText(getActivity(), "Add", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void OnSettle(int position) {
+        Log.i(TAG, "OnSettle: " + position);
+
+        Credit crea = credit.get(position);
+
+        if (!crea.getBalance().equals("0.0")) {
+            addCreditDialog(position, crea.getInvoice_id(), crea.getBalance(), crea.getClient_id());
+        } else {
+            Toast.makeText(getActivity(), "No credit value found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void addCreditDialog(final int position, final String invoice_id, String balance, String client_id) {
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.credit_dialog);
+        dialog.setCancelable(true);
+
+        TextView name = dialog.findViewById(R.id.dia_quantity);
+        final EditText units = dialog.findViewById(R.id.units);
+
+        name.setText(balance);
+
+        Button dialogButton = dialog.findViewById(R.id.ok_button);
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (units.getText().toString().trim().equals("")) {
+                    Toast.makeText(getActivity(), "Please enter units", Toast.LENGTH_SHORT).show();
+                } else {
+//                    final ProgressDialog pdialog = ProgressDialog.show(getActivity(), "Updating credits", "Please wait...", false, true);
+
+                    Credit model = credit.get(position);
+
+                    double amount = Double.parseDouble(model.getBalance()) - Double.parseDouble(units.getText().toString());
+                    model.setBalance(String.valueOf(amount));
+                    credit.set(position, model);
+                    creditAdapter.notifyDataSetChanged();
+
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Credits");
+
+                    HashMap<String, Object> main = new HashMap<>();
+                    main.put("balance", String.valueOf(amount));
+
+//                    reference.child(client_id_).child(invoice_id).updateChildren(main).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<Void> task) {
+//                            Log.i(TAG, "onComplete: " + task.toString());
+//                            Toast.makeText(getActivity(), "Units added successfully", Toast.LENGTH_SHORT).show();
+//                            dialog.dismiss();
+//                            pdialog.dismiss();
+//                        }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            Log.i(TAG, "onFailure: " + e.toString());
+//                        }
+//                    });
+                }
+            }
+        });
+
+        try {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
+        } catch (WindowManager.BadTokenException e) {
+            e.printStackTrace();
+        }
     }
 }

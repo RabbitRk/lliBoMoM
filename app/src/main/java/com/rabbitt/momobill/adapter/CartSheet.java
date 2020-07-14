@@ -37,6 +37,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.demo.pdfreader;
+import com.rabbitt.momobill.model.Client;
 import com.rabbitt.momobill.model.Invoice;
 import com.rabbitt.momobill.model.ProductInvoice;
 import com.rabbitt.momobill.prefsManager.IncrementPref;
@@ -64,6 +65,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     int invkey = -1, orderkey = -1;
     Context context;
     View v;
+    String invoice = "";
 
     ProgressDialog progressDialog;
 
@@ -269,6 +271,15 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         return df.format(c);
     }
 
+    public String getDate_() {
+        Date c = Calendar.getInstance().getTime();
+
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat df = new SimpleDateFormat(getString(R.string.inv_format));
+
+        return df.format(c);
+    }
+
     @Override
     public void onClick(View v) {
 
@@ -326,6 +337,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                     }
 
                     final DatabaseReference invoiceSingle = FirebaseDatabase.getInstance().getReference("Invoice_Single");
+                    final DatabaseReference client_ref = FirebaseDatabase.getInstance().getReference("Client").child(client_id);
 
                     invoiceSingle.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -335,8 +347,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                             }
                             invkey++;
 
-                            //                    final IncrementPref pref = new IncrementPref(getActivity());
-                            final String invoice = String.valueOf(invkey);
+                             invoice = String.valueOf(invkey);
 
                             String balance = String.valueOf(Double.parseDouble(total_amount.getText().toString()) - Double.parseDouble(paid.getText().toString()));
 
@@ -398,10 +409,25 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                                         public void onComplete(@NonNull Task<Void> task) {
                                             Log.i(TAG, "onComplete: " + task.toString());
                                             Toast.makeText(getActivity(), "Invoice created successfully", Toast.LENGTH_SHORT).show();
-//                                    pref.setInvoiceId(String.valueOf(Integer.parseInt(invoice) + 1));
                                             reduceCount(data);
-                                            generateInvoice();
-                                            dialog.dismiss();
+
+                                            client_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                    Client client = dataSnapshot.getValue(Client.class);
+
+//                                                    Log.i(TAG, "Client Snap: "+client.getName());
+                                                    generateInvoice(client);
+                                                    dialog.dismiss();
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
@@ -555,13 +581,14 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
     File file;
 
-    private void generateInvoice() {
+    private void generateInvoice(Client client) {
         Uri uri = null;
         String path1 = Environment.getExternalStorageDirectory() + File.separator + "INV" + "temp.pdf";
         file = new File(path1);
 
         Invoice in = new Invoice();
-        in.pdfcreate(file, uri, uri, uri, context, data);
+        in.pdfcreate(file, uri, uri, uri, context, data, invoice, client, getDate_());
+//        in.pdfcreate(file, invoice, client, uri, context, data);
         startActivity(new Intent(getActivity(), pdfreader.class).putExtra("inv", "INV").putExtra("from", "genrate"));
     }
 

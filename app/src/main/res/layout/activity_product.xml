@@ -178,6 +178,7 @@
                     android:background="@drawable/edx_bg"
                     android:digits="0123456789"
                     android:hint="@string/sgst"
+                    android:enabled="false"
                     android:inputType="number"
                     android:padding="10dp"
                     android:textSize="16sp" />

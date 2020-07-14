@@ -277,10 +277,10 @@ public class ClientActivity extends AppCompatActivity {
             phone.setError("Required");
             return false;
         }
-        if (email.getText().toString().trim().equals("")) {
-            email.setError("Required");
-            return false;
-        }
+//        if (email.getText().toString().trim().equals("")) {
+//            email.setError("Required");
+//            return false;
+//        }
         if (add1.getText().toString().trim().equals("")) {
             add1.setError("Required");
             return false;
@@ -301,10 +301,10 @@ public class ClientActivity extends AppCompatActivity {
             pincode.setError("Required");
             return false;
         }
-        if (gst.getText().toString().trim().equals("")) {
-            gst.setError("Required");
-            return false;
-        }
+//        if (gst.getText().toString().trim().equals("")) {
+//            gst.setError("Required");
+//            return false;
+//        }
 
         return true;
     }

@@ -37,6 +37,7 @@
 
     <string name="date_format">yyyy-MM-dd HH:mm</string>
     <string name="short_format">yyyy_MM_dd</string>
+    <string name="inv_format">dd-MM-yyyy</string>
     <string name="pur_rate">Purchase Rate</string>
     <string name="hsn_code">HSN Code</string>
 
