@@ -1,7 +1,10 @@
 package com.rabbitt.momobill.fragment;
 
+import android.Manifest;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -9,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -16,6 +20,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DataSnapshot;
@@ -48,7 +54,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String TAG = "maluDash";
 
     private String mParam1;
     private String mParam2;
@@ -116,7 +121,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         list = new ArrayList<>();
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("Order");
+        myRef = database.getReference();
         clientRef = database.getReference("Client");
         productRef = database.getReference("Product");
         creditRef = database.getReference("Credits");
@@ -149,21 +154,37 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                 startActivity(new Intent(getActivity(), CheckOrderActivity.class));
                 break;
             case R.id.txt_credit:
-                progressDialog = ProgressDialog.show(getContext(), "Please wait", "Saving", true);
-                populateList();
+                if (checkPermission()) {
+                    progressDialog = ProgressDialog.show(getContext(), "Please wait", "Loading", true);
+                    populateList();
+                }
 //                startActivity(new Intent(getActivity(), SettingsActivity.class));
                 break;
             case R.id.txt_invoice:
-                progressDialog = ProgressDialog.show(getContext(), "Please wait", "Saving", true);
-                populateCreditList();
+                if (checkPermission()) {
+                    progressDialog = ProgressDialog.show(getContext(), "Please wait", "Loading", true);
+                    populateCreditList();
+                }
 //                startActivity(new Intent(getActivity(), SettingsActivity.class));
                 break;
 
             case R.id.invoice_report:
-                selectedItem = 0;
-                selectMethod();
+                if (checkPermission()) {
+                    selectedItem = 0;
+                    selectMethod();
+                }
                 break;
         }
+    }
+
+    private boolean checkPermission() {
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), permissions, 1);
+            return false;
+        }
+
+        return true;
     }
 
     private void selectMethod() {
@@ -209,16 +230,56 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         final View dialogView = inflater.inflate(R.layout.invoice_report_method, null);
 
         LinearLayout date, month, range;
+        final EditText dateTxt, fromTxt, toTxt;
+
         date = dialogView.findViewById(R.id.date_layout);
         month = dialogView.findViewById(R.id.month_layout);
         range = dialogView.findViewById(R.id.date_range_layout);
 
+        dateTxt = dialogView.findViewById(R.id.date);
+        fromTxt = dialogView.findViewById(R.id.from_date);
+        toTxt = dialogView.findViewById(R.id.to_date);
+
+        dateTxt.setFocusable(false);
+        fromTxt.setFocusable(false);
+        toTxt.setFocusable(false);
+
 
         switch (method) {
+
             case 0:
                 date.setVisibility(View.VISIBLE);
                 month.setVisibility(View.GONE);
                 range.setVisibility(View.GONE);
+
+
+                dateTxt.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        final Calendar c = Calendar.getInstance();
+                        int mYear = c.get(Calendar.YEAR);
+                        int mMonth = c.get(Calendar.MONTH);
+                        int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+                        c.add(Calendar.DATE, -1);
+
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                                new DatePickerDialog.OnDateSetListener() {
+
+                                    @Override
+                                    public void onDateSet(DatePicker view, int year,
+                                                          int monthOfYear, int dayOfMonth) {
+                                        Date date = new Date(year - 1900, monthOfYear, dayOfMonth);
+                                        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+                                        dateTxt.setText(df.format(date));
+                                    }
+                                }, mYear, mMonth, mDay);
+
+                        datePickerDialog.show();
+                    }
+                });
+
                 break;
 
             case 1:
@@ -247,6 +308,60 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                 month.setVisibility(View.GONE);
                 range.setVisibility(View.VISIBLE);
 
+
+                fromTxt.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        final Calendar c = Calendar.getInstance();
+                        int mYear = c.get(Calendar.YEAR);
+                        int mMonth = c.get(Calendar.MONTH);
+                        int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+                        c.add(Calendar.DATE, -1);
+
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                                new DatePickerDialog.OnDateSetListener() {
+
+                                    @Override
+                                    public void onDateSet(DatePicker view, int year,
+                                                          int monthOfYear, int dayOfMonth) {
+                                        Date date = new Date(year - 1900, monthOfYear, dayOfMonth);
+                                        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+                                        fromTxt.setText(df.format(date));
+                                    }
+                                }, mYear, mMonth, mDay);
+
+                        datePickerDialog.show();
+                    }
+                });
+
+                toTxt.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        final Calendar c = Calendar.getInstance();
+                        int mYear = c.get(Calendar.YEAR);
+                        int mMonth = c.get(Calendar.MONTH);
+                        int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+                        c.add(Calendar.DATE, -1);
+
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                                new DatePickerDialog.OnDateSetListener() {
+
+                                    @Override
+                                    public void onDateSet(DatePicker view, int year,
+                                                          int monthOfYear, int dayOfMonth) {
+                                        Date date = new Date(year - 1900, monthOfYear, dayOfMonth);
+                                        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+                                        toTxt.setText(df.format(date));
+                                    }
+                                }, mYear, mMonth, mDay);
+
+                        datePickerDialog.show();
+                    }
+                });
+
+
                 invoiceRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -271,7 +386,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             public void onClick(View view) {
 
                 if (method == 0) {
-                    EditText dateTxt = dialogView.findViewById(R.id.date);
+//                    EditText dateTxt = dialogView.findViewById(R.id.date);
                     String selDate;
                     selDate = dateTxt.getText().toString();
                     SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -323,11 +438,10 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
                 } else if (method == 2) {
 
-                    EditText fromDateTxt = dialogView.findViewById(R.id.from_date);
-                    EditText toDateTxt = dialogView.findViewById(R.id.to_date);
+
                     String fromDate, toDate;
-                    fromDate = fromDateTxt.getText().toString();
-                    toDate = toDateTxt.getText().toString();
+                    fromDate = fromTxt.getText().toString();
+                    toDate = toTxt.getText().toString();
 
                     SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
                     SimpleDateFormat dbformat = new SimpleDateFormat("yyyy_MM_dd");
@@ -367,6 +481,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             }
         });
     }
+
 
     private void getRangedDate(ArrayList<String> newDatesList, final String fromDate, final String toDate) {
 
@@ -548,9 +663,11 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                     String clientId_ = details_child.child("client_id").getValue().toString();
                     String total = details_child.child("amount").getValue().toString();
 
+
                     DataSnapshot client_child = dataSnapshot.child("Client").child(clientId_);
                     String client_name = client_child.child("name").getValue().toString();
                     String gstin = client_child.child("gst").getValue().toString();
+
 
                     c_nameList.add(client_name);
                     inv_dateList.add(dbDate);
@@ -722,7 +839,8 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
 
                     for (final DataSnapshot clientChild : child.getChildren()) {
-                        Log.i(TAG, "onDataChange: "+clientChild);
+
+
                         billno = clientChild.getKey();
                         cr = clientChild.child("balance").getValue().toString();
                         amnt = clientChild.child("amount").getValue().toString();
@@ -734,8 +852,15 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                         Log.i("Invoice Values", billno + "  " + cr);
                     }
                 }
-                saveCreditExcel();
+
+                if (list.isEmpty()) {
+                    progressDialog.dismiss();
+                    Toast.makeText(getContext(), "No Credit Found", Toast.LENGTH_SHORT).show();
+                } else
+                    saveInvoiceExcel();
+
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -746,7 +871,13 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
     }
 
-    private boolean saveCreditExcel() {
+//    private String getClientName(String clientid) {
+//
+//
+//        return name;
+//    }
+
+    private boolean saveInvoiceExcel() {
 
         boolean success = false;
 
@@ -766,12 +897,15 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
         c = row.createCell(0);
         c.setCellValue("Date");
+//        c.setCellStyle(cs);
 
         c = row.createCell(1);
         c.setCellValue("Bill No");
+//        c.setCellStyle(cs);
 
         c = row.createCell(2);
         c.setCellValue("Name");
+//        c.setCellStyle(cs);
 
         c = row.createCell(3);
         c.setCellValue("Total Amount");
@@ -807,7 +941,10 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
             cell = row1.createCell(5);
             cell.setCellValue(list.get(i - 1).getCr());
+
+
         }
+
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
@@ -839,6 +976,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         return success;
     }
 
+
     private void populateList() {
 
         namelist.clear();
@@ -852,9 +990,10 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+
                 String date, productId;
 
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                for (DataSnapshot child : dataSnapshot.child("Order").getChildren()) {
 
                     final String fdate;
                     date = child.getKey().trim();
@@ -865,7 +1004,9 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                     date = date.substring(date.indexOf("_") + 1);
                     dd = date;
 
+
                     fdate = dd + "-" + mm + "-" + yy;
+//                    datelist.add(date);
 
                     Log.i("iteration", "1");
                     for (DataSnapshot clientChild : child.getChildren()) {
@@ -889,33 +1030,29 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                                 final String cess = productChild.child("cess").getValue().toString();
 
 
-                                clientRef.child(clientId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                DataSnapshot client_child = dataSnapshot.child("Client").child(clientId);
 
-                                        String gstin = dataSnapshot.child("gst").getValue().toString();
+                                String gstin = client_child.child("gst").getValue().toString();
 
-                                        String name = dataSnapshot.child("name").getValue().toString();
-                                        Log.i("clientid", name);
-                                        gstinlist.add(gstin);
-                                        namelist.add(name);
-                                        datelist.add(fdate);
-                                        basicvallist.add(basicval);
-                                        taxlist.add(tax);
-                                        cesslist.add(cess);
-                                        saveOrdersFile();
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
+                                String name = client_child.child("name").getValue().toString();
+                                Log.i("clientid", name);
+                                gstinlist.add(gstin);
+                                namelist.add(name);
+                                datelist.add(fdate);
+                                basicvallist.add(basicval);
+                                taxlist.add(tax);
+                                cesslist.add(cess);
 
                             }
                         }
                     }
                 }
+
+                if (namelist.isEmpty()) {
+                    progressDialog.dismiss();
+                    Toast.makeText(getContext(), "No Orders Found", Toast.LENGTH_SHORT).show();
+                } else
+                    saveExcelFile();
 
             }
 
@@ -930,7 +1067,14 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
     }
 
-    private boolean saveOrdersFile() {
+    private boolean saveExcelFile() {
+
+        if (namelist.isEmpty()) {
+            progressDialog.dismiss();
+            Toast.makeText(getContext(), "No Orders Found", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
 
         // check if available and not read only
 //        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {

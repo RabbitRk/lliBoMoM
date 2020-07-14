@@ -1,5 +1,6 @@
 package com.rabbitt.momobill.model;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -17,10 +18,17 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.rabbitt.momobill.R;
+import com.rabbitt.momobill.demo.Convertor;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_GST;
@@ -32,35 +40,7 @@ import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PREF;
 public class Invoice {
     private static final String TAG = "maluPDF";
 
-
-//    String num_to_words,invoice_id,invoice_date,user_phone,user_com,user_add,user_gst,user_cp,client_com,client_add,client_state,client_zip,client_gst,total,accno,ifsc;
-//    ArrayList<String[]> items;
-//    ArrayList<String[]> GST;
-
-//    public Invoice(String num_to_words,String invoice_id, String invoice_date, String user_com, String user_add, String user_gst, String user_cp, String user_phone,String client_com, String client_add, String client_state, String client_zip, String client_gst, ArrayList<String[]> items, ArrayList<String[]> gsts, String total,String accno,String ifsc)
-//    {
-//        this.num_to_words=num_to_words;
-//        this.invoice_id=invoice_id;
-//        this.invoice_date=invoice_date;
-//        this.user_com=user_com;
-//        this.user_add=user_add;
-//        this.user_gst=user_gst;
-//        this.user_cp=user_cp;
-//        this.client_com=client_com;
-//        this.client_add=client_add;
-//        this.client_state=client_state;
-//        this.client_zip=client_zip;
-//        this.client_gst=client_gst;
-//        this.items=items;
-//        this.GST=gsts;
-//        this.total=total;
-//        this.accno=accno;
-//        this.ifsc=ifsc;
-//        this.user_phone=user_phone;
-//    }
-
-
-    public void pdfcreate(File file, Uri path, Uri stamp, Uri logopath, Context context, List<ProductInvoice> data) {
+    public void pdfcreate(File file, Uri path, Uri stamp, Uri logopath, Context context, List<ProductInvoice> data, String invoice, Client client, String date_) {
 
         Log.i(TAG, "pdfcreate: " + path);
         com.itextpdf.text.Document doc = new com.itextpdf.text.Document(PageSize.A4, 0f, 0f, 0f, 0f);
@@ -120,12 +100,12 @@ public class Invoice {
 //            if (logopath != null && logo.exists()) {
 //                cell = new PdfPCell(image3);
 //            } else {
-                cell = new PdfPCell(new Phrase(""));
+            cell = new PdfPCell(new Phrase(""));
 //            }
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable.addCell(cell);
-            cell = new PdfPCell(new Paragraph("" + shrp.getString(USER_LOC, "")+" "+shrp.getString(USER_LOC_2,""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
+            cell = new PdfPCell(new Paragraph("" + shrp.getString(USER_LOC, "") + " " + shrp.getString(USER_LOC_2, ""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable.addCell(cell);
@@ -140,7 +120,7 @@ public class Invoice {
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable.addCell(cell);
-            cell = new PdfPCell(new Paragraph("Phone :" + shrp.getString(USER_PHONE,""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
+            cell = new PdfPCell(new Paragraph("Phone :" + shrp.getString(USER_PHONE, ""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
             //cell.setPaddingLeft(2);
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -154,7 +134,7 @@ public class Invoice {
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable.addCell(cell);
-            cell = new PdfPCell(new Paragraph("GSTIN " + shrp.getString(USER_GST,""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
+            cell = new PdfPCell(new Paragraph("GSTIN " + shrp.getString(USER_GST, ""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
             //cell.setPaddingLeft(2);
             cell.setBorder(Rectangle.NO_BORDER);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -203,7 +183,7 @@ public class Invoice {
             PdfPTable innertable2 = new PdfPTable(2);
             innertable2.setWidthPercentage(100);
             innertable2.setWidths(new int[]{50, 50});
-            PdfPCell cell1 = new PdfPCell(new Phrase("Voucher no. :" + "invoice_id"));
+            PdfPCell cell1 = new PdfPCell(new Phrase("Voucher no. :" + invoice));
             //cell1.setBorder(Rectangle.NO_BORDER);
             cell1.setHorizontalAlignment(Element.ALIGN_LEFT);
             innertable2.addCell(cell1);
@@ -214,12 +194,12 @@ public class Invoice {
             cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("Voucher Date: " + "invoice_date"));
+            cell1 = new PdfPCell(new Phrase("Voucher Date: " + date_));
 
             innertable2.addCell(cell1);
 
 
-            cell1 = new PdfPCell(new Phrase("Name: " + "client_com"));
+            cell1 = new PdfPCell(new Phrase("Name: " + client.getName()));
             //cell.setBorder(Rectangle.NO_BORDER);
             cell.setPaddingLeft(2);
 
@@ -229,14 +209,14 @@ public class Invoice {
             cell1.setHorizontalAlignment(Element.ALIGN_LEFT);
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("Address :" + "client_add"));
+            cell1 = new PdfPCell(new Phrase("Address :" + client.getAdd1() + " " + client.getAdd2()));
             innertable2.addCell(cell1);
 
             cell1 = new PdfPCell(new Phrase(""));
             innertable2.addCell(cell1);
 
 
-            cell1 = new PdfPCell(new Phrase("GSTIN :" + "client_gst"));
+            cell1 = new PdfPCell(new Phrase("GSTIN :" + client.getGst()));
             //cell.setBorder(Rectangle.NO_BORDER);
             cell.setPaddingLeft(2);
 
@@ -246,7 +226,7 @@ public class Invoice {
             cell1.setHorizontalAlignment(Element.ALIGN_LEFT);
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("State: " + "client_state" + "        Code: " + "client_zip"));
+            cell1 = new PdfPCell(new Phrase("State: " + client.getState() + "    Code: " + client.getPincode()));
             //cell.setBorder(Rectangle.NO_BORDER);
             cell1.setHorizontalAlignment(Element.ALIGN_LEFT);
 
@@ -271,8 +251,13 @@ public class Invoice {
 
             PdfPCell cell5 = new PdfPCell(new Phrase("Product Description"));
             innertable5.addCell(cell5);
+
+            cell5 = new PdfPCell(new Phrase("HSN Code"));
+            innertable5.addCell(cell5);
+
             cell5 = new PdfPCell(new Phrase("Units"));
             innertable5.addCell(cell5);
+
             cell5 = new PdfPCell(new Phrase("Taxable Value"));
             innertable5.addCell(cell5);
 
@@ -289,24 +274,25 @@ public class Invoice {
             innertable5.addCell(cell5);
 
 
-            Double amtbefore = 0.0;
+            double amtbefore = 0.0, tax_inc = 0.0;
 
-            for(int i=0;i<data.size();i++) {
+            for (int i = 0; i < data.size(); i++) {
                 ProductInvoice productInvoice = data.get(i);
 //                String gsco[] = GST.get(i);
 
                 cell5 = new PdfPCell(new Phrase(productInvoice.getProduct_name()));
                 innertable5.addCell(cell5);
-                cell5 = new PdfPCell(new Phrase(productInvoice.getCess()));
+                cell5 = new PdfPCell(new Phrase(productInvoice.getHsn()));
+                innertable5.addCell(cell5);
+                cell5 = new PdfPCell(new Phrase(productInvoice.getUnit()));
                 innertable5.addCell(cell5);
                 cell5 = new PdfPCell(new Phrase(productInvoice.getSale_rate()));
                 innertable5.addCell(cell5);
-
-                cell5 = new PdfPCell(new Phrase(productInvoice.getProduct_name()));
+                cell5 = new PdfPCell(new Phrase(productInvoice.getCgst()));
+                innertable5.addCell(cell5);
+                cell5 = new PdfPCell(new Phrase(productInvoice.getCgst()));
                 innertable5.addCell(cell5);
                 cell5 = new PdfPCell(new Phrase(productInvoice.getCess()));
-                innertable5.addCell(cell5);
-                cell5 = new PdfPCell(new Phrase(productInvoice.getSale_rate()));
                 innertable5.addCell(cell5);
 
 
@@ -321,8 +307,14 @@ public class Invoice {
 //                PdfPCell nesthousing5 = new PdfPCell(nested5);
 //                innertable5.addCell(nesthousing5);
 //
-                amtbefore=amtbefore+(Double.parseDouble(productInvoice.getSale_rate())*Double.parseDouble(productInvoice.getSale_rate()));
-                cell5 = new PdfPCell(new Phrase("" + productInvoice.getUnit()));
+//                amtbefore = amtbefore + (Double.parseDouble(productInvoice.getSale_rate()) * Double.parseDouble(productInvoice.getUnit()));
+                amtbefore = amtbefore + Double.parseDouble(productInvoice.getSale_rate());
+                //Total column  productInvoice.getSale_rate()
+                double singleamount = calculate(productInvoice.getIn(), Double.parseDouble(productInvoice.getCgst()), Double.parseDouble(productInvoice.getCess()), Double.parseDouble(productInvoice.getSale_rate()));
+                tax_inc = tax_inc + singleamount;
+
+                 cell5 = new PdfPCell(new Phrase("" + singleamount));
+
                 cell5.setMinimumHeight(10f);
                 innertable5.addCell(cell5);
             }
@@ -333,7 +325,7 @@ public class Invoice {
             t.setWidths(new int[]{50, 50});
             PdfPCell ce = new PdfPCell(new Phrase("Total"));
             t.addCell(ce);
-            ce = new PdfPCell(new Phrase("" + amtbefore));
+            ce = new PdfPCell(new Phrase("" + tax_inc));
             t.addCell(ce);
          /*   ce = new PdfPCell(new Phrase("0"));
             t.addCell(ce);
@@ -343,6 +335,13 @@ public class Invoice {
             t.addCell(ce);*/
             doc.add(t);
 
+            Convertor convert_ = new Convertor();
+
+            // rounding the double
+            NumberFormat nf = NumberFormat.getNumberInstance();
+            nf.setMaximumFractionDigits(0);
+            String rounded = nf.format(tax_inc);
+            Log.i(TAG, "pdfcreate: "+rounded);
 
             //next step
             PdfPTable innertable6 = new PdfPTable(1);
@@ -351,7 +350,7 @@ public class Invoice {
             cell6.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable6.addCell(cell6);
             cell6.setMinimumHeight(50f);
-            cell6 = new PdfPCell(new Phrase("" + "num_to_words"));
+            cell6 = new PdfPCell(new Phrase("" + Convertor.convert(Integer.parseInt(rounded))));
             cell6.setPaddingLeft(20);
             innertable6.addCell(cell6);
             cell6.setMinimumHeight(10f);
@@ -372,7 +371,7 @@ public class Invoice {
 //                // cell65.setFixedHeight(150);
 //                nested4.addCell(cell65);
 //            } else {
-                nested4.addCell("");
+            nested4.addCell("");
 //            }
             nested4.addCell("Authorised Signatory");
             PdfPCell nesthousing4 = new PdfPCell(nested4);
@@ -385,7 +384,7 @@ public class Invoice {
 //                nested5.addCell(cell55);
 //
 //            } else {
-                nested5.addCell("");
+            nested5.addCell("");
 //            }
             nested5.addCell("Common Seal");
             PdfPCell nesthousing5 = new PdfPCell(nested5);
@@ -427,6 +426,29 @@ public class Invoice {
         } catch (DocumentException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private double calculate(String inc, double gst, double ces, double rat) {
+
+        double return_value;
+        if (inc.equals("inc")) {
+            return_value = rat;
+        } else {
+            return_value = calculate_amount(rat, gst, ces);
+        }
+
+        return return_value;
+    }
+
+    private double calculate_amount(double sale_r, double gst, double ces) {
+        double taxval = ces + gst;
+        sale_r = (sale_r * (taxval / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
+        return roundDecimals(sale_r);
+    }
+
+    double roundDecimals(double d) {
+        DecimalFormat twoDForm = new DecimalFormat("#.###");
+        return Double.parseDouble(twoDForm.format(d));
     }
 
 

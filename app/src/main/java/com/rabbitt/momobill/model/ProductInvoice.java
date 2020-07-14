@@ -11,6 +11,15 @@ public class ProductInvoice {
     String cess;
     String in;
     String single;
+    String hsn;
+
+    public String getHsn() {
+        return hsn;
+    }
+
+    public void setHsn(String hsn) {
+        this.hsn = hsn;
+    }
 
     public String getSingle() {
         return single;

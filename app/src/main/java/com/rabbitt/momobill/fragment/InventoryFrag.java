@@ -59,6 +59,8 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
     private List<Product> data = new ArrayList<>();
     private ProductAdapter productAdapter;
     private RecyclerView productRecycler;
+    List<Product> filteredList;
+    EditText edx;
 
     public InventoryFrag() {
         // Required empty public constructor
@@ -138,7 +140,7 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
             }
         });
 
-        EditText edx = view.findViewById(R.id.txt_product_search);
+        edx = view.findViewById(R.id.txt_product_search);
         edx.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -183,7 +185,7 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
     }
 
     private void filter(String text) {
-        List<Product> filteredList = new ArrayList<>();
+        filteredList = new ArrayList<>();
         for (Product item : data) {
             if (item.getProduct_name().toLowerCase().contains(text.toLowerCase())) {
                 filteredList.add(item);
@@ -196,14 +198,20 @@ public class InventoryFrag extends Fragment implements View.OnClickListener, Pro
     public void OnItemClick(int position) {
         Log.i(TAG, "OnItemClick: " + position);
         Log.i(TAG, "pos " + position);
-        Product model = data.get(position);
+
+        Product model;
+        if (edx.getText().toString().equals("")) {
+            model = data.get(position);
+        } else {
+            model = filteredList.get(position);
+        }
 
         String product_id = model.getProduct_id();
         String unit = model.getUnit();
         String name = model.getProduct_name();
         String imgUrl = model.getImg_url();
 
-        Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  "+imgUrl  + "  " + name);
+        Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  " + imgUrl + "  " + name);
 
         openDialog(unit, name, product_id, imgUrl);
     }

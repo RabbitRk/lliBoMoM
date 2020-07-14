@@ -1,12 +1,5 @@
 package com.rabbitt.momobill.activity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -18,7 +11,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,9 +20,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.github.gcacace.signaturepad.views.SignaturePad;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -46,13 +47,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.acl.Owner;
 
 import static com.rabbitt.momobill.prefsManager.PrefsManager.KEY;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.OWNER;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.PREF_NAME;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_EMAIL;
-import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_NAME;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PHONE;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -114,7 +113,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         String email = preference.getString(USER_EMAIL,"No Email Found");
 
-        Toast.makeText(this, email, Toast.LENGTH_SHORT).show();
 
         final AlertDialog dialogBuilder = new AlertDialog.Builder(this).create();
         LayoutInflater inflater = this.getLayoutInflater();
@@ -138,18 +136,22 @@ public class SettingsActivity extends AppCompatActivity {
 
                 String mail = newEmail.getText().toString();
                 String child;
-                prefEditor.putString(USER_EMAIL,mail);
+                prefEditor.putString(USER_EMAIL, mail);
                 prefEditor.commit();
 
-                if(checkPref.getBoolean(OWNER,false))
+                if (checkPref.getBoolean(OWNER, false))
                     child = "Owner";
                 else
                     child = "Employee";
 
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Agency");
-                reference.child(child).child(key).child("email").setValue(mail);
-
-                dialogBuilder.dismiss();
+                reference.child(child).child(key).child("email").setValue(mail).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        dialogBuilder.dismiss();
+                        Toast.makeText(SettingsActivity.this, "Saved Successfully", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
             }
         });
@@ -193,18 +195,23 @@ public class SettingsActivity extends AppCompatActivity {
 
                 String phone = newPhone.getText().toString();
                 String child;
-                prefEditor.putString(USER_PHONE,phone);
+                prefEditor.putString(USER_PHONE, phone);
                 prefEditor.commit();
 
-                if(checkPref.getBoolean(OWNER,false))
+                if (checkPref.getBoolean(OWNER, false))
                     child = "Owner";
                 else
                     child = "Employee";
 
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Agency");
-                reference.child(child).child(key).child("phone").setValue(phone);
+                reference.child(child).child(key).child("phone").setValue(phone).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        dialogBuilder.dismiss();
+                        Toast.makeText(SettingsActivity.this, "Saved Successfully", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-                dialogBuilder.dismiss();
 
             }
         });
@@ -268,14 +275,20 @@ public class SettingsActivity extends AppCompatActivity {
     private void pickCamera() {
 
         //Intent to capture image from camera
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "New Pic");//Title of picture
-        values.put(MediaStore.Images.Media.DESCRIPTION, "Image to text");//desc
-        imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        startActivityForResult(cameraIntent, IMAGE_PICK_CAMERA_CODE);
+        try {
+
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.TITLE, "New Pic");//Title of picture
+            values.put(MediaStore.Images.Media.DESCRIPTION, "Image to text");//desc
+            imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+            startActivityForResult(cameraIntent, IMAGE_PICK_CAMERA_CODE);
+        } catch (Exception e) {
+            Toast.makeText(this, "Please Check Your Permission", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void requestCameraPermission() {
@@ -310,11 +323,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
-            final ProgressDialog progressDialog = ProgressDialog.show(this,"","Uploading...",true);
+
             CropImage.ActivityResult result = CropImage.getActivityResult(intent);
 
             if (resultCode == RESULT_OK) {
-
+                final ProgressDialog progressDialog = ProgressDialog.show(this, "", "Uploading...", true);
                 resultUri = result.getUri();
                 Bitmap bitmap = null;
                 try {
@@ -332,25 +345,25 @@ public class SettingsActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss();
-                            Toast.makeText(SettingsActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingsActivity.this, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             progressDialog.dismiss();
-                            Toast.makeText(SettingsActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingsActivity.this, "Upload Failed", Toast.LENGTH_SHORT).show();
                         }
                     });
 
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                    Toast.makeText(SettingsActivity.this, "Storage Permission is denied", Toast.LENGTH_SHORT).show();
                 }
             }
             else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception e = result.getError();
-                Toast.makeText(this, "Error is" + e, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -358,11 +371,14 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void getSign(View view) {
 
+        if (!checkStoragePermission())
+            requestStoragePermission();
+
         final AlertDialog dialogBuilder = new AlertDialog.Builder(this).create();
         LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.signature_dialog,null);
-        final SignaturePad signaturePad=dialogView.findViewById(R.id.signature_pad);
-        Button save,clr,cancel;
+        View dialogView = inflater.inflate(R.layout.signature_dialog, null);
+        final SignaturePad signaturePad = dialogView.findViewById(R.id.signature_pad);
+        Button save, clr, cancel;
         save = dialogView.findViewById(R.id.save_sign);
         clr = dialogView.findViewById(R.id.clear_sign);
         cancel = dialogView.findViewById(R.id.cancel_sign);
@@ -385,18 +401,20 @@ public class SettingsActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss();
-                            Toast.makeText(SettingsActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingsActivity.this, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             progressDialog.dismiss();
-                            Toast.makeText(SettingsActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SettingsActivity.this, "Upload Failed", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(SettingsActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                    Toast.makeText(SettingsActivity.this, "Storage Permission is denied", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(SettingsActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });

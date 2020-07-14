@@ -1,5 +1,6 @@
 package com.rabbitt.momobill.fragment;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -11,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -119,29 +122,44 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(getActivity(), "FAB Clicked", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getActivity(), "FAB Clicked", Toast.LENGTH_SHORT).show();
         startActivity(new Intent(getActivity(), ClientActivity.class));
     }
 
-    @Override
-    public void OnCall(int position) {
-        Log.i(TAG, "OnItemClick: "+position);
-        Log.i(TAG, "pos " + position);
-        Client model = data.get(position);
-
-        String number = model.getPhone();
-
-        try {
-            if (!number.equals("")) {
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:" + number));
-                startActivity(Intent.createChooser(callIntent, null));
-            }
-        } catch (Exception ex) {
-            Log.i(TAG, "makeCall: " + ex.getMessage());
+    private boolean checkPermission() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CALL_PHONE}, 1);
+            return false;
         }
 
-        Log.i(TAG, "pos " + data);
+        return true;
+    }
+
+
+    @Override
+    public void OnCall(int position) {
+
+        if (checkPermission()) {
+            Log.i(TAG, "OnItemClick: " + position);
+            Log.i(TAG, "pos " + position);
+            Client model = data.get(position);
+
+            String number = model.getPhone();
+
+            try {
+                if (!number.equals("")) {
+                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                    callIntent.setData(Uri.parse("tel:" + number));
+                    startActivity(Intent.createChooser(callIntent, null));
+                }
+            } catch (Exception ex) {
+                Log.i(TAG, "makeCall: " + ex.getMessage());
+            }
+
+            Log.i(TAG, "pos " + data);
+        } else {
+            Toast.makeText(getContext(), "Call Permission is Denied", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

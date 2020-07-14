@@ -83,6 +83,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
 
     private int mYear, mMonth, mDay, mHour, mMinute;
     private EditText dateTxt;
+    EditText edx;
 
     public OrderFrag() {
         // Required empty public constructor
@@ -200,7 +201,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedLine = linelist.get(i).getLine();
                 preferences.edit().putString("orderLine", selectedLine).apply();
-                Toast.makeText(getContext(), selectedLine, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), selectedLine, Toast.LENGTH_SHORT).show();
                 getClients();
             }
         });
@@ -250,7 +251,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
             }
         });
 
-        EditText edx = inflate.findViewById(R.id.txt_name);
+        edx = inflate.findViewById(R.id.txt_name);
         edx.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -353,7 +354,18 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
 
         Log.i(TAG, "OnItemClick: " + position);
         Log.i(TAG, "pos " + position);
-        ProductInvoice model = data.get(position);
+
+        ProductInvoice model;
+
+        if (edx.getText().toString().equals(""))
+        {
+            model = data.get(position);
+        }
+        else
+        {
+            model = filteredList.get(position);
+        }
+//        ProductInvoice model = data.get(position);
 
         String product_id = model.getProduct_id();
         String unit = model.getUnit();
@@ -410,9 +422,9 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
     }
 
 
-
+    List<ProductInvoice> filteredList;
     private void filter(String text) {
-        List<ProductInvoice> filteredList = new ArrayList<>();
+        filteredList = new ArrayList<>();
         for (ProductInvoice item : data) {
             if (item.getProduct_name().toLowerCase().contains(text.toLowerCase())) {
                 filteredList.add(item);
@@ -429,23 +441,11 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
                 showDialog();
                 break;
             case R.id.cart_btn:
-//                if (dateTxt.getText().toString().equals(""))
-//                {
-//                    Toast.makeText(getActivity(),   "Please select date", Toast.LENGTH_SHORT).show();
-//                }
-//                else {
-
-
                     if (validate())
                     {
-                        Toast.makeText(getActivity(), "Please add products to the cart", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
                         CartSheet cartSheet = new CartSheet(cart, this, this, "order", clientId, dateTxt.getText().toString(), getContext());
-//                        CartSheet cartSheet = new CartSheet(cart, this,  this, "order", client_id.get(spinner.getSelectedIndex()), dateTxt.getText().toString(), getContext());
                         cartSheet.show(getParentFragmentManager(), "cart");
                     }
-//                }
                 break;
         }
     }
