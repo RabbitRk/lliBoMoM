@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -62,6 +63,8 @@ public class DashFrag extends Fragment implements View.OnClickListener {
     DataSnapshot fulSnapShot;
 
     CardView today, month, invoice, credit, invoiceReport;
+
+    TextView monthTxt, todayTxt;
 
     AlertDialog invoiceDialogBuilder;
     String monthName;
@@ -127,10 +130,88 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         creditRef = database.getReference("Credits");
         invoiceRef = database.getReference("Invoice");
 
+
+        Calendar calendar = Calendar.getInstance();
+        final SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy_MM_dd");
+        final SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
+        final SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+
+        String today = dbFormat.format(calendar.getTime());
+        final String thisMonth = monthFormat.format(calendar.getTime());
+        final String thisYear = yearFormat.format(calendar.getTime());
+
+//        To check and retrieve today's invoice total
+
+        invoiceRef.child(today).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.exists()) {
+                    double amnt = 0.0;
+
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+                        DataSnapshot details_child = child.child("Details").child("amount");
+                        amnt += Double.parseDouble(String.valueOf(details_child.getValue()));
+                    }
+                    String amntTxt = String.valueOf(amnt);
+                    todayTxt.setText(amntTxt);
+                } else
+                    todayTxt.setText("N/A");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+//        To check and retrieve this month's invoice total
+        invoiceRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Double month_amnt = 0.0;
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    Date dbMonth = null;
+                    try {
+                        dbMonth = dbFormat.parse(String.valueOf(child.getKey()));
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    String retrievedMonth = monthFormat.format(dbMonth);
+                    String retrievedYear = yearFormat.format(dbMonth);
+
+                    if (retrievedMonth.equals(thisMonth) && retrievedYear.equals(thisYear)) {
+
+                        for (DataSnapshot invoice_child : child.getChildren()) {
+
+                            DataSnapshot details_child = invoice_child.child("Details");
+                            month_amnt += Double.parseDouble(String.valueOf(details_child.child("amount").getValue()));
+
+                        }
+                    }
+                }
+                if(month_amnt == 0.0)
+                    monthTxt.setText("N/A");
+                else
+                    monthTxt.setText(String.valueOf(month_amnt));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         return inflate;
     }
 
+
     private void init(View view) {
+        todayTxt =view.findViewById(R.id.today_text);
+        monthTxt = view.findViewById(R.id.month_text);
         today = view.findViewById(R.id.txt_today);
         month = view.findViewById(R.id.txt_month);
         credit = view.findViewById(R.id.txt_credit);
@@ -578,8 +659,11 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 for (DataSnapshot child : dataSnapshot.child("Invoice").getChildren()) {
+                    Calendar calendar = Calendar.getInstance();
                     SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy_MM_dd");
                     SimpleDateFormat df = new SimpleDateFormat("MM");
+                    SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+                    String thisYear = yearFormat.format(calendar.getTime());
 
                     Date dbMonth = null;
                     try {
@@ -590,7 +674,8 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                     }
                     String dbDate = dbFormat.format(dbMonth);
                     String retrievedMonth = df.format(dbMonth);
-                    if (retrievedMonth.equals(selMonth)) {
+                    String retrievedYear = yearFormat.format(dbMonth);
+                    if (retrievedMonth.equals(selMonth) && retrievedYear.equals(thisYear)) {
 
                         for (DataSnapshot invoice_child : child.getChildren()) {
 
