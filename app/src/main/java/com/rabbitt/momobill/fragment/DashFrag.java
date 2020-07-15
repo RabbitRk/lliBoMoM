@@ -696,11 +696,8 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                             inv_noList.add(inv_no);
                             amountList.add(total);
                             gst_inList.add(gstin);
-
                         }
-
                     }
-
                 }
 
                 if (c_nameList.isEmpty()) {

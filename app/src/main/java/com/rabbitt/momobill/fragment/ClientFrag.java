@@ -1,14 +1,17 @@
 package com.rabbitt.momobill.fragment;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,9 +30,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.ClientActivity;
+import com.rabbitt.momobill.activity.EditClientActivity;
 import com.rabbitt.momobill.adapter.ClientAdapter;
 import com.rabbitt.momobill.model.Client;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,11 +45,17 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "maluClientFrag";
 
-    private List<Client> data = new ArrayList<>();
+    public static List<Client> data = new ArrayList<>();
     private ClientAdapter clientAdapter;
-    private RecyclerView clientRecycler;
+    public static RecyclerView clientRecycler;
     private String mParam1;
     private String mParam2;
+
+    private static String POPUP_CONSTANT = "mPopup";
+    private static String POPUP_FORCE_SHOW_ICON = "setForceShowIcon";
+
+    public static List<String> idList = new ArrayList<>();
+    public static View.OnClickListener myOnClickListener;
 
     public ClientFrag() {
         // Required empty public constructor
@@ -84,6 +96,8 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
         //Onclick listener
         fab.setOnClickListener(this);
 
+        myOnClickListener = new MyOnClickListener(getContext());
+
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                 .child("Client");
 
@@ -93,10 +107,12 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
                 Log.i(TAG, "onDataChange: "+dataSnapshot);
                 if (data != null) {
                     data.clear();
+                    idList.clear();
                 }
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Client client = snapshot.getValue(Client.class);
                     data.add(client);
+                    idList.add(snapshot.getKey());
                 }
                 updateRecycler(data);
             }
@@ -217,5 +233,96 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
             app_installed = false;
         }
         return app_installed;
+    }
+
+    private static class MyOnClickListener implements View.OnClickListener {
+
+        private final Context context;
+        int selectedItemPosition;
+        String clientid;
+        String line;
+        private MyOnClickListener(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public void onClick(View v) {
+            selectedItemPosition = clientRecycler.getChildPosition(v);
+            clientid = idList.get(selectedItemPosition);
+            showPopup(v);
+        }
+        public void showPopup(View view) {
+            PopupMenu popup = new PopupMenu(context, view);
+            try {
+                // Reflection apis to enforce show icon
+                Field[] fields = popup.getClass().getDeclaredFields();
+                for (Field field : fields) {
+                    if (field.getName().equals(POPUP_CONSTANT)) {
+                        field.setAccessible(true);
+                        Object menuPopupHelper = field.get(popup);
+                        Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+                        Method setForceIcons = classPopupHelper.getMethod(POPUP_FORCE_SHOW_ICON, boolean.class);
+                        setForceIcons.invoke(menuPopupHelper, true);
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            popup.getMenuInflater().inflate(R.menu.client_popup_menu, popup.getMenu());
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+
+                    switch (menuItem.getItemId()) {
+                        case R.id.delete:
+                            deleteClient(clientid);
+//                            Toast.makeText(context, "You clicked delete on "+data.get(selectedItemPosition).getName(), Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.edit:
+                            editClient(clientid);
+                            Toast.makeText(context, "You clicked edit on "+data.get(selectedItemPosition).getName(), Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+
+                    return false;
+                }
+            });
+            popup.show();
+        }
+
+        private void editClient(String clientid) {
+
+            Intent intent = new Intent(context, EditClientActivity.class);
+            intent.putExtra("clientid",clientid);
+            context.startActivity(intent);
+
+        }
+
+        private void deleteClient(final String clientid) {
+
+
+            final DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                    .child("Client");
+            reference.child(clientid).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    line = dataSnapshot.child("line").getValue().toString();
+                    reference.child(clientid).removeValue();
+
+                    DatabaseReference linereference = FirebaseDatabase.getInstance().getReference()
+                            .child("Line");
+                    linereference.child(line).child(clientid).removeValue();
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+        }
+
     }
 }

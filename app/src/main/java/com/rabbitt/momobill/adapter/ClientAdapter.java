@@ -34,6 +34,7 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.holder> {
     @Override
     public ClientAdapter.holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.client_list_item, null);
+        view.setOnClickListener(ClientFrag.myOnClickListener);
         return new holder(view, mOnRecycleItemListener);
     }
 
