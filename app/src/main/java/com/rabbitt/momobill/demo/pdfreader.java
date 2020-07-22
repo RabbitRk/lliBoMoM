@@ -8,97 +8,52 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.tabs.TabLayout;
 import com.joanzapata.pdfview.PDFView;
 import com.rabbitt.momobill.R;
+import com.rabbitt.momobill.adapter.TabAdapter;
 
 import java.io.File;
 import java.io.IOException;
 
 public class pdfreader extends AppCompatActivity {
 
-    private PDFView imageView;
+    String fname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdfreader);
-        imageView = (PDFView) findViewById(R.id.pdfview);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setTitle("Invoice Preview");
+        final ViewPager viewPager = findViewById(R.id.view_pager);
 
-        try {
-            openPDF();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this,
-                    "Something Wrong: " + e.toString(),
-                    Toast.LENGTH_LONG).show();
-        }
+        fname = getIntent().getStringExtra("inv");
 
-    }
+        TabLayout tabs = findViewById(R.id.tabs);
+        tabs.addTab(tabs.newTab().setText("PDF"));
+        tabs.addTab(tabs.newTab().setText("Thermal"));
+        tabs.setTabGravity(TabLayout.GRAVITY_FILL);
+        TabAdapter tabAdapter = new TabAdapter(this, getSupportFragmentManager(),tabs.getTabCount(),fname);
+        viewPager.setAdapter(tabAdapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabs));
+        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
 
-    private void openPDF() throws IOException {
-
-        try
-        {
-            if(getIntent().getStringExtra("from").equals("genrate")) {
-                File file = new File(Environment.getExternalStorageDirectory() + File.separator + getIntent().getStringExtra("inv") + "temp.pdf");
-                imageView.fromFile(file);
-                imageView.fromFile(file)
-                        .defaultPage(1)
-                        .showMinimap(false)
-                        .enableSwipe(true)
-                        .swipeVertical(true)
-                        .load();
             }
-            else {
-                File file = new File(Environment.getExternalStorageDirectory() + File.separator + getIntent().getStringExtra("inv") + ".pdf");
-                if(file.exists()) {
-                    imageView.fromFile(file);
-                    imageView.fromFile(file)
-                            .defaultPage(1)
-                            .showMinimap(false)
-                            .enableSwipe(true)
-                            .swipeVertical(true)
-                            .load();
-                }
-                else
-                {
-                    Toast.makeText(this, "File Not Found", Toast.LENGTH_SHORT).show();
-                }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
             }
-        }
-        catch(Exception e)
-        {
-            Log.i("maluPdf", "Exception: "+e.toString());
-        }
 
-    }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
 
-    /**
-     * this method will delete the file after previewing it
-     */
-
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if(getIntent().getStringExtra("from").equals("generate")) {
-            File file = new File(Environment.getExternalStorageDirectory() + File.separator + getIntent().getStringExtra("inv") + "temp.pdf");
-            file.delete();
-        }
-    }
-
-    @Nullable
-    @Override
-    public Intent getSupportParentActivityIntent() {
-        onBackPressed();
-        if(getIntent().getStringExtra("from").equals("generate")) {
-            File file = new File(Environment.getExternalStorageDirectory() + File.separator + getIntent().getStringExtra("inv") + "temp.pdf");
-            file.delete();
-        }
-        return null;
+            }
+        });
 
     }
 }

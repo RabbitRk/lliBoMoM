@@ -275,6 +275,7 @@ public class Invoice {
 
 
             double amtbefore = 0.0, tax_inc = 0.0;
+            double subtotalcess = 0.0, subtotalcgst = 0.0, subtot = 0.0, cess_temp = 0.0, cgst_temp = 0.0;
 
             for (int i = 0; i < data.size(); i++) {
                 ProductInvoice productInvoice = data.get(i);
@@ -286,7 +287,43 @@ public class Invoice {
                 innertable5.addCell(cell5);
                 cell5 = new PdfPCell(new Phrase(productInvoice.getUnit()));
                 innertable5.addCell(cell5);
-                cell5 = new PdfPCell(new Phrase(productInvoice.getSale_rate()));
+
+                String pre_amount = "";
+                double data_ = Double.parseDouble(productInvoice.getSale_rate());
+                double tax = Double.parseDouble(productInvoice.getCgst()) * 2;
+                double cess = Double.parseDouble(productInvoice.getCess());
+
+                if (productInvoice.getIn().equals("inc")) {
+
+                    cgst_temp = roundDecimals(data_ * (100 / (tax + 100)));
+                    cgst_temp = roundDecimals(cgst_temp * (tax / 100));
+                    subtotalcgst += cgst_temp / 2;
+
+                    cess_temp = data_ * (100 / (cess + 100));
+                    subtotalcess += roundDecimals(cess_temp * (cess / 100));
+
+                    Log.i(TAG, "pdfcreate: cgst: " + subtotalcgst + "  " + " cess: " + subtotalcess);
+
+                    tax += cess + 100;
+
+                    double amount = data_ * (100 / tax);
+
+                    Log.i(TAG, "pdfcreate: Amount " + roundDecimals(amount));
+
+                    pre_amount = String.valueOf(roundDecimals(amount));
+                    subtot = subtot + roundDecimals(amount);
+
+                } else {
+
+                    subtotalcess += data_ * (cess / 100);
+                    subtotalcgst += (data_ * (tax / 100)) / 2;
+                    Log.i(TAG, "pdfcreate Exc: cgst: " + subtotalcgst + "  " + " cess: " + subtotalcess);
+
+                    pre_amount = productInvoice.getSale_rate();
+                    subtot = subtot + Double.parseDouble(productInvoice.getSale_rate());
+                }
+
+                cell5 = new PdfPCell(new Phrase(pre_amount));
                 innertable5.addCell(cell5);
                 cell5 = new PdfPCell(new Phrase(productInvoice.getCgst()));
                 innertable5.addCell(cell5);
@@ -341,6 +378,9 @@ public class Invoice {
             NumberFormat nf = NumberFormat.getNumberInstance();
             nf.setMaximumFractionDigits(0);
             String rounded = nf.format(tax_inc);
+            if (rounded.contains(",")) {
+                rounded = rounded.replace(",", "");
+            }
             Log.i(TAG, "pdfcreate: " + rounded);
 
             //next step
@@ -403,41 +443,40 @@ public class Invoice {
             innertable7.addCell(nesthousing);
             PdfPTable nested2 = new PdfPTable(1);
 
-            double subtotalcess = 0.0, subtotalcgst = 0.0, subtot = 0.0;
-            for (int i = 0; i < data.size(); i++) {
-                ProductInvoice productInvoice = data.get(i);
-
-                String tax_ = productInvoice.getIn();
-                if (tax_.equals("inc")) {
-                    double _sale = Double.parseDouble(productInvoice.getSale_rate());
-                    double _tax = Double.parseDouble(productInvoice.getCgst()) * 2;
-                    double _in_tax = Double.parseDouble(productInvoice.getCgst()) + 100;
-                    double _cess = Double.parseDouble(productInvoice.getCess());
-                    double _in_cess = Double.parseDouble(productInvoice.getCess())+ 100;
-
-                    double _sub = _sale * (100 / _in_tax);
-                    double _sub_cess = _sale * (100 / _in_cess);
-
-                    subtotalcgst += Double.parseDouble(round(_sub * (_tax / 100)));
-                    subtotalcess += Double.parseDouble(round(_sub_cess * (_cess / 100)));
-                    subtot += Double.parseDouble(round(_sub));
-                    Log.i(TAG, "pdfcreate: INC "+"_sale: "+ _sale+ "_tax: "+ _tax+ "_in_tax: "+ _in_tax+ "_cess: "+ _cess+ "_in_cess: "+ _in_cess+ "_sub: "+ _sub+ "_sub_cess: "+ _sub_cess);
-
-                } else {
-
-                    double _sale = Double.parseDouble(productInvoice.getSale_rate());
-                    double _tax = Double.parseDouble(productInvoice.getCgst()) * 2;
-                    double _cess = Double.parseDouble(productInvoice.getCess());
-
-                    subtotalcgst += Double.parseDouble(round(_sale * (_tax / 100)));
-                    subtotalcess += Double.parseDouble(round(_sale * (_cess / 100)));
-
-                    subtot += Double.parseDouble(round(_sale));
-
-                    Log.i(TAG, "pdfcreate: EXC  "+subtot);
-
-                }
-            }
+//            for (int i = 0; i < data.size(); i++) {
+//                ProductInvoice productInvoice = data.get(i);
+//
+//                String tax_ = productInvoice.getIn();
+//                if (tax_.equals("inc")) {
+//                    double _sale = Double.parseDouble(productInvoice.getSale_rate());
+//                    double _tax = Double.parseDouble(productInvoice.getCgst()) * 2;
+//                    double _in_tax = Double.parseDouble(productInvoice.getCgst()) + 100;
+//                    double _cess = Double.parseDouble(productInvoice.getCess());
+//                    double _in_cess = Double.parseDouble(productInvoice.getCess()) + 100;
+//
+//                    double _sub = _sale * (100 / _in_tax);
+//                    double _sub_cess = _sale * (100 / _in_cess);
+//
+//                    subtotalcgst += Double.parseDouble(round(_sub * (_tax / 100)));
+//                    subtotalcess += Double.parseDouble(round(_sub_cess * (_cess / 100)));
+//                    subtot += Double.parseDouble(round(_sub));
+//                    Log.i(TAG, "pdfcreate: INC " + "_sale: " + _sale + "_tax: " + _tax + "_in_tax: " + _in_tax + "_cess: " + _cess + "_in_cess: " + _in_cess + "_sub: " + _sub + "_sub_cess: " + _sub_cess);
+//
+//                } else {
+//
+//                    double _sale = Double.parseDouble(productInvoice.getSale_rate());
+//                    double _tax = Double.parseDouble(productInvoice.getCgst()) * 2;
+//                    double _cess = Double.parseDouble(productInvoice.getCess());
+//
+//                    subtotalcgst += Double.parseDouble(round(_sale * (_tax / 100)));
+//                    subtotalcess += Double.parseDouble(round(_sale * (_cess / 100)));
+//
+//                    subtot += Double.parseDouble(round(_sale));
+//
+//                    Log.i(TAG, "pdfcreate: EXC  " + subtot);
+//
+//                }
+//            }
             nested2.addCell("" + subtot);
 
             nested2.addCell("" + subtotalcgst);
@@ -475,12 +514,11 @@ public class Invoice {
     }
 
     double roundDecimals(double d) {
-        DecimalFormat twoDForm = new DecimalFormat("#.###");
+        DecimalFormat twoDForm = new DecimalFormat("#.#");
         return Double.parseDouble(twoDForm.format(d));
     }
 
-    String round(double val)
-    {
+    String round(double val) {
         NumberFormat nf = NumberFormat.getNumberInstance();
         nf.setMaximumFractionDigits(0);
         return nf.format(val);

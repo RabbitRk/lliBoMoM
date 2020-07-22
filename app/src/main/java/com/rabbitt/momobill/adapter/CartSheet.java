@@ -583,13 +583,17 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
     private void generateInvoice(Client client) {
         Uri uri = null;
-        String path1 = Environment.getExternalStorageDirectory() + File.separator + "INV" + "temp.pdf";
+        new File(Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice").mkdir();
+        String path1 = Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice/"+ invoice + "_Inv.pdf";
         file = new File(path1);
 
         Invoice in = new Invoice();
         in.pdfcreate(file, uri, uri, uri, context, data, invoice, client, getDate_());
 //        in.pdfcreate(file, invoice, client, uri, context, data);
-        startActivity(new Intent(getActivity(), pdfreader.class).putExtra("inv", "INV").putExtra("from", "genrate"));
+        Intent intent = new Intent(getActivity(), pdfreader.class);
+        intent.putExtra("inv",invoice);
+        startActivity(intent);
+//        startActivity(new Intent(getActivity(), PdfTabbedActivity.class).putExtra("inv", "INV").putExtra("from", "genrate"));
     }
 
     private void updateFirebase(List<ProductInvoice> data) {
