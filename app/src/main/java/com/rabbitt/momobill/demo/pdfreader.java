@@ -42,7 +42,15 @@ public class pdfreader extends AppCompatActivity {
 
         if (object != null) {
             Log.i(TAG, "onCreate: Array yes "+object.size());
+            for(ProductInvoice ob : object)
+            {
+                Log.i(TAG, "Product Name "+ob.getProduct_name());
+                Log.i(TAG, "Quantity "+ob.getUnit());
+                Log.i(TAG, "Total "+ob.getSale_rate());
+
+            }
         }
+
         else
         {
             Log.i(TAG, "onCreate: Array: no");
@@ -61,7 +69,7 @@ public class pdfreader extends AppCompatActivity {
         tabs.addTab(tabs.newTab().setText("Thermal"));
         tabs.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        TabAdapter tabAdapter = new TabAdapter(this, getSupportFragmentManager(), tabs.getTabCount(), fname, data);
+        TabAdapter tabAdapter = new TabAdapter(this, getSupportFragmentManager(), tabs.getTabCount(), fname, object);
         viewPager.setAdapter(tabAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabs));
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

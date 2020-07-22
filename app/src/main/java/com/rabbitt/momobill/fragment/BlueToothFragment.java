@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.DeviceActivity;
 import com.rabbitt.momobill.demo.UnicodeFormatter;
+import com.rabbitt.momobill.model.Product;
 import com.rabbitt.momobill.model.ProductInvoice;
 
 import java.io.IOException;
@@ -53,6 +54,9 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
     BluetoothDevice mBluetoothDevice;
 
     List<ProductInvoice> data = null;
+
+    int totalQty;
+    double totalVal;
 
     TextView txt;
     public BlueToothFragment() {
@@ -111,7 +115,12 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
         mPrint = inflate.findViewById(R.id.print);
         txt = inflate.findViewById(R.id.bill_fomat);
 
+//        Initializing total value and quantity to 0
+        totalQty = 0;
+        totalVal = 0.0;
 
+//        get invoice data from argument
+        List<ProductInvoice> data = (List<ProductInvoice>) getArguments().getSerializable("data");
 
         //
         String BILL = "";
@@ -125,21 +134,48 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
                 + "-----------------------------------------------\n";
 
 
-        BILL = BILL + String.format("%1$-10s %2$10s %3$13s %4$10s", "Item", "Qty", "Rate", "Totel");
+        BILL = BILL + String.format("%1$-10s %2$10s %3$13s %4$10s", "Item", "Qty", "Rate", "Total");
         BILL = BILL + "\n";
         BILL = BILL
                 + "-----------------------------------------------";
-        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-001", "5", "10", "50.00");
-        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-002", "10", "5", "50.00");
-        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-003", "20", "10", "200.00");
-        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-004", "50", "10", "500.00");
+
+//generating bill
+        if (data != null) {
+
+            for(ProductInvoice ob : data)
+            {
+                String product;
+                double total,rate;
+                int quantity;
+
+
+                product = ob.getProduct_name();
+                quantity = Integer.parseInt(ob.getUnit());
+                total = Double.parseDouble(ob.getSale_rate());
+                rate = total/quantity;
+
+                totalQty = totalQty + quantity;
+                totalVal = totalVal + total;
+
+                BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", product, quantity, rate, total);
+                Log.i(TAG, "Item "+product);
+                Log.i(TAG, "Quantity "+quantity);
+                Log.i(TAG, "Total "+total);
+
+            }
+        }
+
+
+//        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-002", "10", "5", "50.00");
+//        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-003", "20", "10", "200.00");
+//        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-004", "50", "10", "500.00");
 
         BILL = BILL
                 + "\n-----------------------------------------------";
         BILL = BILL + "\n\n ";
 
-        BILL = BILL + "                   Total Qty:" + "      " + "85" + "\n";
-        BILL = BILL + "                   Total Value:" + "     " + "700.00" + "\n";
+        BILL = BILL + "                   Total Qty:" + "      " + totalQty + "\n";
+        BILL = BILL + "                   Total Value:" + "     " + totalVal + "\n";
 
         BILL = BILL
                 + "-----------------------------------------------\n";

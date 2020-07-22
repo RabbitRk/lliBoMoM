@@ -58,6 +58,19 @@
         <activity android:name=".activity.EditProductActivity" />
         <activity android:name=".activity.CheckOrderActivity" />
         <activity android:name=".activity.OrderDetailsActivity" />
+
+<!--        File provider def for share pdf -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.rabbitt.momobill"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+
     </application>
 
 </manifest>
