@@ -11,18 +11,24 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import com.rabbitt.momobill.fragment.BlueToothFragment;
 import com.rabbitt.momobill.fragment.ClientFrag;
 import com.rabbitt.momobill.fragment.PDFfragment;
+import com.rabbitt.momobill.model.ProductInvoice;
+
+import java.io.Serializable;
+import java.util.List;
 
 public class TabAdapter extends FragmentPagerAdapter {
 
     Context context;
     int count;
     String fname;
+    List<ProductInvoice> data;
 
-    public TabAdapter(Context context, FragmentManager supportFragmentManager, int count, String fname) {
+    public TabAdapter(Context context, FragmentManager supportFragmentManager, int count, String fname, List<ProductInvoice> data) {
         super(supportFragmentManager);
         this.context = context;
         this.count = count;
         this.fname = fname;
+        this.data = data;
     }
 
     @NonNull
@@ -37,7 +43,9 @@ public class TabAdapter extends FragmentPagerAdapter {
                 return pdFfragment;
 
             case 1:
-                return new BlueToothFragment();
+                Bundle bundle1 = new Bundle();
+                bundle1.putSerializable("data", (Serializable) data);
+                return BlueToothFragment.newInstance(bundle1);
         }
         return null;
     }

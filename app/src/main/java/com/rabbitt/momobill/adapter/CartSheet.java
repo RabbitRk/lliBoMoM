@@ -42,9 +42,14 @@ import com.rabbitt.momobill.model.Invoice;
 import com.rabbitt.momobill.model.ProductInvoice;
 import com.rabbitt.momobill.prefsManager.IncrementPref;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -292,7 +297,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                 for (int i = 0; i < data.size(); i++) {
                     Log.i(TAG, "Invoice Amount: " + data.get(i).getIn());
                     String inc = data.get(i).getIn();
-                    double gst = Double.parseDouble(data.get(i).getCgst());
+                    double gst = Double.parseDouble(data.get(i).getCgst()) * 2;
                     double ces = Double.parseDouble(data.get(i).getCess());
                     double rat = Double.parseDouble(data.get(i).getSale_rate());
                     double val = calculate(inc, gst, ces, rat);
@@ -587,14 +592,27 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         String path1 = Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice/"+ invoice + "_Inv.pdf";
         file = new File(path1);
 
+        // Work Area
+
+        ArrayList<ProductInvoice> val = new ArrayList<>(data.size());
+        val.addAll(data);
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("valuesArray", val);
+
+        //
+
         Invoice in = new Invoice();
         in.pdfcreate(file, uri, uri, uri, context, data, invoice, client, getDate_());
 //        in.pdfcreate(file, invoice, client, uri, context, data);
         Intent intent = new Intent(getActivity(), pdfreader.class);
         intent.putExtra("inv",invoice);
+        intent.putExtra("inc", bundle);
         startActivity(intent);
 //        startActivity(new Intent(getActivity(), PdfTabbedActivity.class).putExtra("inv", "INV").putExtra("from", "genrate"));
     }
+
+
 
     private void updateFirebase(List<ProductInvoice> data) {
         createOrder();

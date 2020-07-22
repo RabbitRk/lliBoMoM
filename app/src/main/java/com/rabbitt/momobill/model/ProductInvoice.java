@@ -1,6 +1,9 @@
 package com.rabbitt.momobill.model;
 
-public class ProductInvoice {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class ProductInvoice implements Parcelable {
 
     String img_url;
     String product_name;
@@ -12,6 +15,35 @@ public class ProductInvoice {
     String in;
     String single;
     String hsn;
+
+    public ProductInvoice(Parcel inp) {
+        img_url = inp.readString();
+        product_name = inp.readString();
+        sale_rate = inp.readString();
+        unit = inp.readString();
+        product_id = inp.readString();
+        cgst = inp.readString();
+        cess = inp.readString();
+        in = inp.readString();
+        single = inp.readString();
+        hsn = inp.readString();
+    }
+
+    public static final Creator<ProductInvoice> CREATOR = new Creator<ProductInvoice>() {
+        @Override
+        public ProductInvoice createFromParcel(Parcel in) {
+            return new ProductInvoice(in);
+        }
+
+        @Override
+        public ProductInvoice[] newArray(int size) {
+            return new ProductInvoice[size];
+        }
+    };
+
+    public ProductInvoice() {
+
+    }
 
     public String getHsn() {
         return hsn;
@@ -93,4 +125,22 @@ public class ProductInvoice {
         this.unit = unit;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(img_url);
+        dest.writeString(product_name);
+        dest.writeString(sale_rate);
+        dest.writeString(unit);
+        dest.writeString(product_id);
+        dest.writeString(cgst);
+        dest.writeString(cess);
+        dest.writeString(in);
+        dest.writeString(single);
+        dest.writeString(hsn);
+    }
 }

@@ -23,10 +23,12 @@ import android.widget.Toast;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.DeviceActivity;
 import com.rabbitt.momobill.demo.UnicodeFormatter;
+import com.rabbitt.momobill.model.ProductInvoice;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,8 +37,8 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private String mParam1;
-    private String mParam2;
+//    private String mParam1;
+//    private String mParam2;
 
     //Additionally added
     protected static final String TAG = "maluBlueTooth";
@@ -50,16 +52,27 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
     private BluetoothSocket mBluetoothSocket;
     BluetoothDevice mBluetoothDevice;
 
+    List<ProductInvoice> data = null;
+
     TextView txt;
     public BlueToothFragment() {
         // Required empty public constructor
     }
 
-    public static BlueToothFragment newInstance(String param1, String param2) {
+//    public static BlueToothFragment newInstance(String param1, String param2) {
+//        BlueToothFragment fragment = new BlueToothFragment();
+//        Bundle args = new Bundle();
+//        args.putString(ARG_PARAM1, param1);
+//        args.putString(ARG_PARAM2, param2);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
+
+    public static Fragment newInstance(Bundle bundle1) {
         BlueToothFragment fragment = new BlueToothFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args = bundle1;
+//        data = (data)
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,10 +80,21 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+
+        Bundle bundle = getArguments();
+        data = (List<ProductInvoice>) bundle.getSerializable("data");
+        if (data != null) {
+            Log.i(TAG, "onCreate: "+data.size());
         }
+        else
+        {
+            Log.i(TAG, "onCreate: "+"bundle null");
+        }
+//        if (getArguments() != null) {
+////            mParam1 = getArguments().getString(ARG_PARAM1);
+////            mParam2 = getArguments().getString(ARG_PARAM2);
+//
+//        }
     }
 
     @Override

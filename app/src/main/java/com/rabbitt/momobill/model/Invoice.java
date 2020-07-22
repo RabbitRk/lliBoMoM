@@ -1,6 +1,5 @@
 package com.rabbitt.momobill.model;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -18,7 +17,6 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.demo.Convertor;
 
 import java.io.File;
@@ -26,9 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_GST;
@@ -508,7 +503,7 @@ public class Invoice {
     }
 
     private double calculate_amount(double sale_r, double gst, double ces) {
-        double taxval = ces + gst;
+        double taxval = ces + (gst * 2);
         sale_r = (sale_r * (taxval / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
         return roundDecimals(sale_r);
     }
