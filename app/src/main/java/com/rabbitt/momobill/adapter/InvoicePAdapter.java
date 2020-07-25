@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -64,7 +65,7 @@ public class InvoicePAdapter extends RecyclerView.Adapter<InvoicePAdapter.holder
     public class holder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView product_name;//, quantity;//, units, price;
-        ImageView image;
+        ImageView image,tick;
         OnRecyleItemListener onRecyleItemListener;
 
         public holder(@NonNull View itemView, OnRecyleItemListener onRecyleItemListener) {
@@ -77,14 +78,20 @@ public class InvoicePAdapter extends RecyclerView.Adapter<InvoicePAdapter.holder
 //            price = itemView.findViewById(R.id.txt_price);
 
             image = itemView.findViewById(R.id.grid_image);
+            tick = itemView.findViewById(R.id.tick_view);
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
+            if(tick.getVisibility() == View.VISIBLE)
+                Toast.makeText(context.getContext(), "This product is already on the cart", Toast.LENGTH_SHORT).show();
+            else
+//                Toast.makeText(context.getContext(), "disabled", Toast.LENGTH_SHORT).show();
             onRecyleItemListener.OnItemClick(getAdapterPosition());
         }
     }
+
 
     public interface OnRecyleItemListener {
         void OnItemClick(int position);

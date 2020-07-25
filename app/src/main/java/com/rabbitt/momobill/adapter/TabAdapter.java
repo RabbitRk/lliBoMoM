@@ -44,6 +44,7 @@ public class TabAdapter extends FragmentPagerAdapter {
 
             case 1:
                 Bundle bundle1 = new Bundle();
+                bundle1.putString("inv", fname);
                 bundle1.putSerializable("data", (Serializable) data);
                 return BlueToothFragment.newInstance(bundle1);
         }
