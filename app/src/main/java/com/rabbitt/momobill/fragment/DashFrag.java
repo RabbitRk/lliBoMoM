@@ -45,11 +45,13 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class DashFrag extends Fragment implements View.OnClickListener {
 
@@ -154,6 +156,8 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                         amnt += Double.parseDouble(String.valueOf(details_child.getValue()));
                     }
                     String amntTxt = String.valueOf(amnt);
+                    NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en","IN"));
+                    amntTxt = formatter.format(amnt);
                     todayTxt.setText(amntTxt);
                 } else
                     todayTxt.setText("N/A");
@@ -194,8 +198,12 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                 }
                 if(month_amnt == 0.0)
                     monthTxt.setText("N/A");
-                else
-                    monthTxt.setText(String.valueOf(month_amnt));
+                else {
+                    String amntTxt = String.valueOf(month_amnt);
+                    NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
+                    amntTxt = formatter.format(month_amnt);
+                    monthTxt.setText(amntTxt);
+                }
             }
 
             @Override

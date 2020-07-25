@@ -15,15 +15,30 @@
         app:riv_corner_radius="10dp"
         app:riv_oval="false" />
 
-    <TextView
-        android:id="@+id/grid_name"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
         android:padding="5dp"
-        android:text="Coke"
-        android:textAllCaps="false"
-        android:textColor="@color/black" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/grid_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Coke"
+            android:textAllCaps="false"
+            android:textColor="@color/black" />
+
+        <ImageView
+            android:id="@+id/tick_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:visibility="gone"
+            android:src="@drawable/ic_check" />
+
+    </LinearLayout>
 
 </LinearLayout>

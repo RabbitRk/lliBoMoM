@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -101,6 +102,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     DatabaseReference lineReference;
     SharedPreferences preferences;
     EditText edx;
+
     public InvoiceFrag() {
         // Required empty public constructor
     }
@@ -343,7 +345,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
                 selectedClient = clientList.get(i).getClient();
                 clientId = clientList.get(i).getClientid();
-                Log.i(TAG, "TextOfCredit: "+selectedClient+"   "+clientId);
+                Log.i(TAG, "TextOfCredit: " + selectedClient + "   " + clientId);
                 Log.i(TAG, "onItemSelected: " + client_id.get(i) + " Position " + i + " ClientName " + clients.get(i));
                 getOrder(clientId);
                 getCredit(clientId);
@@ -479,32 +481,61 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     }
 
     @Override
-    public void OnItemClick(int position) {
+    public void OnItemClick(final int position) {
         Log.i(TAG, "OnItemClick: " + position);
         Log.i(TAG, "pos " + position);
 
-        ProductInvoice model;
+        final ProductInvoice model;
 
-        if (edx.getText().toString().equals(""))
-        {
+        if (edx.getText().toString().equals("")) {
             model = data.get(position);
-        }
-        else
-        {
+        } else {
             model = filteredList.get(position);
         }
 
-        String product_id = model.getProduct_id();
-        String unit = model.getUnit();
-        String name = model.getProduct_name();
+        final String product_id = model.getProduct_id();
+        final String unit = model.getUnit();
+        final String name = model.getProduct_name();
 
         Log.i(TAG, "OnItemClick: " + product_id + "  " + unit + "  " + name);
 
-        openDialog(model, unit, name, product_id);
+        DatabaseReference openRef = FirebaseDatabase.getInstance().getReference("Opening");
+
+        openRef.child(getDate()).child(product_id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                int tot = 0, avl = 0, bal = 0;
+                Object ob_unit, sale;
+                ob_unit = dataSnapshot.child("unit").getValue();
+                sale = dataSnapshot.child("sale").getValue();
+
+                if (ob_unit != null)
+                    tot = Integer.parseInt(String.valueOf(ob_unit));
+                if (sale != null)
+                    avl = Integer.parseInt(String.valueOf(sale));
+
+                bal = tot - avl;
+
+                if (bal > 0)
+                    openDialog(model, unit, name, product_id, bal,position);
+                else
+                    Toast.makeText(getContext(), bal + " units available", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 
     @SuppressLint("SetTextI18n")
-    public void openDialog(final ProductInvoice model, final String ex_unit, String name_, final String product_id) {
+    public void openDialog(final ProductInvoice model, final String ex_unit, String name_, final String product_id, final int bal,final int pos) {
+
 
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.invoice_dialog);
@@ -524,20 +555,28 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                 if (units.getText().toString().trim().equals("")) {
                     Toast.makeText(getActivity(), "Please enter units", Toast.LENGTH_SHORT).show();
                 } else {
-                    double sale_ = Double.parseDouble(model.getSale_rate()) * Double.parseDouble(units.getText().toString().trim());
-                    ProductInvoice product = new ProductInvoice();
-                    product.setProduct_name(model.getProduct_name());
-                    product.setSale_rate(String.valueOf(sale_));
-                    product.setUnit(units.getText().toString().trim());
-                    product.setProduct_id(model.getProduct_id());
-                    product.setCgst(model.getCgst());
-                    product.setCess(model.getCess());
-                    product.setImg_url(model.getImg_url());
-                    product.setIn(model.getIn());
+                    int unitTxt = Integer.parseInt(units.getText().toString());
+                    if (unitTxt <= bal) {
+                        double sale_ = Double.parseDouble(model.getSale_rate()) * Double.parseDouble(units.getText().toString().trim());
+                        ProductInvoice product = new ProductInvoice();
+                        product.setProduct_name(model.getProduct_name());
+                        product.setSale_rate(String.valueOf(sale_));
+                        product.setUnit(units.getText().toString().trim());
+                        product.setProduct_id(model.getProduct_id());
+                        product.setCgst(model.getCgst());
+                        product.setCess(model.getCess());
+                        product.setImg_url(model.getImg_url());
+                        product.setIn(model.getIn());
 
-                    cart.add(product);
-                    dialog.dismiss();
+                        cart.add(product);
+                        ImageView view = invoice_recycler.findViewHolderForAdapterPosition(pos).itemView.findViewById(R.id.tick_view);
+                        view.setVisibility(View.VISIBLE);
+                        dialog.dismiss();
 //                     createInvoice(dialog, ex_unit, product_id, units.getText().toString().trim());
+                    }
+
+                    else
+                        Toast.makeText(getContext(), "Stock isn't currently available", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -584,11 +623,14 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         if (v.getId() == R.id.cart_btn_order) {
             cart = order;
             order_layout.setVisibility(View.GONE);
+
         } else {
 
             try {
                 if (validate()) {
+                    revertTick();
                     CartSheet cartSheet = new CartSheet(cart, this, this, "invoice", clientId, getDate(), getContext());
+                    cartSheet.setCancelable(false);
                     cartSheet.show(getParentFragmentManager(), "cart");
                 }
             } catch (Exception e) {
@@ -597,6 +639,17 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
         }
     }
+
+    private void revertTick() {
+
+        for(int i  =0 ; i<data.size();i++)
+        {
+            ImageView view = invoice_recycler.findViewHolderForAdapterPosition(i).itemView.findViewById(R.id.tick_view);
+            view.setVisibility(View.GONE);
+        }
+
+    }
+
 
     private boolean validate() {
 
@@ -614,7 +667,9 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         }
         return true;
     }
+
     List<ProductInvoice> filteredList;
+
     private void filter(String text) {
         filteredList = new ArrayList<>();
         for (ProductInvoice item : data) {

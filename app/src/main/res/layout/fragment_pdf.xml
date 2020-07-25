@@ -16,19 +16,40 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="8dp"
         android:weightSum="3">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:paddingStart="25dp"
+            android:drawablePadding="-15dp"
+            android:layout_marginEnd="3dp"
+            android:drawableStart="@drawable/save"
+            android:background="@drawable/btn_bg"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
             android:text="Save" />
 
         <Button
+            android:id="@+id/share_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:paddingStart="25dp"
+            android:drawablePadding="-15dp"
             android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="3dp"
+            android:drawableStart="@drawable/share"
+            android:background="@drawable/btn_bg"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
             android:text="Share" />
 
         <Button
@@ -36,6 +57,14 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_weight="1"
+            android:paddingStart="25dp"
+            android:drawablePadding="-15dp"
+            android:layout_marginStart="3dp"
+            android:drawableStart="@drawable/print"
+            android:background="@drawable/btn_bg"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
             android:text="Print" />
 
     </LinearLayout>

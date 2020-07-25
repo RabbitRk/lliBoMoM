@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -23,14 +24,27 @@ import android.widget.Toast;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.DeviceActivity;
 import com.rabbitt.momobill.demo.UnicodeFormatter;
+import com.rabbitt.momobill.model.Product;
 import com.rabbitt.momobill.model.ProductInvoice;
+import com.rabbitt.momobill.prefsManager.PrefsManager;
+
+import org.apache.poi.util.StringUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_CITY;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_EMAIL;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_LOC;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_LOC_2;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PIN;
 
 public class BlueToothFragment extends Fragment implements View.OnClickListener {
 
@@ -54,7 +68,10 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
 
     List<ProductInvoice> data = null;
 
-    TextView txt;
+    int totalQty;
+    double totalVal;
+
+    TextView txt,txt2;
     public BlueToothFragment() {
         // Required empty public constructor
     }
@@ -110,43 +127,106 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
         mScan = inflate.findViewById(R.id.scan);
         mPrint = inflate.findViewById(R.id.print);
         txt = inflate.findViewById(R.id.bill_fomat);
+        txt2 = inflate.findViewById(R.id.bill_fomat2);
+
+        SharedPreferences preference = getContext().getSharedPreferences(PrefsManager.USER_PREF,0);
+        String add1 = preference.getString(USER_LOC,"Address Line 1");
+        String add2 = preference.getString(USER_LOC_2,"Address Line 2");
+        String city = preference.getString(USER_CITY,"City");
+        String pin = preference.getString(USER_PIN,"Pin code");
 
 
+
+
+//        Initializing total value and quantity to 0
+        totalQty = 0;
+        totalVal = 0.0;
+
+//        get invoice data from argument
+        List<ProductInvoice> data = (List<ProductInvoice>) getArguments().getSerializable("data");
+
+        String invId = getArguments().getString("inv");
 
         //
         String BILL = "";
 
-        BILL =  "                   XXXX MART    \n" +
-                "                 XX.AA.BB.CC.     \n " +
-                "               NO 25 ABC ABCDE    \n" +
-                "                 XXXXX YYYYYY      \n" +
-                "                MMM 590019091      \n";
+//        BILL =  "                   XXXX MART    \n" +
+//                "                 XX.AA.BB.CC.     \n " +
+//                "               NO 25 ABC ABCDE    \n" +
+//                "                 XXXXX YYYYYY      \n" +
+//                "                MMM 590019091      \n";
+
+        BILL =  "Santha Agencies\n" +
+                add1+"\n " +
+                add2+"\n" +
+                city+"\n" ;
+        BILL = BILL
+                + "-----------------------------------------------\n";
+        BILL = BILL + String.format("%1$-12s %2$30s", "Inv.id" , invId);
+        BILL = BILL + "\n";
+
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat df =new SimpleDateFormat("dd/MM/yyyy");
+        String date_txt =  df.format(date);
+
+        BILL = BILL + String.format("%1$-3s %2$30s", "Date" , date_txt);
+        BILL = BILL + "\n";
+
+
         BILL = BILL
                 + "-----------------------------------------------\n";
 
 
-        BILL = BILL + String.format("%1$-10s %2$10s %3$13s %4$10s", "Item", "Qty", "Rate", "Totel");
+        BILL = BILL + String.format("%1$-10s %2$10s %3$13s %4$10s", "Item", "Qty", "Rate", "Total");
         BILL = BILL + "\n";
         BILL = BILL
                 + "-----------------------------------------------";
-        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-001", "5", "10", "50.00");
-        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-002", "10", "5", "50.00");
-        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-003", "20", "10", "200.00");
-        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-004", "50", "10", "500.00");
+
+//generating bill
+        if (data != null) {
+
+            for(ProductInvoice ob : data)
+            {
+                String product;
+                double total,rate;
+                int quantity;
+
+
+                product = ob.getProduct_name();
+                quantity = Integer.parseInt(ob.getUnit());
+                total = Double.parseDouble(ob.getSale_rate());
+                rate = total/quantity;
+
+                totalQty = totalQty + quantity;
+                totalVal = totalVal + total;
+
+                BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", product, quantity, rate, total);
+                Log.i(TAG, "Item "+product);
+                Log.i(TAG, "Quantity "+quantity);
+                Log.i(TAG, "Total "+total);
+
+            }
+        }
+
+
+//        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-002", "10", "5", "50.00");
+//        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-003", "20", "10", "200.00");
+//        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-004", "50", "10", "500.00");
 
         BILL = BILL
                 + "\n-----------------------------------------------";
         BILL = BILL + "\n\n ";
+        String BILL2 ="";
+        BILL2 = BILL2 + "\t\t\t\tTotal Qty  :" + "          " + totalQty + "\n";
+        BILL2 = BILL2 + "\t\t\t\tTotal Value:" + "       " + totalVal + "\n";
 
-        BILL = BILL + "                   Total Qty:" + "      " + "85" + "\n";
-        BILL = BILL + "                   Total Value:" + "     " + "700.00" + "\n";
-
-        BILL = BILL
+        BILL2 = BILL2
                 + "-----------------------------------------------\n";
-        BILL = BILL + "\n\n ";
+        BILL2 = BILL2 + "\n\n ";
         //This is printer specific code you can comment ==== > Start
 
         txt.setText(BILL);
+        txt2.setText(BILL2);
         //
         mScan.setOnClickListener(this);
         mPrint.setOnClickListener(this);

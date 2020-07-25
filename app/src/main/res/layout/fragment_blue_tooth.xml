@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:layout_marginStart="5dp"
+    android:layout_marginEnd="5dp"
+    android:layout_marginBottom="8dp"
     tools:context=".fragment.BlueToothFragment">
 
 
@@ -11,19 +14,56 @@
         android:id="@+id/bill_fomat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:foregroundGravity="center"
         android:text="Print" />
 
-    <Button
-        android:id="@+id/scan"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/bill_fomat2"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scan" />
-
-    <Button
-        android:id="@+id/print"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_below="@+id/bill_fomat"
+        android:gravity="start"
         android:text="Print" />
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/scan"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableStart="@drawable/search"
+            android:layout_marginEnd="3dp"
+            android:paddingStart="50dp"
+            android:drawablePadding="-50dp"
+            android:background="@drawable/btn_bg"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:text="Scan" />
+
+        <Button
+            android:id="@+id/print"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:drawableStart="@drawable/print"
+            android:paddingStart="50dp"
+            android:drawablePadding="-50dp"
+            android:background="@drawable/btn_bg"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:text="Print" />
+    </LinearLayout>
+
+</RelativeLayout>

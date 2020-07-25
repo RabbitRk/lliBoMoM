@@ -175,8 +175,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                     Toast.makeText(context, "Please enter the unit properly", Toast.LENGTH_SHORT).show();
                 }
 
-                try
-                {
+                try {
                     ProductInvoice model = data.get(position);
                     double amount = Double.parseDouble(model.getSale_rate()) * Double.parseDouble(paid.getText().toString());
 
@@ -186,10 +185,8 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                     data.set(position, model);
                     productAdapter.notifyDataSetChanged();
                     dialog.dismiss();
-                }
-                catch(Exception e)
-                {
-                    Log.i(TAG, "Exception: "+e.getMessage()+e.toString());
+                } catch (Exception e) {
+                    Log.i(TAG, "Exception: " + e.getMessage() + e.toString());
                 }
 
 
@@ -310,6 +307,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         } else {
             data.clear();
             productAdapter.notifyDataSetChanged();
+            this.dismiss();
         }
     }
 
@@ -352,7 +350,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                             }
                             invkey++;
 
-                             invoice = String.valueOf(invkey);
+                            invoice = String.valueOf(invkey);
 
                             String balance = String.valueOf(Double.parseDouble(total_amount.getText().toString()) - Double.parseDouble(paid.getText().toString()));
 
@@ -395,6 +393,8 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
                                 product.put(pv.getProduct_id(), pro);
                             }
+
+//                            Add total sold project to today's opening
 
                             main.put("Details", hashMap);
                             main.put("Product", product);
@@ -503,6 +503,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                             Log.i(TAG, "onFailure: " + e.toString());
                         }
                     });
+
                 }
 
                 @Override
@@ -511,22 +512,54 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                 }
             });
 
-            HashMap<String, Object> hashMap = new HashMap<>();
-            hashMap.put("sale", pv.getUnit());
+            DatabaseReference openreference = FirebaseDatabase.getInstance()
+                    .getReference()
+                    .child("Opening")
+                    .child(getDate())
+                    .child(pv.getProduct_id());
 
-            DatabaseReference reference3 = FirebaseDatabase.getInstance().getReference("Opening");
-            reference3.child(getDate()).child(pv.getProduct_id()).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            openreference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    Log.i(TAG, "onComplete: " + task.toString());
-                    Toast.makeText(getActivity(), "Invoice complete", Toast.LENGTH_SHORT).show();
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    int sale = 0;
+                    int cursale = Integer.parseInt(pv.getUnit());
+                    Object obj = dataSnapshot.child("sale").getValue();
+
+                    if(obj != null)
+                        sale = Integer.parseInt(String.valueOf(obj));
+
+
+                    int totsale = cursale+sale;
+                    HashMap<String, Object> hashMap2 = new HashMap<>();
+                    hashMap2.put("sale", String.valueOf(totsale));
+
+                    Log.i(TAG,"onDataChange: Unit "+pv.getUnit());
+                    Log.i(TAG,"onDataChange: Sale "+sale);
+                    Log.i(TAG,"onDataChange: TotSale "+totsale);
+
+                    DatabaseReference reference3 = FirebaseDatabase.getInstance().getReference("Opening");
+                    reference3.child(getDate()).child(pv.getProduct_id()).updateChildren(hashMap2).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Log.i(TAG, "onComplete: " + task.toString());
+                            Toast.makeText(getActivity(), "Invoice complete", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.i(TAG, "onFailure: " + e.toString());
+                        }
+                    });
+
                 }
-            }).addOnFailureListener(new OnFailureListener() {
+
                 @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.i(TAG, "onFailure: " + e.toString());
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
                 }
             });
+
+
         }
     }
 
@@ -589,7 +622,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     private void generateInvoice(Client client) {
         Uri uri = null;
         new File(Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice").mkdir();
-        String path1 = Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice/"+ invoice + "_Inv.pdf";
+        String path1 = Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice/" + invoice + "_Inv.pdf";
         file = new File(path1);
 
         // Work Area
@@ -606,12 +639,11 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         in.pdfcreate(file, uri, uri, uri, context, data, invoice, client, getDate_());
 //        in.pdfcreate(file, invoice, client, uri, context, data);
         Intent intent = new Intent(getActivity(), pdfreader.class);
-        intent.putExtra("inv",invoice);
+        intent.putExtra("inv", invoice);
         intent.putExtra("inc", bundle);
         startActivity(intent);
 //        startActivity(new Intent(getActivity(), PdfTabbedActivity.class).putExtra("inv", "INV").putExtra("from", "genrate"));
     }
-
 
 
     private void updateFirebase(List<ProductInvoice> data) {
