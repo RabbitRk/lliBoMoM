@@ -42,6 +42,7 @@ public class pdfreader extends AppCompatActivity {
 
         if (object != null) {
             Log.i(TAG, "onCreate: Array yes "+object.size());
+
         }
         else
         {
@@ -53,8 +54,6 @@ public class pdfreader extends AppCompatActivity {
 //        } catch (IOException | ClassNotFoundException e) {
 //            e.printStackTrace();
 //        }
-
-
 
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.addTab(tabs.newTab().setText("PDF"));
