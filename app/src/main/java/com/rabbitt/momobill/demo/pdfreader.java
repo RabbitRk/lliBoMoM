@@ -41,7 +41,7 @@ public class pdfreader extends AppCompatActivity {
         ArrayList<ProductInvoice> object = (ArrayList<ProductInvoice>) bundle.getSerializable("valuesArray");
 
         if (object != null) {
-            Log.i(TAG, "onCreate: Array yes "+object.size());
+             Log.i(TAG, "onCreate: Array yes "+object.size());
 
         }
         else
