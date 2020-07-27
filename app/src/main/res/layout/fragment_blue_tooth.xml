@@ -17,16 +17,17 @@
         android:layout_centerInParent="true"
         android:gravity="center"
         android:foregroundGravity="center"
+        android:textColor="#0000ff"
         android:text="Print" />
 
-    <TextView
-        android:id="@+id/bill_fomat2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_below="@+id/bill_fomat"
-        android:gravity="start"
-        android:text="Print" />
+<!--    <TextView-->
+<!--        android:id="@+id/bill_fomat2"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        android:layout_below="@+id/bill_fomat"-->
+<!--        android:gravity="start"-->
+<!--        android:text="Print" />-->
 
     <LinearLayout
         android:layout_width="match_parent"

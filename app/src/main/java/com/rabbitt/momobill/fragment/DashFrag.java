@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -23,6 +24,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DataSnapshot;
@@ -31,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.rabbitt.momobill.BuildConfig;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.CheckOrderActivity;
 import com.rabbitt.momobill.activity.OpeningActivity;
@@ -897,6 +900,24 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         } catch (Exception e) {
             Log.w("FileUtils", "Failed to save file", e);
         } finally {
+
+            // create new Intent
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+
+            // set flag to give temporary permission to external app to use your FileProvider
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // generate URI, I defined authority as the application ID in the Manifest, the last param is file I want to open
+            Uri uri = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID, file);
+
+
+            intent.putExtra(Intent.EXTRA_STREAM,uri);
+
+            //giving intent a valid MIME type
+            intent.setDataAndType(uri,"application/vnd.ms-excel");
+
+
+            startActivity(intent);
             try {
                 if (null != os)
                     os.close();
@@ -1056,6 +1077,24 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         } catch (Exception e) {
             Log.w("FileUtils", "Failed to save file", e);
         } finally {
+
+            // create new Intent
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+
+            // set flag to give temporary permission to external app to use your FileProvider
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // generate URI, I defined authority as the application ID in the Manifest, the last param is file I want to open
+            Uri uri = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID, file);
+
+
+            intent.putExtra(Intent.EXTRA_STREAM,uri);
+
+            //giving intent a valid MIME type
+            intent.setDataAndType(uri,"application/vnd.ms-excel");
+
+
+            startActivity(intent);
             try {
                 if (null != os)
                     os.close();
@@ -1310,6 +1349,24 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         } catch (Exception e) {
             Log.w("FileUtils", "Failed to save file", e);
         } finally {
+
+            // create new Intent
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+
+            // set flag to give temporary permission to external app to use your FileProvider
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // generate URI, I defined authority as the application ID in the Manifest, the last param is file I want to open
+            Uri uri = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID, file);
+
+
+            intent.putExtra(Intent.EXTRA_STREAM,uri);
+
+            //giving intent a valid MIME type
+            intent.setDataAndType(uri,"application/vnd.ms-excel");
+
+
+            startActivity(intent);
             try {
                 if (null != os)
                     os.close();

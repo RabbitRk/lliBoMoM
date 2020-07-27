@@ -13,6 +13,10 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.Message;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +25,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.storage.internal.Util;
+import com.itextpdf.xmp.impl.Utils;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.DeviceActivity;
 import com.rabbitt.momobill.demo.UnicodeFormatter;
@@ -42,9 +48,12 @@ import java.util.UUID;
 
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_CITY;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_EMAIL;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_GST;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_LOC;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_LOC_2;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PHONE;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PIN;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_STATE;
 
 public class BlueToothFragment extends Fragment implements View.OnClickListener {
 
@@ -127,13 +136,16 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
         mScan = inflate.findViewById(R.id.scan);
         mPrint = inflate.findViewById(R.id.print);
         txt = inflate.findViewById(R.id.bill_fomat);
-        txt2 = inflate.findViewById(R.id.bill_fomat2);
+
 
         SharedPreferences preference = getContext().getSharedPreferences(PrefsManager.USER_PREF,0);
         String add1 = preference.getString(USER_LOC,"Address Line 1");
         String add2 = preference.getString(USER_LOC_2,"Address Line 2");
         String city = preference.getString(USER_CITY,"City");
+        String phone = preference.getString(USER_PHONE,"state");
         String pin = preference.getString(USER_PIN,"Pin code");
+
+        String gstin = preference.getString(USER_GST,"gstin");
 
 
 
@@ -156,31 +168,38 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
 //                "                 XXXXX YYYYYY      \n" +
 //                "                MMM 590019091      \n";
 
-        BILL =  "Santha Agencies\n" +
-                add1+"\n " +
-                add2+"\n" +
-                city+"\n" ;
+        BILL =  "SANTHA AGENCIES\n" +
+                add1.toUpperCase()+",\n " +
+                add2.toUpperCase()+",\n" +
+                city.toUpperCase()+"-" +
+                pin.toUpperCase()+",\n" +
+                "PH : "+phone+",\n" +
+                "GSTIN : "+gstin.toUpperCase()+",\n" ;
+
         BILL = BILL
-                + "-----------------------------------------------\n";
-        BILL = BILL + String.format("%1$-12s %2$30s", "Inv.id" , invId);
-        BILL = BILL + "\n";
+                + "----------------------------------------------------------------------------\n";
+//        BILL = BILL + String.format("%1$-12s %2$20s", "Bill No :" , invId);
+//        BILL = BILL + "\n";
 
         Date date = Calendar.getInstance().getTime();
         SimpleDateFormat df =new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat tf =new SimpleDateFormat("hh:mm a");
         String date_txt =  df.format(date);
 
-        BILL = BILL + String.format("%1$-3s %2$30s", "Date" , date_txt);
+        BILL = BILL + String.format("%1$-10s %2$-10s %3$-10s %4$-10s","Bill No :",invId, "Date : " , date_txt);
+        BILL = BILL + "\n";
+        BILL = BILL + String.format("%1$-10s %2$-10s %3$-10s %4$-10s","Counter :","Counter", "Time : " , tf.format(date));
         BILL = BILL + "\n";
 
 
         BILL = BILL
-                + "-----------------------------------------------\n";
+                + "----------------------------------------------------------------------------\n";
 
 
-        BILL = BILL + String.format("%1$-10s %2$10s %3$13s %4$10s", "Item", "Qty", "Rate", "Total");
+        BILL = BILL + String.format("%1$-10s %2$10s %3$13s %4$10s", "PRODUCT", "QTY", "RATE", "AMT");
         BILL = BILL + "\n";
         BILL = BILL
-                + "-----------------------------------------------";
+                + "----------------------------------------------------------------------------";
 
 //generating bill
         if (data != null) {
@@ -200,7 +219,7 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
                 totalQty = totalQty + quantity;
                 totalVal = totalVal + total;
 
-                BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", product, quantity, rate, total);
+                BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$13s %4$10s", product, quantity, rate, total);
                 Log.i(TAG, "Item "+product);
                 Log.i(TAG, "Quantity "+quantity);
                 Log.i(TAG, "Total "+total);
@@ -214,20 +233,22 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
 //        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-004", "50", "10", "500.00");
 
         BILL = BILL
-                + "\n-----------------------------------------------";
+                + "\n----------------------------------------------------------------------------";
+        BILL = BILL + "\n"+String.format("%1$-10s %2$-50s","TOTAL ITEMS :", totalQty );
+        BILL = BILL
+                + "\n----------------------------------------------------------------------------";
         BILL = BILL + "\n\n ";
-        String BILL2 ="";
-        BILL2 = BILL2 + "\t\t\t\tTotal Qty  :" + "          " + totalQty + "\n";
-        BILL2 = BILL2 + "\t\t\t\tTotal Value:" + "       " + totalVal + "\n";
+//        String BILL ="";
+        BILL = BILL + "           TOTAL :" + "          " + totalVal + "\n";
+        BILL = BILL + "NET AMOUNT :" + "          " + totalVal + "\n";
 
-        BILL2 = BILL2
-                + "-----------------------------------------------\n";
-        BILL2 = BILL2 + "\n\n ";
+        BILL = BILL
+                + "----------------------------------------------------------------------------\n";
+        BILL = BILL + "\n\n ";
         //This is printer specific code you can comment ==== > Start
 
         txt.setText(BILL);
-        txt2.setText(BILL2);
-        //
+
         mScan.setOnClickListener(this);
         mPrint.setOnClickListener(this);
     }

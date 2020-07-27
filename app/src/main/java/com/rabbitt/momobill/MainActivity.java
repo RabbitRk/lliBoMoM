@@ -13,6 +13,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.gauravk.bubblenavigation.BubbleNavigationLinearView;
+import com.gauravk.bubblenavigation.BubbleToggleView;
 import com.gauravk.bubblenavigation.listener.BubbleNavigationChangeListener;
 import com.rabbitt.momobill.activity.SettingsActivity;
 import com.rabbitt.momobill.fragment.ClientFrag;
@@ -21,6 +22,8 @@ import com.rabbitt.momobill.fragment.InventoryFrag;
 import com.rabbitt.momobill.fragment.InvoiceFrag;
 import com.rabbitt.momobill.fragment.OrderFrag;
 import com.rabbitt.momobill.prefsManager.PrefsManager;
+
+import java.util.Objects;
 
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PREF;
 
@@ -46,14 +49,14 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if(item.getItemId()==R.id.settings)
+                if (item.getItemId() == R.id.settings)
                     startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                 return true;
             }
         });
 
-        BubbleNavigationLinearView bubbleNavigationLinearView = findViewById(R.id.bottom_navigation_view_linear);
-        if (bool){
+        final BubbleNavigationLinearView bubbleNavigationLinearView = findViewById(R.id.bottom_navigation_view_linear);
+        if (bool) {
             toolbar.inflateMenu(R.menu.main_menu_item);
             toolbar.setTitle(getString(R.string.home));
             loadFragment(new DashFrag());
@@ -61,9 +64,8 @@ public class MainActivity extends AppCompatActivity {
             bubbleNavigationLinearView.setNavigationChangeListener(new BubbleNavigationChangeListener() {
                 @Override
                 public void onNavigationChanged(View view, int position) {
-                    Log.i(TAG, "onNavigationChanged: "+view.getId()+"  "+position);
-                    switch (position)
-                    {
+                    Log.i(TAG, "onNavigationChanged: " + view.getId() + "  " + position);
+                    switch (position) {
                         case 0:
                             toolbar.setTitle(getString(R.string.home));
                             loadFragment(new DashFrag());
@@ -87,12 +89,18 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
-        }
-        else
-        {
+        } else {
             toolbar.setTitle("Santha agency - Order");
             bubbleNavigationLinearView.setCurrentActiveItem(3);
             loadFragment(new OrderFrag());
+        }
+
+        if (getIntent().getBooleanExtra("nav",false)) {
+            BubbleToggleView dashView = findViewById(R.id.l_item_home);
+            dashView.deactivate();
+            bubbleNavigationLinearView.setCurrentActiveItem(2);
+            toolbar.setTitle("Invoice");
+            loadFragment(new InvoiceFrag());
         }
     }
 
@@ -116,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         BubbleNavigationLinearView bottomNavigationView = findViewById(R.id.bottom_navigation_view_linear);
         int selectedItemId = bottomNavigationView.getCurrentActiveItemPosition();
-        Log.i(TAG, "onBackPressed: "+selectedItemId);
+        Log.i(TAG, "onBackPressed: " + selectedItemId);
 //
 //        if (getCurrentFragment().equals(null))
 //        {
@@ -128,8 +136,7 @@ public class MainActivity extends AppCompatActivity {
 //                super.onBackPressed();
 //            }
 //        }
-        try
-        {
+        try {
 //            String com = prefsManager.getIns();
 //            Log.i(TAG, "onBackPressed: "+com+"        "+getCurrentFragment());
 //            Log.i(TAG, "rabbitt: "+adapter.getCategory());
@@ -178,17 +185,15 @@ public class MainActivity extends AppCompatActivity {
 ////                    break;
 //
 //                default:
-                    if (R.id.l_item_home != selectedItemId) {
-                        setHomeItem(MainActivity.this);
-                    } else {
-                        finish();
-                        super.onBackPressed();
-                    }
+            if (R.id.l_item_home != selectedItemId) {
+                setHomeItem(MainActivity.this);
+            } else {
+                finish();
+                super.onBackPressed();
+            }
 //            }
-        }
-        catch (NullPointerException npe)
-        {
-            Log.i(TAG, "onBackPressed:Exception "+npe.getMessage());
+        } catch (NullPointerException npe) {
+            Log.i(TAG, "onBackPressed:Exception " + npe.getMessage());
 
             if (selectedItemId != 0) {
                 setHomeItem(MainActivity.this);
