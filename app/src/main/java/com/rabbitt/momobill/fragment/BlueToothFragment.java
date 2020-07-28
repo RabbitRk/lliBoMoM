@@ -237,14 +237,44 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
         BILL = BILL + "\n"+String.format("%1$-10s %2$-50s","TOTAL ITEMS :", totalQty );
         BILL = BILL
                 + "\n----------------------------------------------------------------------------";
-        BILL = BILL + "\n\n ";
+//        BILL = BILL + "\n\n ";
 //        String BILL ="";
         BILL = BILL + "           TOTAL :" + "          " + totalVal + "\n";
         BILL = BILL + "NET AMOUNT :" + "          " + totalVal + "\n";
 
         BILL = BILL
                 + "----------------------------------------------------------------------------\n";
-        BILL = BILL + "\n\n ";
+        BILL = BILL + "GST SUMMARY DETAILS";
+        BILL = BILL + "\n ";
+        BILL = BILL
+                + "----------------------------------------------------------------------------\n";
+
+        BILL = BILL + String.format("%1$5s %2$8s %3$8s %4$8s %5$8s", "TAX % ", "Taxable Val", "SGST", "CGST","Total");
+        BILL = BILL + "\n ";
+        BILL = BILL + String.format("%1$-10s %2$8s %3$15s %4$12s %5$12s", "0", "37.00", "0.00", "0.00","37.00");
+        BILL = BILL + "\n ";
+        BILL = BILL + String.format("%1$-10s %2$8s %3$15s %4$12s %5$12s", "5", "9.52", "0.24", "0.24","10.00");
+        BILL = BILL + "\n ";
+        BILL = BILL + String.format("%1$-10s %2$8s %3$15s %4$12s %5$12s", "12", "153.57", "9.21", "9.21","172.00");
+        BILL = BILL + "\n ";
+
+        BILL = BILL
+                + "----------------------------------------------------------------------------\n";
+        BILL = BILL + String.format("%1$-10s %2$-50s","TOTAL SAVINGS :", "RS. 7.00" );
+        BILL = BILL
+                + "----------------------------------------------------------------------------\n";
+
+        BILL = BILL + String.format("%1$10s %2$10s","  Given Amount :", "RS. 250.00" );
+        BILL = BILL + "\n ";
+        BILL = BILL + String.format("%1$10s %2$10s","Balance Amount :", "RS. 31.00 " );
+        BILL = BILL + "\n ";
+
+        BILL = BILL
+                + "----------------------------------------------------------------------------\n";
+
+        BILL = BILL + "THANK YOU FOR PURCHASING";
+
+
         //This is printer specific code you can comment ==== > Start
 
         txt.setText(BILL);
