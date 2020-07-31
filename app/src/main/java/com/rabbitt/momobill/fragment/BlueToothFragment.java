@@ -1,6 +1,7 @@
 package com.rabbitt.momobill.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -9,14 +10,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.Message;
-import android.text.Html;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,16 +23,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.storage.internal.Util;
-import com.itextpdf.xmp.impl.Utils;
 import com.rabbitt.momobill.R;
-import com.rabbitt.momobill.activity.DeviceActivity;
+import com.rabbitt.momobill.activity.DeviceListActivity;
 import com.rabbitt.momobill.demo.UnicodeFormatter;
-import com.rabbitt.momobill.model.Product;
 import com.rabbitt.momobill.model.ProductInvoice;
 import com.rabbitt.momobill.prefsManager.PrefsManager;
-
-import org.apache.poi.util.StringUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,15 +40,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_CITY;
-import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_EMAIL;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_GST;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_LOC;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_LOC_2;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PHONE;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PIN;
-import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_STATE;
 
-public class BlueToothFragment extends Fragment implements View.OnClickListener {
+public class BlueToothFragment extends Fragment implements View.OnClickListener,Runnable {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -64,7 +55,7 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
 //    private String mParam2;
 
     //Additionally added
-    protected static final String TAG = "maluBlueTooth";
+    protected static final String TAG = "TAG";
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
     Button mScan, mPrint, mDisc;
@@ -75,6 +66,8 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
     private BluetoothSocket mBluetoothSocket;
     BluetoothDevice mBluetoothDevice;
 
+
+    String BILL = "";
     List<ProductInvoice> data = null;
 
     int totalQty;
@@ -160,7 +153,7 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
         String invId = getArguments().getString("inv");
 
         //
-        String BILL = "";
+//        String BILL = "";
 
 //        BILL =  "                   XXXX MART    \n" +
 //                "                 XX.AA.BB.CC.     \n " +
@@ -288,32 +281,36 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
         switch (v.getId())
         {
             case R.id.scan:
-                mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                if (mBluetoothAdapter == null) {
-                    Toast.makeText(getActivity(), "Message1", Toast.LENGTH_SHORT).show();
-                } else {
-                    if (!mBluetoothAdapter.isEnabled()) {
-                        Intent enableBtIntent = new Intent(
-                                BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                        startActivityForResult(enableBtIntent,
-                                REQUEST_ENABLE_BT);
-                    } else {
-                        ListPairedDevices();
-                        Intent connectIntent = new Intent(getActivity(),
-                                DeviceActivity.class);
-                        startActivityForResult(connectIntent,
-                                REQUEST_CONNECT_DEVICE);
+                mScan.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View mView) {
+                        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                        if (mBluetoothAdapter == null) {
+                            Toast.makeText(getContext(), "Message1", Toast.LENGTH_SHORT).show();
+                        } else {
+                            if (!mBluetoothAdapter.isEnabled()) {
+                                Intent enableBtIntent = new Intent(
+                                        BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                                startActivityForResult(enableBtIntent,
+                                        REQUEST_ENABLE_BT);
+                            } else {
+                                ListPairedDevices();
+                                Intent connectIntent = new Intent(getContext(),
+                                        DeviceListActivity.class);
+                                startActivityForResult(connectIntent,
+                                        REQUEST_CONNECT_DEVICE);
+                            }
+                        }
                     }
-                }
+                });
+
                 break;
             case R.id.print:
-                print();
+                print(BILL);
                 break;
         }
     }
 
     public void run() {
-        Log.i(TAG, "run: Working called");
         try {
             mBluetoothSocket = mBluetoothDevice
                     .createRfcommSocketToServiceRecord(applicationUUID);
@@ -326,6 +323,8 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
             return;
         }
     }
+
+
 
     private void closeSocket(BluetoothSocket nOpenSocket) {
         try {
@@ -341,50 +340,33 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
         @Override
         public void handleMessage(Message msg) {
             mBluetoothConnectProgressDialog.dismiss();
-            Toast.makeText(getActivity(), "DeviceConnected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "DeviceConnected", Toast.LENGTH_SHORT).show();
         }
     };
+    @Override
+    public void onDestroy() {
+        // TODO Auto-generated method stub
+        super.onDestroy();
+        try {
+            if (mBluetoothSocket != null)
+                mBluetoothSocket.close();
+        } catch (Exception e) {
+            Log.e("Tag", "Exe ", e);
+        }
+    }
 
 
-    private void print() {
+
+    private void print(final String BILL) {
         Thread t = new Thread() {
             public void run() {
                 try {
                     OutputStream os = mBluetoothSocket.getOutputStream();
-                    String BILL = "";
 
-                    BILL =  "                   XXXX MART    \n" +
-                            "                 XX.AA.BB.CC.     \n " +
-                            "               NO 25 ABC ABCDE    \n" +
-                            "                 XXXXX YYYYYY      \n" +
-                            "                MMM 590019091      \n";
-                    BILL = BILL
-                            + "-----------------------------------------------\n";
-
-
-                    BILL = BILL + String.format("%1$-10s %2$10s %3$13s %4$10s", "Item", "Qty", "Rate", "Totel");
-                    BILL = BILL + "\n";
-                    BILL = BILL
-                            + "-----------------------------------------------";
-                    BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-001", "5", "10", "50.00");
-                    BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-002", "10", "5", "50.00");
-                    BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-003", "20", "10", "200.00");
-                    BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-004", "50", "10", "500.00");
-
-                    BILL = BILL
-                            + "\n-----------------------------------------------";
-                    BILL = BILL + "\n\n ";
-
-                    BILL = BILL + "                   Total Qty:" + "      " + "85" + "\n";
-                    BILL = BILL + "                   Total Value:" + "     " + "700.00" + "\n";
-
-                    BILL = BILL
-                            + "-----------------------------------------------\n";
-                    BILL = BILL + "\n\n ";
                     os.write(BILL.getBytes());
                     //This is printer specific code you can comment ==== > Start
 
-                    txt.setText(BILL);
+//                    txt.setText(BILL);
 
 
                     // Setting height
@@ -412,8 +394,8 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
         t.start();
     }
 
-    private int intToByteArray(int gs) {
-        byte[] b = ByteBuffer.allocate(4).putInt(gs).array();
+    public static byte intToByteArray(int value) {
+        byte[] b = ByteBuffer.allocate(4).putInt(value).array();
 
         for (int k = 0; k < b.length; k++) {
             System.out.println("Selva  [" + k + "] = " + "0x"
@@ -423,14 +405,57 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
         return b[3];
     }
 
+    public byte[] sel(int val) {
+        ByteBuffer buffer = ByteBuffer.allocate(2);
+        buffer.putInt(val);
+        buffer.flip();
+        return buffer.array();
+    }
+
     private void ListPairedDevices() {
         Set<BluetoothDevice> mPairedDevices = mBluetoothAdapter
                 .getBondedDevices();
         if (mPairedDevices.size() > 0) {
             for (BluetoothDevice mDevice : mPairedDevices) {
-                Log.i(TAG, "PairedDevices: " + mDevice.getName() + "  "
+                Log.v(TAG, "PairedDevices: " + mDevice.getName() + "  "
                         + mDevice.getAddress());
             }
+        }
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQUEST_CONNECT_DEVICE:
+                if (resultCode == Activity.RESULT_OK) {
+                    Bundle mExtra = data.getExtras();
+                    String mDeviceAddress = mExtra.getString("DeviceAddress");
+                    Log.v(TAG, "Coming incoming address " + mDeviceAddress);
+                    mBluetoothDevice = mBluetoothAdapter
+                            .getRemoteDevice(mDeviceAddress);
+                    mBluetoothConnectProgressDialog = ProgressDialog.show(getContext(),
+                            "Connecting...", mBluetoothDevice.getName() + " : "
+                                    + mBluetoothDevice.getAddress(), true, false);
+                    Thread mBlutoothConnectThread = new Thread(this);
+                    mBlutoothConnectThread.start();
+                    // pairToDevice(mBluetoothDevice); This method is replaced by
+                    // progress dialog with thread
+                }
+                break;
+
+            case REQUEST_ENABLE_BT:
+                if (resultCode == Activity.RESULT_OK) {
+                    ListPairedDevices();
+                    Intent connectIntent = new Intent(getContext(),
+                            DeviceListActivity.class);
+                    startActivityForResult(connectIntent, REQUEST_CONNECT_DEVICE);
+                } else {
+                    Toast.makeText(getContext(), "Message", Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 }

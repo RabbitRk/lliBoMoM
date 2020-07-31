@@ -3,12 +3,14 @@ package com.rabbitt.momobill.activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -18,20 +20,21 @@ import com.rabbitt.momobill.R;
 
 import java.util.Set;
 
-public class DeviceActivity extends AppCompatActivity {
+public class DeviceListActivity extends ListActivity {
     protected static final String TAG = "TAG";
     private BluetoothAdapter mBluetoothAdapter;
     private ArrayAdapter<String> mPairedDevicesArrayAdapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle mSavedInstanceState) {
+        super.onCreate(mSavedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_device);
 
         setResult(Activity.RESULT_CANCELED);
-        mPairedDevicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item);
+        mPairedDevicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.device_name);
 
-        ListView mPairedListView = (ListView) findViewById(R.id.paired_devices);
+        ListView mPairedListView = (ListView) findViewById(android.R.id.list);
         mPairedListView.setAdapter(mPairedDevicesArrayAdapter);
         mPairedListView.setOnItemClickListener(mDeviceClickListener);
 
@@ -80,3 +83,4 @@ public class DeviceActivity extends AppCompatActivity {
         }
     };
 }
+
