@@ -165,10 +165,9 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
 
         String product_id = model.getProduct_id();
         String unit = model.getUnit();
-        String name = model.getProduct_name();
+        final String name = model.getProduct_name();
 
         Log.i(TAG, "OnItemClick: p: " + product_id + "  u: " + unit  + "  n: " + name);
-
 
         final IncrementPref i = new IncrementPref(this);
 
@@ -222,6 +221,7 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "onComplete: " + task.toString());
+                    Toast.makeText(OpeningActivity.this, " "+name+" added to the Opening stock", Toast.LENGTH_SHORT).show();
                     i.setOpeningVal(String.valueOf(Integer.parseInt(OP_VAL) + 1));
                 }
             }).addOnFailureListener(new OnFailureListener() {

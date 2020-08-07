@@ -107,11 +107,6 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
         {
             Log.i(TAG, "onCreate: "+"bundle null");
         }
-//        if (getArguments() != null) {
-////            mParam1 = getArguments().getString(ARG_PARAM1);
-////            mParam2 = getArguments().getString(ARG_PARAM2);
-//
-//        }
     }
 
     @Override
@@ -136,26 +131,16 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
         String pin = preference.getString(USER_PIN,"Pin code");
 
 
-
-
-//        Initializing total value and quantity to 0
+        //Initializing total value and quantity to 0
         totalQty = 0;
         totalVal = 0.0;
 
-//        get invoice data from argument
+        //get invoice data from argument
         List<ProductInvoice> data = (List<ProductInvoice>) getArguments().getSerializable("data");
 
         String invId = getArguments().getString("inv");
 
-        //
         String BILL = "";
-
-//        BILL =  "                   XXXX MART    \n" +
-//                "                 XX.AA.BB.CC.     \n " +
-//                "               NO 25 ABC ABCDE    \n" +
-//                "                 XXXXX YYYYYY      \n" +
-//                "                MMM 590019091      \n";
-
         BILL =  "Santha Agencies\n" +
                 add1+"\n " +
                 add2+"\n" +
@@ -208,7 +193,6 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
             }
         }
 
-
 //        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-002", "10", "5", "50.00");
 //        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-003", "20", "10", "200.00");
 //        BILL = BILL + "\n " + String.format("%1$-10s %2$10s %3$11s %4$10s", "item-004", "50", "10", "500.00");
@@ -217,11 +201,14 @@ public class BlueToothFragment extends Fragment implements View.OnClickListener 
                 + "\n-----------------------------------------------";
         BILL = BILL + "\n\n ";
         String BILL2 ="";
-        BILL2 = BILL2 + "\t\t\t\tTotal Qty  :" + "          " + totalQty + "\n";
-        BILL2 = BILL2 + "\t\t\t\tTotal Value:" + "       " + totalVal + "\n";
+        BILL2 = BILL2 + "\t\t\t\tTotal Qty  :" + "  " + totalQty + "\n";
+        BILL2 = BILL2 + "\t\t\t\tTotal Value:" + "  " + totalVal + "\n";
 
         BILL2 = BILL2
                 + "-----------------------------------------------\n";
+
+        BILL2 = BILL2 + "\t\t\t\tCGST  :" + "  " + totalQty + "\n";
+        BILL2 = BILL2 + "\t\t\t\tTotal Value:" + "  " + totalVal + "\n";
         BILL2 = BILL2 + "\n\n ";
         //This is printer specific code you can comment ==== > Start
 
