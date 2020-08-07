@@ -9,15 +9,15 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="#666"
-        android:padding="5dp"
+        android:paddingLeft="5dip"
         android:text="Bluetooth Printers"
         android:textColor="#fff"
         android:visibility="gone" />
 
     <ListView
-        android:id="@+id/paired_devices"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:background="#fff"
         android:layout_weight="1"
         android:stackFromBottom="true" />

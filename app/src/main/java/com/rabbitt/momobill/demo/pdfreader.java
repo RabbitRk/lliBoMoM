@@ -1,5 +1,6 @@
 package com.rabbitt.momobill.demo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -7,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.rabbitt.momobill.MainActivity;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.adapter.TabAdapter;
 import com.rabbitt.momobill.model.ProductInvoice;
@@ -91,6 +93,13 @@ public class pdfreader extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("nav",true);
+        startActivity(intent);
+    }
 
     static public Object bytes2Object(byte raw[])
             throws IOException, ClassNotFoundException {
