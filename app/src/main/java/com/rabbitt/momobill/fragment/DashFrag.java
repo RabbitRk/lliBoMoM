@@ -478,7 +478,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             public void onClick(View view) {
 
                 if (method == 0) {
-//                    EditText dateTxt = dialogView.findViewById(R.id.date);
                     String selDate;
                     selDate = dateTxt.getText().toString();
                     SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -507,8 +506,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                             }
                         });
 
-//                        invoiceDialogBuilder.dismiss();
-
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -522,7 +519,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                         String selMonth = df.format(dbDate);
                         Log.i("month_selected", selMonth);
                         getMonthData(selMonth, monthName);
-//                        invoiceDialogBuilder.dismiss();
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -593,7 +589,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-
                     for (DataSnapshot child : dataSnapshot.child("Invoice").child(dbDate).getChildren()) {
 
                         String inv_no = child.getKey();
@@ -620,7 +615,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
                 }
 
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -638,7 +632,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         d1 = dbformat.parse(fromDate);
         d2 = dbformat.parse(toDate);
 
-
         for (int i = 0; i < datesOfInvoice.size(); i++) {
             String b = datesOfInvoice.get(i);
             d3 = dbformat.parse(b);
@@ -646,12 +639,9 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                 Log.i("newDates", datesOfInvoice.get(i));
                 newList.add(datesOfInvoice.get(i));
             }
-
         }
-
         return newList;
     }
-
 
     private void getMonthData(final String selMonth, final String month_name) {
 

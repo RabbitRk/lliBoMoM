@@ -10,7 +10,7 @@ public class ProductInvoice implements Parcelable {
     String sale_rate;
     String unit;
     String product_id;
-    String cgst;
+    public String cgst;
     String cess;
     String in;
     String single;
