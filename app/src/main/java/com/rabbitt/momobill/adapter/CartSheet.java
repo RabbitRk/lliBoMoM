@@ -294,7 +294,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                 for (int i = 0; i < data.size(); i++) {
                     Log.i(TAG, "Invoice Amount: " + data.get(i).getIn());
                     String inc = data.get(i).getIn();
-                    double gst = Double.parseDouble(data.get(i).getCgst()) * 2;
+                    double gst = Double.parseDouble(data.get(i).getCgst());
                     double ces = Double.parseDouble(data.get(i).getCess());
                     double rat = Double.parseDouble(data.get(i).getSale_rate());
                     double val = calculate(inc, gst, ces, rat);

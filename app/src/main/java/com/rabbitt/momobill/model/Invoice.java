@@ -24,26 +24,40 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_CITY;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_GST;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_LOC;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_LOC_2;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PHONE;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PIN;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PREF;
 
 public class Invoice {
     private static final String TAG = "maluPDF";
 
-        public void pdfcreate(File file, Uri path, Uri stamp, Uri logopath, Context context, List<ProductInvoice> data, String invoice, Client client, String date_) {
+    public void pdfcreate(File file, Uri path, Uri stamp, Uri logopath, Context context, List<ProductInvoice> data, String invoice, Client client, String date_) {
 
 
-            Log.i(TAG, "pdfcreate: " + path);
+        Log.i(TAG, "pdfcreate: " + path);
         com.itextpdf.text.Document doc = new com.itextpdf.text.Document(PageSize.A5.rotate(), 0f, 0f, 0f, 0f);
         String outPath = file.getPath();
 
         try {
-            SharedPreferences shrp = context.getSharedPreferences(USER_PREF, Context.MODE_PRIVATE);
+            SharedPreferences preference = context.getSharedPreferences(USER_PREF, Context.MODE_PRIVATE);
+
+            String add1 = preference.getString(USER_LOC, "Address Line 1");
+            String add2 = preference.getString(USER_LOC_2, "Address Line 2");
+            String city = preference.getString(USER_CITY, "City");
+            String phone = preference.getString(USER_PHONE, "phone");
+            String pin = preference.getString(USER_PIN, "Pin code");
+
+            String gstin = preference.getString(USER_GST, "gstin");
 
             PdfWriter.getInstance(doc, new FileOutputStream(outPath));
             doc.open();
@@ -77,7 +91,7 @@ public class Invoice {
 //                image3.scaleToFit(50, 50);
 //            }
             //innertable.setWidths(new int[]{40});
-    //Topic
+            //Topic
 //            PdfPCell cell = new PdfPCell();
 //            cell.setBorder(Rectangle.NO_BORDER);
 //            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -147,7 +161,7 @@ public class Invoice {
 //            cell.setBorder(Rectangle.NO_BORDER);
 //            innertable.addCell(cell);
 //            doc.add(innertable);
-    //Topic End
+            //Topic End
 //Second table
 
 //            PdfPTable inner = new PdfPTable(1);
@@ -173,7 +187,8 @@ public class Invoice {
             PdfPCell cell1 = new PdfPCell(new Phrase("Voucher no. :" + invoice));
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("Data" + invoice));/////////////////////////////////////////////////////////////////////////
+            cell1 = new PdfPCell(new Phrase("SANTHA AGENCIES"));/////////////////////////////////////////////////////////////////////////
+            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable2.addCell(cell1);
 
             cell1 = new PdfPCell(new Phrase("Details of Supplier"));
@@ -183,7 +198,8 @@ public class Invoice {
             cell1 = new PdfPCell(new Phrase("Voucher Date: " + date_));
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("Data" + invoice));/////////////////////////////////////////////////////////////////////////
+            cell1 = new PdfPCell(new Phrase(add1));/////////////////////////////////////////////////////////////////////////
+            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable2.addCell(cell1);
 
             cell1 = new PdfPCell(new Phrase("Name: " + client.getName()));
@@ -192,7 +208,8 @@ public class Invoice {
             cell1 = new PdfPCell(new Phrase("Place of supply: "));
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("Data" + invoice));/////////////////////////////////////////////////////////////////////////
+            cell1 = new PdfPCell(new Phrase(add2+"\n"+city+"-"+pin));/////////////////////////////////////////////////////////////////////////
+            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable2.addCell(cell1);
 
 
@@ -202,7 +219,8 @@ public class Invoice {
             cell1 = new PdfPCell(new Phrase(""));
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("Data" + invoice));/////////////////////////////////////////////////////////////////////////
+            cell1 = new PdfPCell(new Phrase("PH: "+phone));/////////////////////////////////////////////////////////////////////////
+            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable2.addCell(cell1);
 
 
@@ -212,7 +230,8 @@ public class Invoice {
             cell1 = new PdfPCell(new Phrase("Address : \t" + "user_add"));
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("Data" + invoice));/////////////////////////////////////////////////////////////////////////
+            cell1 = new PdfPCell(new Phrase("GSTIN : "+gstin));/////////////////////////////////////////////////////////////////////////
+            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable2.addCell(cell1);
 
             cell1 = new PdfPCell(new Phrase("State: " + client.getState() + "    Code: " + client.getPincode()));
@@ -383,15 +402,68 @@ public class Invoice {
             nested5.addCell("CGST");
             nested5.addCell("SGST");
 
-            nested5.addCell("3");
-            nested5.addCell("34");
-            nested5.addCell("3");
-            nested5.addCell("34");
 
-            nested5.addCell("3");
-            nested5.addCell("35");
-            nested5.addCell("3");
-            nested5.addCell("35");
+            List<ProductInvoice> tax = new ArrayList<>();
+            for (int i = 0; i < data.size(); i++) {  // Filtering the model which the tax are not inclusive
+                if (data.get(i).getIn().equals("exc")) {
+                    tax.add(data.get(i));
+                    Log.i(TAG, "parseData: " + data.get(i).toString());
+                }
+            }
+
+            ArrayList<Integer> tax_val = new ArrayList<>(); //Split up the taxes for the EXCLUSIVE products
+
+            for (int i = 0; i < tax.size(); i++) {
+                Log.i(TAG, "parseData: 2: " + tax.get(i).getCgst());
+                tax_val.add(Integer.valueOf(tax.get(i).getCgst()));
+            }
+
+            Set<Integer> set = new HashSet<Integer>();
+            set.addAll(tax_val); //Getting the unique values
+
+            List<Summary> val = new ArrayList<>(); //Getting taxable and the gst percentages
+
+            for (Iterator<Integer> it = set.iterator(); it.hasNext(); ) { //3
+                int f = it.next();
+                double taxable = 0.0;
+                for (int i = 0; i < tax.size(); i++) { //4
+                    Log.i(TAG, "Iteration: " + i);
+                    if (tax.get(i).getCgst().equals(String.valueOf(f))) {
+                        taxable += Double.parseDouble(tax.get(i).getSale_rate());
+                    }
+                }
+                Log.i(TAG, "Taxable: " + taxable + "    " + f);
+
+                //Custom model
+                Summary summary = new Summary();
+                summary.setPercentage(String.valueOf(f));
+                summary.setTaxable(String.valueOf(taxable));
+
+                val.add(summary);
+                Log.i(TAG, "parseData:" + f);
+            }
+
+
+            for(int i=0;i<val.size();i++) {
+                double taxable = Double.parseDouble(val.get(i).getTaxable());
+                double per = Double.parseDouble(val.get(i).getPercentage());
+                double cgst = taxable * ((per / 2.0) / 100.0);
+                nested5.addCell(String.valueOf(per));
+                nested5.addCell(String.valueOf(taxable));
+                nested5.addCell(String.valueOf(cgst));
+                nested5.addCell(String.valueOf(cgst));
+            }
+
+//
+//            nested5.addCell("3");
+//            nested5.addCell("34");
+//            nested5.addCell("3");
+//            nested5.addCell("34");
+//
+//            nested5.addCell("3");
+//            nested5.addCell("35");
+//            nested5.addCell("3");
+//            nested5.addCell("35");
 
             PdfPCell nesthousing5 = new PdfPCell(nested5);
 
@@ -489,6 +561,7 @@ public class Invoice {
         nf.setMaximumFractionDigits(0);
         return nf.format(val);
     }
+
 
 
 }

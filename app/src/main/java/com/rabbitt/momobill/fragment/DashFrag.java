@@ -78,7 +78,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
     static ArrayList<String> crnamelist, billlist, crdatelist, amntlist, paidlist, creditlist;
 
 
-    static ArrayList<String> namelist, gstinlist, datelist, basicvallist, taxlist, cesslist;
+    static ArrayList<String> namelist, gstinlist, datelist, basicvallist, taxlist, cesslist,unitList;
     ArrayList<CreditModel> list;
     String date, billno, name, amnt, paid, cr, clientid;
     ProgressDialog progressDialog;
@@ -118,6 +118,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         basicvallist = new ArrayList<>();
         taxlist = new ArrayList<>();
         cesslist = new ArrayList<>();
+        unitList = new ArrayList<>();
 
         crnamelist = new ArrayList<>();
         crdatelist = new ArrayList<>();
@@ -575,12 +576,18 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
         progressDialog = ProgressDialog.show(getContext(), "Please wait", "Loading", true);
         final ArrayList<String> c_nameList, inv_dateList, inv_noList, amountList, gst_inList;
+        final ArrayList<String> taxableList,cgstList,sgstList,cess_List;
+
 
         c_nameList = new ArrayList<>();
         inv_dateList = new ArrayList<>();
         inv_noList = new ArrayList<>();
         amountList = new ArrayList<>();
         gst_inList = new ArrayList<>();
+        cgstList = new ArrayList<>();
+        sgstList = new ArrayList<>();
+        cess_List = new ArrayList<>();
+        taxableList = new ArrayList<>();
 
         for (final String dbDate : newDatesList) {
 
@@ -588,6 +595,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             rootref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
 
                     for (DataSnapshot child : dataSnapshot.child("Invoice").child(dbDate).getChildren()) {
 
@@ -602,18 +610,58 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                         String gstin = client_child.child("gst").getValue().toString();
 
 
+                        double final_cgst=0.0,final_sgst=0.0,final_cess=0.0,final_taxable=0.0;
+                        for (DataSnapshot productChild : child.child("Product").getChildren()) {
+                            String proid = productChild.getKey();
+                            String inc_exc = productChild.child("in_ex").getValue().toString();
+
+                            int per = Integer.parseInt(productChild.child("cgst").getValue().toString());
+
+                            int cess = Integer.parseInt(productChild.child("cess").getValue().toString());
+                            double sale_rate = Double.parseDouble(productChild.child("sale_rate").getValue().toString());
+
+                            if(inc_exc.equals("inc")) {
+                                final_taxable += Double.parseDouble(total);
+                                final_sgst += 0.00;
+                                final_cgst += 0.00;
+                                final_cess += 0.00;
+                                Log.i("GST_VALUES", "TOTAL" +final_taxable );
+                            } else {
+//                            double dividend = 100+per+cess;
+//
+//                            dividend = 100/dividend;
+
+                                final_taxable += sale_rate;
+                                double cgst = sale_rate * ((per/2.0)/100.0);
+                                double sgst = sale_rate * ((per/2.0)/100.0);
+                                double cess_val = 0.0;
+                                cess_val = Double.parseDouble(total) - (sale_rate+cgst+sgst);
+                                if (cess_val>=0.0)
+                                    final_cess +=cess_val;
+                                final_cgst +=cgst;
+                                final_sgst += sgst;
+                                Log.i("GST_VALUES", "TOTAL" + sale_rate);
+                            }
+
+                            Log.i("GST_VALUES", "TOTAL" +total +"   CGST" +final_cgst + "  CESS" +final_cess +"  SGST" +final_sgst);
+                        }
                         c_nameList.add(client_name);
                         inv_dateList.add(dbDate);
                         inv_noList.add(inv_no);
                         amountList.add(total);
                         gst_inList.add(gstin);
+                        taxableList.add(String.valueOf(final_taxable));
+                        cgstList.add(String.valueOf(final_cgst));
+                        sgstList.add(String.valueOf(final_sgst));
+                        cess_List.add(String.valueOf(final_cess));
                     }
 
                     invoiceDialogBuilder.dismiss();
                     progressDialog.dismiss();
-                    invoiceExcel(gst_inList, c_nameList, inv_noList, inv_dateList, amountList, "Invoice_between" + fromDate + "_to_" + toDate);
+                    invoiceExcel(gst_inList, c_nameList, inv_noList, inv_dateList, amountList, taxableList, cgstList, sgstList, cess_List, "Invoice_between" + fromDate + "_to_" + toDate);
 
                 }
+
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -647,12 +695,18 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
         progressDialog = ProgressDialog.show(getContext(), "Please wait", "Loading", true);
         final ArrayList<String> c_nameList, inv_dateList, inv_noList, amountList, gst_inList;
+        final ArrayList<String> taxableList, cgstList, sgstList, cess_List;
+
 
         c_nameList = new ArrayList<>();
         inv_dateList = new ArrayList<>();
         inv_noList = new ArrayList<>();
         amountList = new ArrayList<>();
         gst_inList = new ArrayList<>();
+        cgstList = new ArrayList<>();
+        sgstList = new ArrayList<>();
+        cess_List = new ArrayList<>();
+        taxableList = new ArrayList<>();
 
         DatabaseReference rootref = FirebaseDatabase.getInstance().getReference();
         rootref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -691,12 +745,51 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                             String client_name = client_child.child("name").getValue().toString();
                             String gstin = client_child.child("gst").getValue().toString();
 
+                            double final_cgst = 0.0, final_sgst = 0.0, final_cess = 0.0, final_taxable = 0.0;
+                            for (DataSnapshot productChild : invoice_child.child("Product").getChildren()) {
+                                String proid = productChild.getKey();
+                                Log.i("GST_VALUES", "TOTAL" + proid);
+                                String inc_exc = productChild.child("in_ex").getValue().toString();
 
+                                int per = Integer.parseInt(productChild.child("cgst").getValue().toString());
+
+                                int cess = Integer.parseInt(productChild.child("cess").getValue().toString());
+                                double sale_rate = Double.parseDouble(productChild.child("sale_rate").getValue().toString());
+
+                                if (inc_exc.equals("inc")) {
+                                    final_taxable += Double.parseDouble(total);
+                                    final_sgst += 0.00;
+                                    final_cgst += 0.00;
+                                    final_cess += 0.00;
+                                    Log.i("GST_VALUES", "TOTAL" + final_taxable);
+                                } else {
+//                            double dividend = 100+per+cess;
+//
+//                            dividend = 100/dividend;
+
+                                    final_taxable += sale_rate;
+                                    double cgst = sale_rate * ((per / 2.0) / 100.0);
+                                    double sgst = sale_rate * ((per / 2.0) / 100.0);
+                                    double cess_val = 0.0;
+                                    cess_val = Double.parseDouble(total) - (sale_rate + cgst + sgst);
+                                    if (cess_val >= 0.0)
+                                        final_cess += cess_val;
+                                    final_cgst += cgst;
+                                    final_sgst += sgst;
+                                    Log.i("GST_VALUES", "TOTAL" + sale_rate);
+                                }
+
+                                Log.i("GST_VALUES", "TOTAL" + total + "   CGST" + final_cgst + "  CESS" + final_cess + "  SGST" + final_sgst);
+                            }
                             c_nameList.add(client_name);
                             inv_dateList.add(dbDate);
                             inv_noList.add(inv_no);
                             amountList.add(total);
                             gst_inList.add(gstin);
+                            taxableList.add(String.valueOf(final_taxable));
+                            cgstList.add(String.valueOf(final_cgst));
+                            sgstList.add(String.valueOf(final_sgst));
+                            cess_List.add(String.valueOf(final_cess));
                         }
                     }
                 }
@@ -709,7 +802,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                     progressDialog.dismiss();
 
 
-                    invoiceExcel(gst_inList, c_nameList, inv_noList, inv_dateList, amountList, "Invoice for " + month_name);
+                    invoiceExcel(gst_inList, c_nameList, inv_noList, inv_dateList, amountList, taxableList, cgstList, sgstList, cess_List,"Invoice for " + month_name);
                 }
 
             }
@@ -726,18 +819,23 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
         progressDialog = ProgressDialog.show(getContext(), "Please wait", "Loading", true);
         final ArrayList<String> c_nameList, inv_dateList, inv_noList, amountList, gst_inList;
+        final ArrayList<String> taxableList, cgstList, sgstList, cess_List;
+
 
         c_nameList = new ArrayList<>();
         inv_dateList = new ArrayList<>();
         inv_noList = new ArrayList<>();
         amountList = new ArrayList<>();
         gst_inList = new ArrayList<>();
+        cgstList = new ArrayList<>();
+        sgstList = new ArrayList<>();
+        cess_List = new ArrayList<>();
+        taxableList = new ArrayList<>();
 
         DatabaseReference rootref = FirebaseDatabase.getInstance().getReference();
         rootref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
 
                 for (DataSnapshot child : dataSnapshot.child("Invoice").child(dbDate).getChildren()) {
 
@@ -746,21 +844,59 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                     String clientId_ = details_child.child("client_id").getValue().toString();
                     String total = details_child.child("amount").getValue().toString();
 
-
                     DataSnapshot client_child = dataSnapshot.child("Client").child(clientId_);
                     String client_name = client_child.child("name").getValue().toString();
                     String gstin = client_child.child("gst").getValue().toString();
 
+                    double final_cgst = 0.0, final_sgst = 0.0, final_cess = 0.0, final_taxable = 0.0;
+                    for (DataSnapshot productChild : child.child("Product").getChildren()) {
+                        String proid = productChild.getKey();
+                        String inc_exc = productChild.child("in_ex").getValue().toString();
 
+                        int per = Integer.parseInt(productChild.child("cgst").getValue().toString());
+
+                        int cess = Integer.parseInt(productChild.child("cess").getValue().toString());
+                        double sale_rate = Double.parseDouble(productChild.child("sale_rate").getValue().toString());
+
+                        if (inc_exc.equals("inc")) {
+                            final_taxable += Double.parseDouble(total);
+                            final_sgst += 0.00;
+                            final_cgst += 0.00;
+                            final_cess += 0.00;
+                            Log.i("GST_VALUES", "TOTAL" + final_taxable);
+                        } else {
+//                            double dividend = 100+per+cess;
+//
+//                            dividend = 100/dividend;
+
+                            final_taxable += sale_rate;
+                            double cgst = sale_rate * ((per / 2.0) / 100.0);
+                            double sgst = sale_rate * ((per / 2.0) / 100.0);
+                            double cess_val = 0.0;
+                            cess_val = Double.parseDouble(total) - (sale_rate + cgst + sgst);
+                            if (cess_val >= 0.0)
+                                final_cess += cess_val;
+                            final_cgst += cgst;
+                            final_sgst += sgst;
+                            Log.i("GST_VALUES", "TOTAL" + sale_rate);
+                        }
+
+                        Log.i("GST_VALUES", "TOTAL" + total + "   CGST" + final_cgst + "  CESS" + final_cess + "  SGST" + final_sgst);
+                    }
                     c_nameList.add(client_name);
                     inv_dateList.add(dbDate);
                     inv_noList.add(inv_no);
                     amountList.add(total);
                     gst_inList.add(gstin);
+                    taxableList.add(String.valueOf(final_taxable));
+                    cgstList.add(String.valueOf(final_cgst));
+                    sgstList.add(String.valueOf(final_sgst));
+                    cess_List.add(String.valueOf(final_cess));
+
                 }
 
                 progressDialog.dismiss();
-                invoiceExcel(gst_inList, c_nameList, inv_noList, inv_dateList, amountList, "Invoice for " + dbDate);
+                invoiceExcel(gst_inList, c_nameList, inv_noList, inv_dateList, amountList, taxableList, cgstList, sgstList, cess_List,"Invoice for " + dbDate);
 
             }
 
@@ -773,7 +909,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
     }
 
-    private boolean invoiceExcel(ArrayList<String> gst_inList, ArrayList<String> c_nameList, ArrayList<String> inv_noList, ArrayList<String> inv_dateList, ArrayList<String> amountList, String filename) {
+    private boolean invoiceExcel(ArrayList<String> gst_inList, ArrayList<String> c_nameList, ArrayList<String> inv_noList, ArrayList<String> inv_dateList, ArrayList<String> amountList, ArrayList<String> taxList, ArrayList<String> cgstList, ArrayList<String> sgstList, ArrayList<String> cessList, String filename) {
 
         progressDialog = ProgressDialog.show(getContext(), "Please wait", "Saving", true);
         boolean success = false;
@@ -805,26 +941,22 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         c.setCellValue("Date");
 
         c = row.createCell(4);
-        c.setCellValue("Basic Value");
+        c.setCellValue("Basic Value");//Taxable value
 
         c = row.createCell(5);
         c.setCellValue("Tax");
 
         c = row.createCell(6);
-        c.setCellValue("IGST");
+        c.setCellValue("SGST");
 
         c = row.createCell(7);
         c.setCellValue("CGST");
 
         c = row.createCell(8);
-        c.setCellValue("SGST");
+        c.setCellValue("CESS");
 
         c = row.createCell(9);
-        c.setCellValue("Cess");
-
-        c = row.createCell(10);
         c.setCellValue("Total");
-
 
         for (int i = 1; i <= c_nameList.size(); i++) {
 
@@ -848,22 +980,22 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             cell.setCellValue(amountList.get(i - 1));
 
             cell = row1.createCell(5);
-            cell.setCellValue(amountList.get(i - 1));
+            cell.setCellValue(taxList.get(i - 1));
 
             cell = row1.createCell(6);
-            cell.setCellValue(amountList.get(i - 1));
+            cell.setCellValue(sgstList.get(i - 1));
 
             cell = row1.createCell(7);
-            cell.setCellValue(amountList.get(i - 1));
+            cell.setCellValue(cgstList.get(i - 1));
 
             cell = row1.createCell(8);
-            cell.setCellValue(amountList.get(i - 1));
+            cell.setCellValue(cessList.get(i - 1));
 
             cell = row1.createCell(9);
             cell.setCellValue(amountList.get(i - 1));
-
-            cell = row1.createCell(10);
-            cell.setCellValue(amountList.get(i - 1));
+//
+//            cell = row1.createCell(10);
+//            cell.setCellValue(amountList.get(i - 1));
 
         }
 
@@ -1104,6 +1236,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         basicvallist.clear();
         taxlist.clear();
         cesslist.clear();
+        unitList.clear();
 
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -1148,6 +1281,8 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
                                 final String cess = productChild.child("cess").getValue().toString();
 
+                                final String unit = productChild.child("unit").getValue().toString();
+
 
                                 DataSnapshot client_child = dataSnapshot.child("Client").child(clientId);
 
@@ -1161,6 +1296,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                                 basicvallist.add(basicval);
                                 taxlist.add(tax);
                                 cesslist.add(cess);
+                                unitList.add(unit);
 
                             }
                         }
@@ -1234,31 +1370,32 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 //        c.setCellStyle(cs);
 
         c = row.createCell(4);
-        c.setCellValue("Inv No");
+        c.setCellValue("Order No");
 
         c = row.createCell(5);
         c.setCellValue("Date");
 
         c = row.createCell(6);
-        c.setCellValue("Basic Value");
+        c.setCellValue("Unit");
 
         c = row.createCell(7);
-        c.setCellValue("Tax");
+        c.setCellValue("Amount");
 
-        c = row.createCell(8);
-        c.setCellValue("IGST");
+//        c = row.createCell(8);
+//        c.setCellValue("IGST");
+//
+//        c = row.createCell(9);
+//        c.setCellValue("CGST");
+//
+//        c = row.createCell(10);
+//        c.setCellValue("SGST");
+//
+//        c = row.createCell(11);
+//        c.setCellValue("Cess");
+//
+//        c = row.createCell(12);
+//        c.setCellValue("Total");
 
-        c = row.createCell(9);
-        c.setCellValue("CGST");
-
-        c = row.createCell(10);
-        c.setCellValue("SGST");
-
-        c = row.createCell(11);
-        c.setCellValue("Cess");
-
-        c = row.createCell(12);
-        c.setCellValue("Total");
 
         Log.i("clientid", String.valueOf(namelist.size()));
         for (int i = 1; i <= datelist.size(); i++) {
@@ -1289,25 +1426,26 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             cell.setCellValue(datelist.get(i - 1));
 
             cell = row1.createCell(6);
-            cell.setCellValue(basicvallist.get(i - 1));
+            cell.setCellValue(unitList.get(i - 1));
 
             cell = row1.createCell(7);
-            cell.setCellValue(taxlist.get(i - 1));
-
-            cell = row1.createCell(8);
-            cell.setCellValue(taxlist.get(i - 1));
-
-            cell = row1.createCell(9);
-            cell.setCellValue(taxlist.get(i - 1));
-
-            cell = row1.createCell(10);
-            cell.setCellValue(taxlist.get(i - 1));
-
-            cell = row1.createCell(11);
-            cell.setCellValue(cesslist.get(i - 1));
-
-            cell = row1.createCell(12);
             cell.setCellValue(basicvallist.get(i - 1));
+
+
+//            cell = row1.createCell(8);
+//            cell.setCellValue(taxlist.get(i - 1));
+//
+//            cell = row1.createCell(9);
+//            cell.setCellValue(taxlist.get(i - 1));
+//
+//            cell = row1.createCell(10);
+//            cell.setCellValue(taxlist.get(i - 1));
+//
+//            cell = row1.createCell(11);
+//            cell.setCellValue(cesslist.get(i - 1));
+//
+//            cell = row1.createCell(12);
+//            cell.setCellValue(basicvallist.get(i - 1));
 
         }
 
@@ -1347,6 +1485,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
             // generate URI, I defined authority as the application ID in the Manifest, the last param is file I want to open
+
             Uri uri = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID, file);
 
 
