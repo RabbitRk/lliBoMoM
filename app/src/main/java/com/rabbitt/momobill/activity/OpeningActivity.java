@@ -26,15 +26,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.adapter.OpenAdapter;
+import com.rabbitt.momobill.model.Opening;
 import com.rabbitt.momobill.model.Product;
+import com.rabbitt.momobill.model.Summary;
 import com.rabbitt.momobill.prefsManager.IncrementPref;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class OpeningActivity extends AppCompatActivity implements OpenAdapter.OnRecyleItemListener {
     private static final String TAG = "maluOpen";
@@ -78,6 +84,9 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
                     String sale_rate = snapshot.child("sale_rate").getValue(String.class);
                     String unit = snapshot.child("unit").getValue(String.class);
                     String product_id = snapshot.child("product_id").getValue(String.class);
+                    String gst = snapshot.child("cgst_sgst").getValue(String.class);
+                    String inc = snapshot.child("in_ex").getValue(String.class);
+                    String cess = snapshot.child("cess").getValue(String.class);
 
                     Product product = new Product();
                     product.setImg_url(img_url);
@@ -86,9 +95,16 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
                     product.setUnit(unit);
                     product.setProduct_id(product_id);
 
+                    //GST value
+                    product.setGst(gst);
+                    product.setInc(inc);
+                    product.setCess(cess);
+
+
                     data.add(product);
                 }
-                updateRecycler(data);
+//                updateRecycler(data);
+                parseData(data);
             }
 
             @Override
@@ -114,6 +130,49 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
                 filter(s.toString());
             }
         });
+    }
+
+    public void parseData(List<Product> data) { //Replace the PRODUCT model to the model related the module
+
+        List<Product> tax = new ArrayList<>();
+        for (int i = 0; i < data.size(); i++) {  // Filtering the model which the tax are not inclusive
+            if (data.get(i).getInc().equals("exc")) {
+                tax.add(data.get(i));
+                Log.i(TAG, "parseData: " + data.get(i).toString());
+            }
+        }
+
+        ArrayList<Integer> tax_val = new ArrayList<>(); //Split up the taxes for the EXCLUSIVE products
+
+        for (int i = 0; i < tax.size(); i++) {
+            Log.i(TAG, "parseData: 2: " + tax.get(i).getGst());
+            tax_val.add(Integer.valueOf(tax.get(i).getGst()));
+        }
+
+        Set<Integer> set = new HashSet<Integer>();
+        set.addAll(tax_val); //Getting the unique values
+
+        List<Summary> val = new ArrayList<>(); //Getting taxable and the gst percentages
+
+        for (Iterator<Integer> it = set.iterator(); it.hasNext(); ) { //3
+            int f = it.next();
+            double taxable = 0.0;
+            for (int i = 0; i < tax.size(); i++) { //4
+                Log.i(TAG, "Iteration: "+ i);
+                if (tax.get(i).getGst().equals(String.valueOf(f))) {
+                    taxable += Double.parseDouble(tax.get(i).getSale_rate());
+                }
+            }
+            Log.i(TAG, "Taxable: "+taxable+ "    "+f);
+
+            //Custom model
+            Summary summary = new Summary();
+            summary.setPercentage(String.valueOf(f));
+            summary.setTaxable(String.valueOf(taxable));
+
+            val.add(summary);
+            Log.i(TAG, "parseData:" + f);
+        }
     }
 
     private void filter(String text) {
@@ -153,8 +212,7 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
     @Override
     public void OnItemClick(int position, String s) {
 
-        if (s.equals(""))
-        {
+        if (s.equals("")) {
             Toast.makeText(this, "Please enter a value", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -167,7 +225,7 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
         String unit = model.getUnit();
         final String name = model.getProduct_name();
 
-        Log.i(TAG, "OnItemClick: p: " + product_id + "  u: " + unit  + "  n: " + name);
+        Log.i(TAG, "OnItemClick: p: " + product_id + "  u: " + unit + "  n: " + name);
 
         final IncrementPref i = new IncrementPref(this);
 
@@ -217,11 +275,11 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
             hashMap.put("product_name", name);
             hashMap.put("unit", s);
             Log.i(TAG, "addProduct: " + hashMap.toString());
-            reference.child(getDate()).child(product_id).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            reference.child(getDate()).child(product_id).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.i(TAG, "onComplete: " + task.toString());
-                    Toast.makeText(OpeningActivity.this, " "+name+" added to the Opening stock", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OpeningActivity.this, " " + name + " added to the Opening stock", Toast.LENGTH_SHORT).show();
                     i.setOpeningVal(String.valueOf(Integer.parseInt(OP_VAL) + 1));
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -230,9 +288,7 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
                     Log.i(TAG, "onFailure: " + e.toString());
                 }
             });
-        }
-        else
-        {
+        } else {
             Toast.makeText(this, "Units Invalid. Please update the stock", Toast.LENGTH_SHORT).show();
         }
 

@@ -85,10 +85,6 @@ public class LiveReport extends AppCompatActivity implements LiveAdapter.OnRecyl
                     //Setting Balance
                     product.setBalance(String.valueOf(_bal));
 
-
-
-
-
                     product.setProduct_id(snapshot.getKey());
 
                     data.add(product);
