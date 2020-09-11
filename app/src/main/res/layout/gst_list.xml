@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/tax"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="0" />
+
+    <TextView
+        android:id="@+id/tax_val"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="37.00" />
+
+    <TextView
+        android:id="@+id/sgst"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="0.00" />
+
+    <TextView
+        android:id="@+id/cgst"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="0.00" />
+
+    <TextView
+        android:id="@+id/tot_amt"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="37.00" />
+
+</LinearLayout>

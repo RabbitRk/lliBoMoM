@@ -103,8 +103,8 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
 
                     data.add(product);
                 }
-//                updateRecycler(data);
-                parseData(data);
+                updateRecycler(data);
+//                parseData(data);
             }
 
             @Override

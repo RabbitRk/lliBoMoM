@@ -53,4 +53,6 @@ dependencies {
 
     compile files('libs/itextg-5.5.8.jar')
 
+    implementation files('libs/bluetoothsdk.jar')
+
 }
