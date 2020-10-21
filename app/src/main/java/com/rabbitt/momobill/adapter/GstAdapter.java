@@ -39,7 +39,7 @@ public class GstAdapter extends RecyclerView.Adapter<GstAdapter.MyViewHolder> {
         holder.taxValTxt.setText(data.get(position).getTaxVal());
         holder.sgstTxt.setText(data.get(position).getSgst());
         holder.cgstTxt.setText(data.get(position).getCgst());
-        holder.totAmntTxt.setText(data.get(position).getTot());
+//        holder.totAmntTxt.setText(data.get(position).getTot());
 
     }
 
@@ -50,7 +50,7 @@ public class GstAdapter extends RecyclerView.Adapter<GstAdapter.MyViewHolder> {
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        TextView taxTxt,taxValTxt,sgstTxt,cgstTxt,totAmntTxt;
+        TextView taxTxt,taxValTxt,sgstTxt,cgstTxt;//,totAmntTxt;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -58,7 +58,7 @@ public class GstAdapter extends RecyclerView.Adapter<GstAdapter.MyViewHolder> {
             taxValTxt = itemView.findViewById(R.id.tax_val);
             sgstTxt = itemView.findViewById(R.id.sgst);
             cgstTxt = itemView.findViewById(R.id.cgst);
-            totAmntTxt = itemView.findViewById(R.id.tot_amt);
+//            totAmntTxt = itemView.findViewById(R.id.tot_amt);
         }
 
     }

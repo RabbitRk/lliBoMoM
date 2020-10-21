@@ -27,13 +27,13 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.BuildConfig;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
-import com.rabbitt.momobill.BuildConfig;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.CheckOrderActivity;
 import com.rabbitt.momobill.activity.OpeningActivity;
@@ -149,7 +149,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         final String thisMonth = monthFormat.format(calendar.getTime());
         final String thisYear = yearFormat.format(calendar.getTime());
 
-//        To check and retrieve today's invoice total
+//      To check and retrieve today's invoice total
 
         invoiceRef.child(today).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -176,7 +176,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             }
         });
 
-//        To check and retrieve this month's invoice total
+//  To check and retrieve this month's invoice total
         invoiceRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

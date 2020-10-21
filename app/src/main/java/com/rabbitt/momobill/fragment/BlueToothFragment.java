@@ -79,7 +79,7 @@ import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PREF;
 public class BlueToothFragment extends Fragment implements Runnable {
 
     RecyclerView billRecycler, gstRecycler;
-    Button mPrint,mScan;
+    Button mPrint, mScan;
 
 
 //    Print declarations
@@ -95,13 +95,13 @@ public class BlueToothFragment extends Fragment implements Runnable {
     private BluetoothSocket mBluetoothSocket;
     BluetoothDevice mBluetoothDevice;
     List<ProductInvoice> data = null;
-    String inv_no ;
+    String inv_no;
 
     public static DatabaseReference myRef, invoiceRef;
 
-    TextView add1Txt,add2Txt,cityTxt,phoneTxt,gstinTxt;
-    TextView billNoTxt,dateTxt,timeTxt,counterTxt;
-    TextView totalItem,totalTxt,netAmnt;
+    TextView add1Txt, add2Txt, cityTxt, phoneTxt, gstinTxt;
+    TextView billNoTxt, dateTxt, timeTxt, counterTxt;
+    TextView totalItem, totalTxt, netAmnt;
 
 
     public static Fragment newInstance(Bundle bundle1) {
@@ -155,9 +155,9 @@ public class BlueToothFragment extends Fragment implements Runnable {
 
         add1Txt.setText(add1);
         add2Txt.setText(add2);
-        cityTxt.setText(city+"-"+pin);
-        phoneTxt.setText("PH - "+phone);
-        gstinTxt.setText("GSTIN : "+gstin);
+        cityTxt.setText(city + "-" + pin);
+        phoneTxt.setText("PH - " + phone);
+        gstinTxt.setText("GSTIN : " + gstin);
 
 
 //      Bill No, Date ,time
@@ -189,8 +189,8 @@ public class BlueToothFragment extends Fragment implements Runnable {
 
 //        Recyclers for gst and bill
 
-        billRecycler.setHasFixedSize(true);
-        gstRecycler.setHasFixedSize(true);
+//        billRecycler.setHasFixedSize(true);
+//        gstRecycler.setHasFixedSize(true);
 
         billRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         gstRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -351,10 +351,10 @@ public class BlueToothFragment extends Fragment implements Runnable {
     private void print(String file) {
 
 
-        PrintPic pg =new PrintPic();
+        PrintPic pg = new PrintPic();
         pg.initCanvas(490);
         pg.initPaint();
-        pg.drawImage(0,0,file);
+        pg.drawImage(0, 0, file);
         byte[] sendData = pg.printDraw();
 
         OutputStream os = null;
@@ -412,24 +412,26 @@ public class BlueToothFragment extends Fragment implements Runnable {
         int width = linearLayout.getWidth();
         int height = linearLayout.getHeight();
 
-        Bitmap bitmap = getBitmapFromView(linearLayout,width,height);
+        Bitmap bitmap = getBitmapFromView(linearLayout, width, height);
 
-        bitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.getWidth()/2), (bitmap.getHeight()), true);
+        Log.i(TAG, "viewToImg: " + bitmap.getWidth() + bitmap.getHeight());
 
-        String extr = Environment.getExternalStorageDirectory()+"/Santha Agencies/";
-        String filename = "Bill.jpg";
-        File path = new File(extr,filename);
+        bitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.getWidth()/2), (bitmap.getHeight()/2), true);
+
+        String extr = Environment.getExternalStorageDirectory() + "/Santha Agencies/";
+        String filename = "Bill" + inv_no + ".jpg";
+        File path = new File(extr, filename);
         FileOutputStream fos = null;
         try {
 
             fos = new FileOutputStream(path);
 
-            bitmap.compress(Bitmap.CompressFormat.JPEG,100,fos);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
             fos.close();
 
             byte[] img = Utils.decodeBitmap(bitmap);
-            print(extr+filename);
+            print(extr + filename);
 //            MediaStore.Images.Media.insertImage(getContentResolver(),bitmap,"Screen","Screen");
         } catch (Exception e) {
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -438,9 +440,8 @@ public class BlueToothFragment extends Fragment implements Runnable {
     }
 
 
-
     private Bitmap getBitmapFromView(View view, int width, int height) {
-        Bitmap bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Drawable drawable = view.getBackground();
         if (drawable != null)
@@ -460,7 +461,7 @@ public class BlueToothFragment extends Fragment implements Runnable {
 
         double amtbefore = 0.0, tax_inc = 0.0;
         int size = data.size();
-            totalItem.setText(String.valueOf(size));
+        totalItem.setText(String.valueOf(size));
         for (int i = 0; i < data.size(); i++) {
             ProductInvoice productInvoice = data.get(i);
 
@@ -472,9 +473,9 @@ public class BlueToothFragment extends Fragment implements Runnable {
             double total = calculate(productInvoice.getIn(), Double.parseDouble(productInvoice.getCgst()), Double.parseDouble(productInvoice.getCess()), Double.parseDouble(productInvoice.getSale_rate()));
             tax_inc = tax_inc + total;
 
-            double mrp = total/qty;
+            double mrp = total / qty;
 
-            billData.add(new BillModel(product_name,String.valueOf(mrp),String.valueOf((int)qty),String.valueOf(total)));
+            billData.add(new BillModel(product_name, String.valueOf(mrp), String.valueOf((int) qty), String.valueOf(total)));
         }
         totalTxt.setText(String.valueOf(tax_inc));
         netAmnt.setText(String.valueOf(tax_inc));
@@ -494,8 +495,7 @@ public class BlueToothFragment extends Fragment implements Runnable {
             if (data.get(i).getIn().equals("exc")) {
                 tax.add(data.get(i));
                 Log.i(TAG, "parseData: " + data.get(i).toString());
-            }
-            else {
+            } else {
                 // Inclusive data collection
                 inc.add(data.get(i));
                 Log.i(TAG, "INC: " + data.get(i).toString());
@@ -542,20 +542,20 @@ public class BlueToothFragment extends Fragment implements Runnable {
 
 
         if (inc.size() != 0) {
-            gstData.add(new GstModel("0%",String.valueOf(noTax),"0.00","0.00",String.valueOf(noTax)));
+            gstData.add(new GstModel("0%", String.valueOf(noTax), "0.00", "0.00", String.valueOf(noTax)));
         }
 
-        for(int i=0;i<val.size();i++) {
+        for (int i = 0; i < val.size(); i++) {
             double taxable = Double.parseDouble(val.get(i).getTaxable());
             double per = Double.parseDouble(val.get(i).getPercentage());
             double cgst = taxable * ((per / 2.0) / 100.0);
             String percentage = String.valueOf(per);
             String taxTxt = String.valueOf(taxable);
             String cgstTxt = String.valueOf(cgst);
-            double total = taxable+(cgst*2);
+            double total = taxable + (cgst * 2);
             total = roundDecimals(total);
-            String totalTxt= String.valueOf(total);
-            gstData.add(new GstModel(percentage,taxTxt,cgstTxt,cgstTxt,totalTxt));
+            String totalTxt = String.valueOf(total);
+            gstData.add(new GstModel(percentage, taxTxt, cgstTxt, cgstTxt, totalTxt));
         }
 
 
@@ -608,7 +608,7 @@ public class BlueToothFragment extends Fragment implements Runnable {
     }
 
     private double calculate_amount(double sale_r, double gst, double ces) {
-        double taxval = ces + (gst * 2);
+        double taxval = ces + gst;
         sale_r = (sale_r * (taxval / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
         return roundDecimals(sale_r);
     }

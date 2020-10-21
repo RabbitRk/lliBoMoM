@@ -9,11 +9,8 @@
         android:id="@+id/frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:layout_marginTop="50dp"
-        android:padding="15dp"
         android:layout_above="@id/btnLayout"
-        >
+        android:fillViewport="true">
 
         <LinearLayout
             android:id="@+id/linear"
@@ -22,8 +19,6 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"
             >
 
             <TextView
@@ -122,25 +117,25 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp">
 
-<!--                <LinearLayout-->
-<!--                    android:id="@+id/counterLayout"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:orientation="horizontal">-->
+                <!--                <LinearLayout-->
+                <!--                    android:id="@+id/counterLayout"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:orientation="horizontal">-->
 
-<!--                    <TextView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Counter : "-->
-<!--                        android:textStyle="bold" />-->
+                <!--                    <TextView-->
+                <!--                        android:layout_width="wrap_content"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                        android:text="Counter : "-->
+                <!--                        android:textStyle="bold" />-->
 
-<!--                    <TextView-->
-<!--                        android:id="@+id/counter"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Counter - 1" />-->
+                <!--                    <TextView-->
+                <!--                        android:id="@+id/counter"-->
+                <!--                        android:layout_width="wrap_content"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                        android:text="Counter - 1" />-->
 
-<!--                </LinearLayout>-->
+                <!--                </LinearLayout>-->
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -181,35 +176,40 @@
                     android:layout_height="wrap_content"
                     android:gravity="start"
                     android:text="PRODUCT"
-                    android:textStyle="bold"
-                    />
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="50dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:text="MRP"
+                    android:layout_weight="1"
                     android:textStyle="bold" />
 
-<!--                <TextView-->
-<!--                    android:layout_width="50dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:gravity="center_horizontal"-->
-<!--                    android:text="RATE"-->
-<!--                    android:textStyle="bold" />-->
+                <!--                <TextView-->
+                <!--                    android:layout_width="50dp"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:gravity="center_horizontal"-->
+                <!--                    android:text="RATE"-->
+                <!--                    android:textStyle="bold" />-->
 
                 <TextView
-                    android:layout_width="50dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:text="QTY"
+                    android:layout_weight="1"
+
                     android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="50dp"
+                    android:layout_width="0dp"
+
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:text="AMT"
+                    android:layout_weight="1"
+
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -223,8 +223,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/bill_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
+                android:layout_height="wrap_content" />
 
             <!--        TODO Put below code inside recycle card-->
 
@@ -378,7 +377,8 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="50dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:text="TAX %"
@@ -386,32 +386,36 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="100dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:text="Taxable Val"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="60dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:text="SGST"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="60dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:text="CGST"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:text="Total Amt"
-                    android:textStyle="bold" />
+<!--                <TextView-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="center_horizontal"-->
+<!--                    android:text="Total Amt"-->
+<!--                    android:textStyle="bold" />-->
 
             </LinearLayout>
 
@@ -419,7 +423,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/gst_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
 
             <!--            <LinearLayout-->
@@ -465,78 +469,78 @@
 
             <!--            </LinearLayout>-->
 
-<!--            <ImageView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="5dp"-->
-<!--                android:src="@drawable/dashed_line" />-->
+            <!--            <ImageView-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginTop="5dp"-->
+            <!--                android:src="@drawable/dashed_line" />-->
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="start"-->
-<!--                android:orientation="horizontal"-->
-<!--                android:paddingStart="5dp">-->
+            <!--            <LinearLayout-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_gravity="start"-->
+            <!--                android:orientation="horizontal"-->
+            <!--                android:paddingStart="5dp">-->
 
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="TOTAL SAVINGS : "-->
-<!--                    android:textStyle="bold" />-->
+            <!--                <TextView-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:text="TOTAL SAVINGS : "-->
+            <!--                    android:textStyle="bold" />-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/total_savings"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="Rs. 7.00" />-->
+            <!--                <TextView-->
+            <!--                    android:id="@+id/total_savings"-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:text="Rs. 7.00" />-->
 
-<!--            </LinearLayout>-->
+            <!--            </LinearLayout>-->
 
-<!--            <ImageView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="5dp"-->
-<!--                android:src="@drawable/dashed_line" />-->
+            <!--            <ImageView-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginTop="5dp"-->
+            <!--                android:src="@drawable/dashed_line" />-->
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="start"-->
-<!--                android:orientation="horizontal"-->
-<!--                android:paddingStart="5dp">-->
+            <!--            <LinearLayout-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_gravity="start"-->
+            <!--                android:orientation="horizontal"-->
+            <!--                android:paddingStart="5dp">-->
 
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="Given Amount : " />-->
+            <!--                <TextView-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:text="Given Amount : " />-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/given_amt"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="250.00" />-->
+            <!--                <TextView-->
+            <!--                    android:id="@+id/given_amt"-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:text="250.00" />-->
 
-<!--            </LinearLayout>-->
+            <!--            </LinearLayout>-->
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="start"-->
-<!--                android:orientation="horizontal"-->
-<!--                android:paddingStart="5dp">-->
+            <!--            <LinearLayout-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_gravity="start"-->
+            <!--                android:orientation="horizontal"-->
+            <!--                android:paddingStart="5dp">-->
 
-<!--                <TextView-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="Balance Amount : " />-->
+            <!--                <TextView-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:text="Balance Amount : " />-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/bal_amt"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="31.00" />-->
+            <!--                <TextView-->
+            <!--                    android:id="@+id/bal_amt"-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:text="31.00" />-->
 
-<!--            </LinearLayout>-->
+            <!--            </LinearLayout>-->
 
             <ImageView
                 android:layout_width="match_parent"
@@ -566,31 +570,31 @@
             android:id="@+id/scan"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableStart="@drawable/search"
             android:layout_marginEnd="3dp"
-            android:paddingStart="50dp"
-            android:drawablePadding="-50dp"
+            android:layout_weight="1"
             android:background="@drawable/btn_bg"
+            android:drawableStart="@drawable/search"
+            android:drawablePadding="-50dp"
+            android:paddingStart="50dp"
+            android:text="Scan"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="16sp"
-            android:text="Scan" />
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/print"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="2dp"
-            android:drawableStart="@drawable/print"
-            android:paddingStart="50dp"
-            android:drawablePadding="-50dp"
+            android:layout_weight="1"
             android:background="@drawable/btn_bg"
+            android:drawableStart="@drawable/print"
+            android:drawablePadding="-50dp"
+            android:paddingStart="50dp"
+            android:text="Print"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="16sp"
-            android:text="Print" />
+            android:textSize="16sp" />
     </LinearLayout>
 
 </RelativeLayout>

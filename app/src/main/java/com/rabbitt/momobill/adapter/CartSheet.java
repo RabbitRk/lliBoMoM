@@ -609,6 +609,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     private double calculate_amount(double sale_r, double gst, double ces) {
         double taxval = ces + gst;
         sale_r = (sale_r * (taxval / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
+        Log.i(TAG, "calculate_amount: "+sale_r);
         return roundDecimals(sale_r);
     }
 

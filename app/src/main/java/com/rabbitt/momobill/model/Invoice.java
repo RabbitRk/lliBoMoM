@@ -43,9 +43,8 @@ public class Invoice {
 
     public void pdfcreate(File file, Uri path, Uri stamp, Uri logopath, Context context, List<ProductInvoice> data, String invoice, Client client, String date_) {
 
-
         Log.i(TAG, "pdfcreate: " + path);
-        com.itextpdf.text.Document doc = new com.itextpdf.text.Document(PageSize.A5.rotate(), 50, 50, 50, 50);
+        com.itextpdf.text.Document doc = new com.itextpdf.text.Document(PageSize.A4, 24, 24, 24, 24);
         String outPath = file.getPath();
 
         try {
@@ -289,7 +288,13 @@ public class Invoice {
             double amtbefore = 0.0, tax_inc = 0.0;
             double subtotalcess = 0.0, subtotalcgst = 0.0, subtot = 0.0, cess_temp = 0.0, cgst_temp = 0.0;
 
+            double printcess = 0.0, printcgst = 0.0;//,  cess_temp = 0.0, cgst_temp = 0.0;
+
+
             for (int i = 0; i < data.size(); i++) {
+                printcess = 0.0;
+                printcgst = 0.0;
+
                 ProductInvoice productInvoice = data.get(i);
 
                 cell5 = new PdfPCell(new Phrase(productInvoice.getProduct_name()));
@@ -301,53 +306,65 @@ public class Invoice {
 
                 String pre_amount = "";
                 double data_ = Double.parseDouble(productInvoice.getSale_rate());
-                double tax = Double.parseDouble(productInvoice.getCgst()) * 2;
+                double tax = Double.parseDouble(productInvoice.getCgst());
                 double cess = Double.parseDouble(productInvoice.getCess());
 
-                if (productInvoice.getIn().equals("inc")) {
+                Log.i(TAG, "Raw: " + data_ + "    " + tax + "    " + cess);
 
-                    cgst_temp = roundDecimals(data_ * (100 / (tax + 100)));
-                    cgst_temp = roundDecimals(cgst_temp * (tax / 100));
-                    subtotalcgst += cgst_temp / 2;
+                if (productInvoice.getIn().equals("exc")) {
 
-                    cess_temp = data_ * (100 / (cess + 100));
-                    subtotalcess += roundDecimals(cess_temp * (cess / 100));
 
+                    cgst_temp = roundDecimals(data_ * (tax / 100));
+                    cess_temp = roundDecimals(data_ * (cess / 100));
+                    printcgst = cgst_temp / 2;
+                    printcess = cess_temp;
+                    subtotalcgst += cgst_temp;
+                    subtotalcess += cess_temp;
+
+//
+//                    cess_temp = data_ * (100 / (cess + 100));
+//                    subtotalcess += roundDecimals(cess_temp * (cess / 100));
+//
                     Log.i(TAG, "pdfcreate: cgst: " + subtotalcgst + "  " + " cess: " + subtotalcess);
-
-                    tax += cess + 100;
-
-                    double amount = data_ * (100 / tax);
-
-                    Log.i(TAG, "pdfcreate: Amount " + roundDecimals(amount));
+//
+//                    tax += cess + 100;
+//
+                    double amount = Double.parseDouble(productInvoice.getSale_rate()) + cess_temp + cgst_temp;
+//
+//                    Log.i(TAG, "pdfcreate: Amount " + roundDecimals(amount));
 
                     pre_amount = String.valueOf(roundDecimals(amount));
-                    subtot = subtot + roundDecimals(amount);
+                    subtot = subtot + Double.parseDouble(productInvoice.getSale_rate());
 
+//                    subtot = subtot + roundDecimals(amount);
+//                    printcess = subtotalcgst;
+//                    printcgst = subtotalcess;
                 } else {
 
-                    subtotalcess += data_ * (cess / 100);
-                    subtotalcgst += (data_ * (tax / 100)) / 2;
+                    subtotalcess += 0;
+                    subtotalcgst += 0;
                     Log.i(TAG, "pdfcreate Exc: cgst: " + subtotalcgst + "  " + " cess: " + subtotalcess);
 
                     pre_amount = productInvoice.getSale_rate();
                     subtot = subtot + Double.parseDouble(productInvoice.getSale_rate());
+                    printcess = 0.0;
+                    printcgst = 0.0;
                 }
 
-                cell5 = new PdfPCell(new Phrase(pre_amount));
+                cell5 = new PdfPCell(new Phrase(productInvoice.getSale_rate()));
                 innertable5.addCell(cell5);
-                cell5 = new PdfPCell(new Phrase(productInvoice.getCgst()));
+                cell5 = new PdfPCell(new Phrase(String.valueOf(printcgst)));
                 innertable5.addCell(cell5);
-                cell5 = new PdfPCell(new Phrase(productInvoice.getCgst()));
+                cell5 = new PdfPCell(new Phrase(String.valueOf(printcgst)));
                 innertable5.addCell(cell5);
-                cell5 = new PdfPCell(new Phrase(productInvoice.getCess()));
+                cell5 = new PdfPCell(new Phrase(String.valueOf(printcess)));
                 innertable5.addCell(cell5);
 
-                amtbefore = amtbefore + Double.parseDouble(productInvoice.getSale_rate());
-                double singleamount = calculate(productInvoice.getIn(), Double.parseDouble(productInvoice.getCgst()), Double.parseDouble(productInvoice.getCess()), Double.parseDouble(productInvoice.getSale_rate()));
-                tax_inc = tax_inc + singleamount;
+//                amtbefore = amtbefore + Double.parseDouble(productInvoice.getSale_rate());
+//                double singleamount = calculate(productInvoice.getIn(), Double.parseDouble(productInvoice.getCgst()), Double.parseDouble(productInvoice.getCess()), Double.parseDouble(productInvoice.getSale_rate()));
+                tax_inc = tax_inc + Double.parseDouble(pre_amount);
 
-                cell5 = new PdfPCell(new Phrase("" + singleamount));
+                cell5 = new PdfPCell(new Phrase("s" + pre_amount));
 
                 cell5.setMinimumHeight(10f);
                 innertable5.addCell(cell5);
@@ -378,7 +395,7 @@ public class Invoice {
             PdfPTable innertable6 = new PdfPTable(1);
             innertable6.setWidthPercentage(100);
             PdfPCell cell6 = new PdfPCell(new Phrase("Total Amount Paid (In Words:)"));
-            cell6.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell6.setHorizontalAlignment(Element.ALIGN_LEFT);
             innertable6.addCell(cell6);
             cell6.setMinimumHeight(50f);
             cell6 = new PdfPCell(new Phrase("" + Convertor.convert(Integer.parseInt(rounded)) + " Rupees Only"));
@@ -458,8 +475,8 @@ public class Invoice {
             if (inc.size() != 0) {
                 nested5.addCell("0%");
                 nested5.addCell(String.valueOf(noTax));
-                nested5.addCell("");
-                nested5.addCell("");
+                nested5.addCell("0.0");
+                nested5.addCell("0.0");
                 nested5.addCell(String.valueOf(noTax));
             }
 
@@ -481,20 +498,19 @@ public class Invoice {
 
 
             PdfPTable nested = new PdfPTable(1);
-            nested.addCell("Total Amount before tax:");
-            nested.addCell("Add: CGST");
-            nested.addCell("Add: SGST");
-            nested.addCell("Add: CESS");
-            nested.addCell("Grand Total");
+            nested.addCell("Taxable Amount0");
+            nested.addCell("CGST");
+            nested.addCell("SGST");
+            nested.addCell("CESS");
+            nested.addCell("TOTAL");
             PdfPCell nesthousing = new PdfPCell(nested);
 
             innertable7.addCell(nesthousing);
             PdfPTable nested2 = new PdfPTable(1);
 
             nested2.addCell("" + subtot);
-
-            nested2.addCell("" + subtotalcgst);
-            nested2.addCell("" + subtotalcgst);
+            nested2.addCell("" + subtotalcgst/2);
+            nested2.addCell("" + subtotalcgst/2);
             nested2.addCell("" + subtotalcess);
 
             nested2.addCell("" + rounded);
