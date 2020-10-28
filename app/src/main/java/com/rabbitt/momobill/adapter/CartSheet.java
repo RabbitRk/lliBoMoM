@@ -17,6 +17,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.demo.pdfreader;
 import com.rabbitt.momobill.model.Client;
+import com.rabbitt.momobill.model.HttpInvoice;
 import com.rabbitt.momobill.model.Invoice;
 import com.rabbitt.momobill.model.ProductInvoice;
 import com.rabbitt.momobill.prefsManager.IncrementPref;
@@ -54,6 +57,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.OnRecyleItemListener, View.OnClickListener {
@@ -239,6 +243,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
             pro.put("cgst", pv.getCgst());
             pro.put("cess", pv.getCess());
             pro.put("in_ex", pv.getIn());
+            pro.put("purchase_rate", pv.getMrp());
             main.put(pv.getProduct_id(), pro);
         }
 
@@ -311,6 +316,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         }
     }
 
+
     private void paymentPopup(final double total) {
 //        String credit_ = String.valueOf(getCredit(client_id));
         final Dialog dialog = new Dialog(getActivity());
@@ -321,18 +327,28 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         final TextView total_amount = dialog.findViewById(R.id.dia_quantity);
         final EditText paid = dialog.findViewById(R.id.units);
 
+        //Fin
+        final RadioGroup ex = dialog.findViewById(R.id.tax_ex_in);
+        final RadioButton in_ = dialog.findViewById(R.id.radio_default), ex_ = dialog.findViewById(R.id.radio_ex);
+        //Fin end
 
-//        credit.setText(credit_);
         total_amount.setText(String.valueOf(total));
 
         Button dialogButton = dialog.findViewById(R.id.ok_button);
         dialogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!paid.getText().toString().trim().equals("")) {
+                if (!paid.getText().toString().trim().equals("") || ex_.isEnabled()) {
 
                     double t_amount = Double.parseDouble(total_amount.getText().toString());
-                    double _paid = Double.parseDouble(paid.getText().toString());
+                    double _paid = 0.0;
+
+                    if (ex_.isEnabled()) {
+                        _paid = t_amount;
+                    } else {
+                        _paid = Double.parseDouble(paid.getText().toString());
+                    }
+
 
                     if (_paid > t_amount) {
                         Toast.makeText(context, "You are getting more than the total amount", Toast.LENGTH_SHORT).show();
@@ -342,6 +358,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                     final DatabaseReference invoiceSingle = FirebaseDatabase.getInstance().getReference("Invoice_Single");
                     final DatabaseReference client_ref = FirebaseDatabase.getInstance().getReference("Client").child(client_id);
 
+                    double final_paid = _paid;
                     invoiceSingle.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -352,10 +369,10 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
                             invoice = String.valueOf(invkey);
 
-                            String balance = String.valueOf(Double.parseDouble(total_amount.getText().toString()) - Double.parseDouble(paid.getText().toString()));
+                            String balance = String.valueOf(Double.parseDouble(total_amount.getText().toString()) - final_paid);
 
                             if (!(Double.parseDouble(balance) <= 0.0)) {
-                                String paidTxt = paid.getText().toString();
+                                String paidTxt = String.valueOf(final_paid);
                                 String tot = String.valueOf(total);
                                 createCredit(balance, invoice, client_id, client_name, paidTxt, tot);
                             }
@@ -374,7 +391,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                             hashMap.put("invoice_id", invoice);
                             hashMap.put("date_of", getDate());
                             hashMap.put("amount", total);
-                            hashMap.put("paid", paid.getText().toString().trim());
+                            hashMap.put("paid", String.valueOf(final_paid));
                             hashMap.put("balance", balance);
 
 
@@ -463,6 +480,17 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
         });
 
+        ex.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if (!in_.isChecked()) {
+                    paid.setEnabled(false);
+                } else {
+                    paid.setEnabled(true);
+                }
+            }
+        });
+
         try {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             dialog.show();
@@ -525,17 +553,17 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                     int cursale = Integer.parseInt(pv.getUnit());
                     Object obj = dataSnapshot.child("sale").getValue();
 
-                    if(obj != null)
+                    if (obj != null)
                         sale = Integer.parseInt(String.valueOf(obj));
 
 
-                    int totsale = cursale+sale;
+                    int totsale = cursale + sale;
                     HashMap<String, Object> hashMap2 = new HashMap<>();
                     hashMap2.put("sale", String.valueOf(totsale));
 
-                    Log.i(TAG,"onDataChange: Unit "+pv.getUnit());
-                    Log.i(TAG,"onDataChange: Sale "+sale);
-                    Log.i(TAG,"onDataChange: TotSale "+totsale);
+                    Log.i(TAG, "onDataChange: Unit " + pv.getUnit());
+                    Log.i(TAG, "onDataChange: Sale " + sale);
+                    Log.i(TAG, "onDataChange: TotSale " + totsale);
 
                     DatabaseReference reference3 = FirebaseDatabase.getInstance().getReference("Opening");
                     reference3.child(getDate()).child(pv.getProduct_id()).updateChildren(hashMap2).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -609,12 +637,12 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     private double calculate_amount(double sale_r, double gst, double ces) {
         double taxval = ces + gst;
         sale_r = (sale_r * (taxval / 100)) + /*Actual rate*/sale_r; //Adding gst + actual rate
-        Log.i(TAG, "calculate_amount: "+sale_r);
+        Log.i(TAG, "calculate_amount: " + sale_r);
         return roundDecimals(sale_r);
     }
 
     double roundDecimals(double d) {
-        DecimalFormat twoDForm = new DecimalFormat("#.###");
+        DecimalFormat twoDForm = new DecimalFormat("#");
         return Double.parseDouble(twoDForm.format(d));
     }
 
@@ -622,27 +650,50 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
     private void generateInvoice(Client client) {
         Uri uri = null;
-        new File(Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice").mkdir();
+        boolean a = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice").mkdirs();
+
+        if (a) {
+            Toast.makeText(context, "Yes", Toast.LENGTH_SHORT).show();
+        }
+
         String path1 = Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice/" + invoice + "_Inv.pdf";
         file = new File(path1);
 
+//        Log.i(TAG, "generateInvoice: " + Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice");
         // Work Area
 
         ArrayList<ProductInvoice> val = new ArrayList<>(data.size());
         val.addAll(data);
 
+        Map<String, String> data = new HashMap<>();
+
+        Bundle client_b = new Bundle();
+        client_b.putString("name",  client.getName());
+        client_b.putString("phone",  client.getPhone());
+        client_b.putString("email",  client.getEmail());
+        client_b.putString("add1",  client.getAdd1());
+        client_b.putString("add2",  client.getAdd2());
+        client_b.putString("city",  client.getCity());
+        client_b.putString("state",  client.getState());
+        client_b.putString("pincode",  client.getPincode());
+        client_b.putString("gst",  client.getGst());
+
         Bundle bundle = new Bundle();
         bundle.putSerializable("valuesArray", val);
+//        bundle.putBundle("client",  client_b);
 
-        //
 
-        Invoice in = new Invoice();
-        in.pdfcreate(file, uri, uri, uri, context, data, invoice, client, getDate_());
-//        in.pdfcreate(file, invoice, client, uri, context, data);
+//        HttpInvoice in = new HttpInvoice();
+//        in.pdfcreate(file, uri, uri, uri, context, data, invoice, client, getDate_());
+
+
         Intent intent = new Intent(getActivity(), pdfreader.class);
         intent.putExtra("inv", invoice);
         intent.putExtra("inc", bundle);
+        intent.putExtra("client", client_b);
         startActivity(intent);
+
+
 //        startActivity(new Intent(getActivity(), PdfTabbedActivity.class).putExtra("inv", "INV").putExtra("from", "genrate"));
     }
 

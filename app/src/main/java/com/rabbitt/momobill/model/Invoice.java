@@ -44,7 +44,7 @@ public class Invoice {
     public void pdfcreate(File file, Uri path, Uri stamp, Uri logopath, Context context, List<ProductInvoice> data, String invoice, Client client, String date_) {
 
         Log.i(TAG, "pdfcreate: " + path);
-        com.itextpdf.text.Document doc = new com.itextpdf.text.Document(PageSize.A4, 24, 24, 24, 24);
+        com.itextpdf.text.Document doc = new com.itextpdf.text.Document(PageSize.A5.rotate(), 16, 16, 16, 16);
         String outPath = file.getPath();
 
         try {
@@ -55,8 +55,7 @@ public class Invoice {
             String city = preference.getString(USER_CITY, "City");
             String phone = preference.getString(USER_PHONE, "phone");
             String pin = preference.getString(USER_PIN, "Pin code");
-
-            String gstin = preference.getString(USER_GST, "gstin");
+            String gstin = preference.getString(USER_GST, "Gstin");
 
             PdfWriter.getInstance(doc, new FileOutputStream(outPath));
             doc.open();
@@ -64,180 +63,64 @@ public class Invoice {
             PdfPTable innertable = new PdfPTable(3);  //first table
             innertable.setWidthPercentage(100);
 
-//            Image image = null, image2 = null, image3 = null;
-//            if (path != null) {
-//                Bitmap bmp = BitmapFactory.decodeFile(path.toString());
-//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                bmp.compress(Bitmap.CompressFormat.PNG, 10, stream);
-//                image = Image.getInstance(stream.toByteArray());
-//                image.scaleToFit(100, 100);
-//            }
-//            if (stamp != null) {
-//                Bitmap bmp = BitmapFactory.decodeFile(stamp.toString());
-//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                bmp.compress(Bitmap.CompressFormat.PNG, 10, stream);
-//                image2 = Image.getInstance(stream.toByteArray());
-//                image2.scaleToFit(100, 100);
-//            }
-//            File logo = null;
-//            if (logopath != null)
-//                logo = new File(logopath.toString());
-//            if (logopath != null && logo.exists()) {
-//                Bitmap bmp = BitmapFactory.decodeFile(logopath.toString());
-//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                bmp.compress(Bitmap.CompressFormat.PNG, 10, stream);
-//                image3 = Image.getInstance(stream.toByteArray());
-//                image3.scaleToFit(50, 50);
-//            }
-            //innertable.setWidths(new int[]{40});
-            //Topic
-//            PdfPCell cell = new PdfPCell();
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//            cell = new PdfPCell(new Paragraph("" + "Santha Agency", FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//            cell = new PdfPCell();
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//
-//            cell = new PdfPCell(new Phrase(""));
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//            cell = new PdfPCell(new Paragraph("" + shrp.getString(USER_LOC, "") + " " + shrp.getString(USER_LOC_2, ""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//            cell = new PdfPCell();
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//
-//            cell = new PdfPCell();
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//            cell = new PdfPCell(new Paragraph("Phone :" + shrp.getString(USER_PHONE, ""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//            cell = new PdfPCell();
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//
-//            cell = new PdfPCell();
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//            cell = new PdfPCell(new Paragraph("GSTIN " + shrp.getString(USER_GST, ""), FontFactory.getFont(FontFactory.TIMES_BOLD, 17, Font.NORMAL, BaseColor.BLACK)));
-//            //cell.setPaddingLeft(2);
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//            cell = new PdfPCell();
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            innertable.addCell(cell);
-//
-//            cell = new PdfPCell();
-//            cell.setColspan(5);
-//            cell.setFixedHeight(6);
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            innertable.addCell(cell);
-//            cell = new PdfPCell();
-//            cell.setColspan(5);
-//            cell.setFixedHeight(6);
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            innertable.addCell(cell);
-//            cell = new PdfPCell();
-//            cell.setColspan(5);
-//            cell.setFixedHeight(6);
-//            cell.setBorder(Rectangle.NO_BORDER);
-//            innertable.addCell(cell);
-//            doc.add(innertable);
-            //Topic End
-//Second table
-
-//            PdfPTable inner = new PdfPTable(1);
-////            inner.setWidthPercentage(100);
-//            PdfPCell cel = new PdfPCell(new Phrase("PAYMENT VOUCHER",
-//                    FontFactory.getFont(FontFactory.COURIER_BOLD, 25, Font.NORMAL, BaseColor.BLACK)));
-//
-//            cel.setBackgroundColor(BaseColor.LIGHT_GRAY);
-//            cel.setHorizontalAlignment(Element.ALIGN_CENTER);
-//            inner.addCell(cel);
-//            cel = new PdfPCell();
-//            cel.setColspan(5);
-//            cel.setFixedHeight(6);
-//            cel.setBorder(Rectangle.NO_BORDER);
-//            inner.addCell(cel);
-//
-//            doc.add(inner);
-
             //  innertable.addCell(cell);
             PdfPTable innertable2 = new PdfPTable(3);
             innertable2.setWidthPercentage(100);
 
-            PdfPCell cell1 = new PdfPCell(new Phrase("Voucher no. :" + invoice));
+            PdfPCell cell1 = new PdfPCell(new Phrase("SANTHA AGENCIES"));////////////////////////////////////////////////////////////            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("SANTHA AGENCIES"));/////////////////////////////////////////////////////////////////////////
+            cell1 = new PdfPCell(new Phrase("Original / Duplicate \n TAX INVOICE"));
             cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("Details of Supplier"));
-            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell1 = new PdfPCell(new Phrase("Consignee name / Address"));
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("Voucher Date: " + date_));
+
+
+            cell1 = new PdfPCell(new Phrase("Address :" +add1+"\n"+add2+ "\n" + city + "-" + pin));
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase(add1));/////////////////////////////////////////////////////////////////////////
-            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell1 = new PdfPCell(new Phrase("Invoice No: "+invoice));////////////////////////////////////////////////////////////////
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("Name: " + client.getName()));
-
+            cell1 = new PdfPCell(new Phrase("Name :" + client.getName()));
             innertable2.addCell(cell1);
+
+
             cell1 = new PdfPCell(new Phrase("Place of supply: "));
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase(add2 + "\n" + city + "-" + pin));/////////////////////////////////////////////////////////////////////////
-            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell1 = new PdfPCell(new Phrase("Date: "+date_));////////////////////////////////////////////////////////////////
+            innertable2.addCell(cell1);
+
+            cell1 = new PdfPCell(new Phrase("Address :" + client.getAdd1() + "\n" + client.getAdd2() + "\n"+ client.getState() + "\n" + client.getPincode()));
             innertable2.addCell(cell1);
 
 
-            cell1 = new PdfPCell(new Phrase("Address :" + client.getAdd1() + " " + client.getAdd2()));
+
+            cell1 = new PdfPCell(new Phrase("PH: " + phone));///////////////////////////////////////////////////////////////////////
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase(""));
+            cell1 = new PdfPCell(new Phrase("Route: "+date_));////////////////////////////////////////////////////////////////
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("PH: " + phone));/////////////////////////////////////////////////////////////////////////
-            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell1 = new PdfPCell(new Phrase("Phone :" + client.getPhone()));
             innertable2.addCell(cell1);
 
 
-            cell1 = new PdfPCell(new Phrase("GSTIN :" + client.getGst()));
-            innertable2.addCell(cell1);
 
             cell1 = new PdfPCell(new Phrase("Address : \t" + "user_add"));
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("GSTIN : " + gstin));/////////////////////////////////////////////////////////////////////////
-            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell1 = new PdfPCell(new Phrase("Term: Credit/Cash"));////////////////////////////////////////////////////////////////
             innertable2.addCell(cell1);
 
-            cell1 = new PdfPCell(new Phrase("State: " + client.getState() + "    Code: " + client.getPincode()));
-            //cell.setBorder(Rectangle.NO_BORDER);
-            cell1.setHorizontalAlignment(Element.ALIGN_LEFT);
-
+            cell1 = new PdfPCell(new Phrase("GSTIN :" + client.getGst()));
             innertable2.addCell(cell1);
+
+
             cell1 = new PdfPCell();
             cell1.setColspan(5);
             cell1.setFixedHeight(6);
@@ -257,19 +140,22 @@ public class Invoice {
             doc.add(innertable2);
 
 
-            PdfPTable innertable5 = new PdfPTable(8);
+            PdfPTable innertable5 = new PdfPTable(9);
             innertable5.setWidthPercentage(100);
 
             PdfPCell cell5 = new PdfPCell(new Phrase("Product"));
             innertable5.addCell(cell5);
 
-            cell5 = new PdfPCell(new Phrase("HSN Code"));
+            cell5 = new PdfPCell(new Phrase("HSN"));
+            innertable5.addCell(cell5);
+
+            cell5 = new PdfPCell(new Phrase("M.R.P"));
             innertable5.addCell(cell5);
 
             cell5 = new PdfPCell(new Phrase("Units"));
             innertable5.addCell(cell5);
 
-            cell5 = new PdfPCell(new Phrase("Taxable Value"));
+            cell5 = new PdfPCell(new Phrase("Taxable"));
             innertable5.addCell(cell5);
 
             cell5 = new PdfPCell(new Phrase("SGST"));
@@ -300,6 +186,8 @@ public class Invoice {
                 cell5 = new PdfPCell(new Phrase(productInvoice.getProduct_name()));
                 innertable5.addCell(cell5);
                 cell5 = new PdfPCell(new Phrase(productInvoice.getHsn()));
+                innertable5.addCell(cell5);
+                cell5 = new PdfPCell(new Phrase(productInvoice.getUnit()));
                 innertable5.addCell(cell5);
                 cell5 = new PdfPCell(new Phrase(productInvoice.getUnit()));
                 innertable5.addCell(cell5);
@@ -351,10 +239,21 @@ public class Invoice {
                     printcgst = 0.0;
                 }
 
+
+                PdfPCell activitynestedcell = new PdfPCell(new Phrase("Nested Cell 1"));
+                activitynestedcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+//                activitynested.addCell(activitynestedcell);
+//                activity.addElement(activitynested);
+
                 cell5 = new PdfPCell(new Phrase(productInvoice.getSale_rate()));
                 innertable5.addCell(cell5);
+
+
                 cell5 = new PdfPCell(new Phrase(String.valueOf(printcgst)));
-                innertable5.addCell(cell5);
+                innertable5.addCell(cell5);//.addElement(activitynestedcell);
+
+
+
                 cell5 = new PdfPCell(new Phrase(String.valueOf(printcgst)));
                 innertable5.addCell(cell5);
                 cell5 = new PdfPCell(new Phrase(String.valueOf(printcess)));
@@ -371,14 +270,14 @@ public class Invoice {
             }
             doc.add(innertable5);
 
-            PdfPTable t = new PdfPTable(2);
-            t.setWidthPercentage(100);
-            t.setWidths(new int[]{50, 50});
-            PdfPCell ce = new PdfPCell(new Phrase("Total"));
-            t.addCell(ce);
-            ce = new PdfPCell(new Phrase("" + tax_inc));
-            t.addCell(ce);
-            doc.add(t);
+//            PdfPTable t = new PdfPTable(9);
+//            t.setWidthPercentage(100);
+//            t.setWidths(new int[]{50, 50});
+//            PdfPCell ce = new PdfPCell(new Phrase("Total"));
+//            t.addCell(ce);
+//            ce = new PdfPCell(new Phrase("" + tax_inc));
+//            t.addCell(ce);
+//            doc.add(t);
 
             Convertor convert_ = new Convertor();
 

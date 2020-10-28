@@ -1,6 +1,7 @@
 package com.rabbitt.momobill;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -22,8 +24,6 @@ import com.rabbitt.momobill.fragment.InventoryFrag;
 import com.rabbitt.momobill.fragment.InvoiceFrag;
 import com.rabbitt.momobill.fragment.OrderFrag;
 import com.rabbitt.momobill.prefsManager.PrefsManager;
-
-import java.util.Objects;
 
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PREF;
 
@@ -137,6 +137,22 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }
         try {
+if (selectedItemId == 0){
+
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Exit")
+                    .setMessage("Do you really want to exit?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            //Stop the activity
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+}
+
 //            String com = prefsManager.getIns();
 //            Log.i(TAG, "onBackPressed: "+com+"        "+getCurrentFragment());
 //            Log.i(TAG, "rabbitt: "+adapter.getCategory());
@@ -188,7 +204,19 @@ public class MainActivity extends AppCompatActivity {
             if (R.id.l_item_home != selectedItemId) {
                 setHomeItem(MainActivity.this);
             } else {
-                finish();
+
+                new AlertDialog.Builder(this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Exit")
+                        .setMessage("Do you really want to exit?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                //Stop the activity
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
                 super.onBackPressed();
             }
 //            }

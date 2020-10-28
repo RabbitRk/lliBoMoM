@@ -1,9 +1,39 @@
 package com.rabbitt.momobill.model;
 
-public class Client {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Client implements Parcelable {
 
     String name, phone, email, add1, add2, city, state, pincode, gst;
+    public static final Creator<Client> CREATOR = new Creator<Client>() {
+        @Override
+        public Client createFromParcel(Parcel in) {
+            return new Client(in);
+        }
 
+        @Override
+        public Client[] newArray(int size) {
+            return new Client[size];
+        }
+    };
+
+    public Client(Parcel inp) {
+        name = inp.readString();
+        phone = inp.readString();
+        email = inp.readString();
+        add1 = inp.readString();
+        add2 = inp.readString();
+        city = inp.readString();
+        state = inp.readString();
+        pincode = inp.readString();
+        gst = inp.readString();
+    }
+
+    public Client()
+    {
+
+    }
     public String getName() {
         return name;
     }
@@ -74,5 +104,23 @@ public class Client {
 
     public void setGst(String gst) {
         this.gst = gst;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int i) {
+        dest.writeString(name);
+        dest.writeString(phone);
+        dest.writeString(email);
+        dest.writeString(add1);
+        dest.writeString(add2);
+        dest.writeString(city);
+        dest.writeString(state);
+        dest.writeString(pincode);
+        dest.writeString(gst);
     }
 }

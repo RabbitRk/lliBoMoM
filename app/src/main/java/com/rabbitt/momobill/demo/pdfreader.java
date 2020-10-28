@@ -25,6 +25,7 @@ public class pdfreader extends AppCompatActivity {
     String fname;
     List<ProductInvoice> data = null;
     Bundle bundle;
+    Bundle c_bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,7 @@ public class pdfreader extends AppCompatActivity {
 
         fname = getIntent().getStringExtra("inv");
         bundle = getIntent().getBundleExtra("inc");
+        c_bundle = getIntent().getBundleExtra("client");
 
         if (bundle != null) {
             Log.i(TAG, "onCreate: PDF Reader " + bundle.size());
@@ -41,6 +43,7 @@ public class pdfreader extends AppCompatActivity {
             Log.i(TAG, "onCreate: Buble null");
         }
         ArrayList<ProductInvoice> object = (ArrayList<ProductInvoice>) bundle.getSerializable("valuesArray");
+//        ArrayList<String> data_client = (ArrayList<String>) bundle.get("name");
 
         if (object != null) {
             Log.i(TAG, "onCreate: Array yes "+object.size());
@@ -71,7 +74,7 @@ public class pdfreader extends AppCompatActivity {
         tabs.addTab(tabs.newTab().setText("Thermal"));
         tabs.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        TabAdapter tabAdapter = new TabAdapter(this, getSupportFragmentManager(), tabs.getTabCount(), fname, object);
+        TabAdapter tabAdapter = new TabAdapter(this, getSupportFragmentManager(), tabs.getTabCount(), fname, object, c_bundle);
         viewPager.setAdapter(tabAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabs));
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

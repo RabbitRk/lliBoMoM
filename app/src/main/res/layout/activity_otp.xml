@@ -28,6 +28,7 @@
         android:layout_margin="20dp"
         android:textSize="16sp"
         android:textAllCaps="false"
+        android:onClick="submit_click"
         android:textColor="@color/white" />
 
 </LinearLayout>

@@ -14,6 +14,15 @@ public class Product implements Serializable {
     String hsn;
     String puchase;
     String inc;
+    String mrp;
+
+    public String getMrp() {
+        return mrp;
+    }
+
+    public void setMrp(String mrp) {
+        this.mrp = mrp;
+    }
 
     public String getCess() {
         return cess;

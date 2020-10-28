@@ -1678,7 +1678,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
             // generate URI, I defined authority as the application ID in the Manifest, the last param is file I want to open
 
-            Uri uri = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID, file);
+            Uri uri = FileProvider.getUriForFile(getContext(), "com.rabbitt.momobill.provider", file);
 
 
             intent.putExtra(Intent.EXTRA_STREAM, uri);

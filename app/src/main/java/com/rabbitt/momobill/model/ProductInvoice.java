@@ -15,6 +15,7 @@ public class ProductInvoice implements Parcelable {
     String in;
     String single;
     String hsn;
+    String mrp;
 
     public ProductInvoice(Parcel inp) {
         img_url = inp.readString();
@@ -27,6 +28,7 @@ public class ProductInvoice implements Parcelable {
         in = inp.readString();
         single = inp.readString();
         hsn = inp.readString();
+        mrp = inp.readString();
     }
 
     public static final Creator<ProductInvoice> CREATOR = new Creator<ProductInvoice>() {
@@ -43,6 +45,14 @@ public class ProductInvoice implements Parcelable {
 
     public ProductInvoice() {
 
+    }
+
+    public String getMrp() {
+        return mrp;
+    }
+
+    public void setMrp(String mrp) {
+        this.mrp = mrp;
     }
 
     public String getHsn() {

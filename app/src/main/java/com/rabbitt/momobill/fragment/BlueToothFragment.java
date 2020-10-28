@@ -326,7 +326,7 @@ public class BlueToothFragment extends Fragment implements Runnable {
         @Override
         public void handleMessage(Message msg) {
             mBluetoothConnectProgressDialog.dismiss();
-            Toast.makeText(getContext(), "DeviceConnected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Device Connected", Toast.LENGTH_SHORT).show();
         }
     };
 

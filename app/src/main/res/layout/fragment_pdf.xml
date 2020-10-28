@@ -4,13 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <com.joanzapata.pdfview.PDFView
-        android:id="@+id/pdfview"
+    <WebView
+        android:id="@+id/webViewMain"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#a5a39f9f" />
+        android:layout_height="0dp"/>
+
+<!--    <com.joanzapata.pdfview.PDFView-->
+<!--        android:id="@+id/pdfview"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="1"-->
+<!--        android:background="#a5a39f9f" />-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -53,6 +58,7 @@
             android:text="Share" />
 
         <Button
+            android:id="@+id/print"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"

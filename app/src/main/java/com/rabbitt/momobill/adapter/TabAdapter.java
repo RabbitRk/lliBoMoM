@@ -22,13 +22,15 @@ public class TabAdapter extends FragmentPagerAdapter {
     int count;
     String fname;
     List<ProductInvoice> data;
+    Bundle data_client;
 
-    public TabAdapter(Context context, FragmentManager supportFragmentManager, int count, String fname, List<ProductInvoice> data) {
+    public TabAdapter(Context context, FragmentManager supportFragmentManager, int count, String fname, List<ProductInvoice> data, Bundle data_) {
         super(supportFragmentManager);
         this.context = context;
         this.count = count;
         this.fname = fname;
         this.data = data;
+        this.data_client = data_;
     }
 
     @NonNull
@@ -39,6 +41,7 @@ public class TabAdapter extends FragmentPagerAdapter {
                 PDFfragment pdFfragment = new PDFfragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("inv", fname);
+                bundle.putBundle("client", data_client);
                 pdFfragment.setArguments(bundle);
                 return pdFfragment;
 

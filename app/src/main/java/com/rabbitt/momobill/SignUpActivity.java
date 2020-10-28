@@ -62,8 +62,7 @@ public class SignUpActivity extends AppCompatActivity {
         ex.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (in_.isChecked())
-                {
+                if (in_.isChecked()) {
                     email.setVisibility(View.VISIBLE);
                     add1.setVisibility(View.VISIBLE);
                     add2.setVisibility(View.VISIBLE);
@@ -71,9 +70,7 @@ public class SignUpActivity extends AppCompatActivity {
                     state.setVisibility(View.VISIBLE);
                     pincode.setVisibility(View.VISIBLE);
                     gst.setVisibility(View.VISIBLE);
-                }
-                else
-                {
+                } else {
                     email.setVisibility(View.GONE);
                     add1.setVisibility(View.GONE);
                     add2.setVisibility(View.GONE);
@@ -98,10 +95,8 @@ public class SignUpActivity extends AppCompatActivity {
                 design = "Employee";
             }
 
-            if (design.equals("Owner"))
-            {
-                if (!checkOwner())
-                {
+            if (design.equals("Owner")) {
+                if (!checkOwner()) {
                     Toast.makeText(this, "Owner Already Exists", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -110,7 +105,6 @@ public class SignUpActivity extends AppCompatActivity {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Agency");
 
             HashMap<String, Object> hashMap = new HashMap<>();
-
             if (in_.isChecked()) {
                 hashMap.put("name", name.getText().toString().trim());
                 hashMap.put("designation", design);
@@ -122,16 +116,14 @@ public class SignUpActivity extends AppCompatActivity {
                 hashMap.put("state", state.getText().toString().trim());
                 hashMap.put("pincode", pincode.getText().toString().trim());
                 hashMap.put("gst", gst.getText().toString().trim());
-            }
-            else
-            {
+            } else {
                 hashMap.put("name", name.getText().toString().trim());
                 hashMap.put("phone", phone.getText().toString().trim());
             }
+
             Log.i(TAG, "addClient: " + hashMap.toString());
 
             key = reference.child(design).push().getKey();
-
             final String finalDesign = design;
 
             reference.child(design).child(key).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -174,7 +166,7 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-    private void storePreference(String myKey,String name, String phone, String email, String add1, String add2, String city, String state, String pincode, String gst, String d) {
+    private void storePreference(String myKey, String name, String phone, String email, String add1, String add2, String city, String state, String pincode, String gst, String d) {
         new PrefsManager(this).userPreferences_(
                 myKey,
                 name,
@@ -187,12 +179,9 @@ public class SignUpActivity extends AppCompatActivity {
                 pincode,
                 gst
         );
-        if (d.equals("Owner"))
-        {
+        if (d.equals("Owner")) {
             new PrefsManager(this).setOwner(true);
-        }
-        else
-        {
+        } else {
             new PrefsManager(this).setOwner(false);
         }
 
@@ -207,16 +196,13 @@ public class SignUpActivity extends AppCompatActivity {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.i(TAG, "onDataChange: "+dataSnapshot);
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                Log.i(TAG, "onDataChange: " + dataSnapshot);
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
                 }
-                if (dataSnapshot.exists())
-                {
+                if (dataSnapshot.exists()) {
                     Log.i(TAG, "onDataChange: false");
-                }
-                else
-                {
+                } else {
                     isExist[0] = false;
                 }
             }
@@ -226,7 +212,7 @@ public class SignUpActivity extends AppCompatActivity {
 
             }
         });
-        Log.i(TAG, "checkOwner: "+ isExist[0]);
+        Log.i(TAG, "checkOwner: " + isExist[0]);
         return isExist[0];
     }
 
@@ -267,8 +253,7 @@ public class SignUpActivity extends AppCompatActivity {
             gst.setError("Required");
             return false;
         }
-        if (!in_.isChecked() && !ex_.isChecked())
-        {
+        if (!in_.isChecked() && !ex_.isChecked()) {
             Toast.makeText(this, "Select Owner or Employee", Toast.LENGTH_SHORT).show();
             return false;
         }
