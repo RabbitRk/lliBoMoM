@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/rate"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="Custom Rate" />
+    <item
         android:id="@+id/edit"
         android:icon="@android:drawable/ic_menu_edit"
         android:title="Edit" />

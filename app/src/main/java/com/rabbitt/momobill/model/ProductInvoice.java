@@ -10,7 +10,7 @@ public class ProductInvoice implements Parcelable {
     String sale_rate;
     String unit;
     String product_id;
-    public String cgst;
+    String cgst;
     String cess;
     String in;
     String single;
@@ -46,6 +46,27 @@ public class ProductInvoice implements Parcelable {
     public ProductInvoice() {
 
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(img_url);
+        dest.writeString(product_name);
+        dest.writeString(sale_rate);
+        dest.writeString(unit);
+        dest.writeString(product_id);
+        dest.writeString(cgst);
+        dest.writeString(cess);
+        dest.writeString(in);
+        dest.writeString(single);
+        dest.writeString(hsn);
+        dest.writeString(mrp);
+    }
+
 
     public String getMrp() {
         return mrp;
@@ -135,22 +156,4 @@ public class ProductInvoice implements Parcelable {
         this.unit = unit;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(img_url);
-        dest.writeString(product_name);
-        dest.writeString(sale_rate);
-        dest.writeString(unit);
-        dest.writeString(product_id);
-        dest.writeString(cgst);
-        dest.writeString(cess);
-        dest.writeString(in);
-        dest.writeString(single);
-        dest.writeString(hsn);
-    }
 }

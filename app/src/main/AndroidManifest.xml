@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -14,15 +13,16 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:requestLegacyExternalStorage="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".activity.CustomActivity"></activity>
         <activity
             android:name=".activity.DeviceListActivity"
-            android:theme="@android:style/Theme.DeviceDefault.Dialog"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.DeviceDefault.Dialog" />
         <activity
             android:name=".activity.EditClientActivity"
             android:screenOrientation="portrait" />
@@ -95,9 +95,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.OrderDetailsActivity"
-            android:screenOrientation="portrait" />
-
-        <!--        File provider def for share pdf -->
+            android:screenOrientation="portrait" /> <!-- File provider def for share pdf -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.rabbitt.momobill"
@@ -107,8 +105,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-
     </application>
 
 </manifest>

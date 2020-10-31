@@ -53,6 +53,8 @@ import com.rabbitt.momobill.model.Credit;
 import com.rabbitt.momobill.model.Line;
 import com.rabbitt.momobill.model.ProductInvoice;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -227,51 +229,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
         credit_layout = inflate.findViewById(R.id.credit_layout);
         credit_recycler = inflate.findViewById(R.id.recycler_credit_invoice);
-//        getClients();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                .child("Product");
-
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.i(TAG, "onDataChange: " + dataSnapshot);
-                if (data != null) {
-                    data.clear();
-                }
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-
-                    String img_url = snapshot.child("img_url").getValue(String.class);
-                    String product_name = snapshot.child("product_name").getValue(String.class);
-                    String sale_rate = snapshot.child("sale_rate").getValue(String.class);
-                    String unit = snapshot.child("unit").getValue(String.class);
-                    String product_id = snapshot.child("product_id").getValue(String.class);
-                    String gst = snapshot.child("cgst_sgst").getValue(String.class);
-                    String cess = snapshot.child("cess").getValue(String.class);
-                    String in_ex = snapshot.child("in_ex").getValue(String.class);
-                    String hsn = snapshot.child("hsn").getValue(String.class);
-
-                    ProductInvoice product = new ProductInvoice();
-                    product.setImg_url(img_url);
-                    product.setProduct_name(product_name);
-                    product.setSale_rate(sale_rate);
-                    product.setUnit(unit);
-                    product.setProduct_id(product_id);
-                    product.setCgst(gst);
-                    product.setCess(cess);
-                    product.setIn(in_ex);
-                    product.setHsn(hsn);
-
-                    data.add(product);
-                }
-                updateRecycler(data);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         edx = inflate.findViewById(R.id.txt_name);
         edx.addTextChangedListener(new TextWatcher() {
@@ -349,6 +307,88 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                 Log.i(TAG, "onItemSelected: " + client_id.get(i) + " Position " + i + " ClientName " + clients.get(i));
                 getOrder(clientId);
                 getCredit(clientId);
+                getProduct(clientId);
+            }
+        });
+    }
+    String sale_rate;
+    private void getProduct(String clientId) {
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child("Product");
+
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference().child("Custom").child(clientId);
+
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.i(TAG, "onDataChange: " + dataSnapshot);
+                if (data != null) {
+                    data.clear();
+                }
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+                    String img_url = snapshot.child("img_url").getValue(String.class);
+                    String product_name = snapshot.child("product_name").getValue(String.class);
+                    String unit = snapshot.child("unit").getValue(String.class);
+                    String product_id = snapshot.child("product_id").getValue(String.class);
+                    sale_rate = snapshot.child("sale_rate").getValue(String.class);
+
+                    rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot in) {
+                            Log.i(TAG, "onDataChange: " + in.getKey() + "    " + in.child(product_id).child("product_id").getValue(String.class));
+
+                            if (in.child(product_id).child("product_id").getValue(String.class) == null) {
+                                sale_rate = snapshot.child("sale_rate").getValue(String.class);
+                                Log.i(TAG, "onDataChange: SaleRate"+sale_rate);
+                            } else {
+                                if (in.getKey().equals(clientId) && (in.child(product_id).child("product_id").getValue(String.class).equals(product_id))) {
+                                    sale_rate = in.child(product_id).child("sale_rate").getValue(String.class);
+                                } else {
+                                    sale_rate = snapshot.child("sale_rate").getValue(String.class);
+
+                                }
+                                Log.i(TAG, "onDataChange: Else SaleRate"+sale_rate);
+
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+                    String gst = snapshot.child("cgst_sgst").getValue(String.class);
+                    String cess = snapshot.child("cess").getValue(String.class);
+                    String in_ex = snapshot.child("in_ex").getValue(String.class);
+                    String hsn = snapshot.child("hsn").getValue(String.class);
+                    String mrp = snapshot.child("purchase_rate").getValue(String.class);
+
+                    ProductInvoice product = new ProductInvoice();
+                    product.setImg_url(img_url);
+                    product.setProduct_name(product_name);
+                    product.setSale_rate(sale_rate);
+                    product.setUnit(unit);
+                    product.setProduct_id(product_id);
+                    product.setCgst(gst);
+                    product.setCess(cess);
+                    product.setIn(in_ex);
+                    product.setHsn(hsn);
+                    product.setMrp(mrp);
+
+                    data.add(product);
+                }
+                updateRecycler(data);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
     }
@@ -431,6 +471,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                     String gst = snapshot.child("cgst").getValue(String.class);
                     String cess = snapshot.child("cess").getValue(String.class);
                     String in_ex = snapshot.child("in_ex").getValue(String.class);
+                    String mrp = snapshot.child("purchase_rate").getValue(String.class);
 
                     ProductInvoice product = new ProductInvoice();
                     product.setImg_url(img_url);
@@ -441,6 +482,8 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                     product.setCgst(gst);
                     product.setCess(cess);
                     product.setIn(in_ex);
+                    product.setMrp(mrp);
+
 
                     order.add(product);
                 }
@@ -518,7 +561,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                 bal = tot - avl;
 
                 if (bal > 0)
-                    openDialog(model, unit, name, product_id, bal,position);
+                    openDialog(model, unit, name, product_id, bal, position);
                 else
                     Toast.makeText(getContext(), bal + " units available", Toast.LENGTH_SHORT).show();
 
@@ -534,8 +577,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
     }
 
     @SuppressLint("SetTextI18n")
-    public void openDialog(final ProductInvoice model, final String ex_unit, String name_, final String product_id, final int bal,final int pos) {
-
+    public void openDialog(final ProductInvoice model, final String ex_unit, String name_, final String product_id, final int bal, final int pos) {
 
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.invoice_dialog);
@@ -567,15 +609,14 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
                         product.setCess(model.getCess());
                         product.setImg_url(model.getImg_url());
                         product.setIn(model.getIn());
+                        product.setMrp(model.getMrp());
+                        product.setHsn(model.getHsn());
 
                         cart.add(product);
                         ImageView view = invoice_recycler.findViewHolderForAdapterPosition(pos).itemView.findViewById(R.id.tick_view);
                         view.setVisibility(View.VISIBLE);
                         dialog.dismiss();
-//                     createInvoice(dialog, ex_unit, product_id, units.getText().toString().trim());
-                    }
-
-                    else
+                    } else
                         Toast.makeText(getContext(), "Stock isn't currently available", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -642,8 +683,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
     private void revertTick() {
 
-        for(int i  =0 ; i<data.size();i++)
-        {
+        for (int i = 0; i < data.size(); i++) {
             ImageView view = invoice_recycler.findViewHolderForAdapterPosition(i).itemView.findViewById(R.id.tick_view);
             view.setVisibility(View.GONE);
         }

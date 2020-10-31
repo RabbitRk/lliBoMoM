@@ -96,11 +96,9 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 //        Gets Client name for credit
         DatabaseReference clientReference = FirebaseDatabase.getInstance().getReference("Client");
         try {
-
             clientReference.child(client_id).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
                     client_name = dataSnapshot.child("name").getValue().toString();
                 }
 
@@ -407,6 +405,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                                 pro.put("cgst", pv.getCgst());
                                 pro.put("cess", pv.getCess());
                                 pro.put("in_ex", pv.getIn());
+                                pro.put("purchase_rate", pv.getMrp());
 
                                 product.put(pv.getProduct_id(), pro);
                             }
@@ -649,23 +648,21 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     File file;
 
     private void generateInvoice(Client client) {
-        Uri uri = null;
-        boolean a = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice").mkdirs();
-
-        if (a) {
-            Toast.makeText(context, "Yes", Toast.LENGTH_SHORT).show();
-        }
-
-        String path1 = Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice/" + invoice + "_Inv.pdf";
-        file = new File(path1);
+//        Uri uri = null;
+//        boolean a = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice").mkdirs();
+//
+//        if (a) {
+//            Toast.makeText(context, "Yes", Toast.LENGTH_SHORT).show();
+//        }
+//
+//        String path1 = Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice/" + invoice + "_Inv.pdf";
+//        file = new File(path1);
 
 //        Log.i(TAG, "generateInvoice: " + Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice");
         // Work Area
 
         ArrayList<ProductInvoice> val = new ArrayList<>(data.size());
         val.addAll(data);
-
-        Map<String, String> data = new HashMap<>();
 
         Bundle client_b = new Bundle();
         client_b.putString("name",  client.getName());

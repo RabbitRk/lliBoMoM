@@ -201,10 +201,6 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
 
     }
 
-//    public void opening_submit(View view) {
-//
-//    }
-
     public void fab_report(View view) {
         startActivity(new Intent(this, LiveReport.class));
     }
@@ -234,41 +230,6 @@ public class OpeningActivity extends AppCompatActivity implements OpenAdapter.On
 
             final String OP_VAL = i.getOpeningVal();
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Opening");
-
-            //Getting Existing data from the database
-
-//            DatabaseReference exist = FirebaseDatabase.getInstance().getReference()
-//                    .child("Opening").child(getDate());
-//
-//            reference.addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                    Log.i(TAG, "onDataChange: " + dataSnapshot);
-//                    if (data != null) {
-//                        data.clear();
-//                    }
-//                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//
-//                        String img_url = snapshot.child("img_url").getValue(String.class);
-//                        String product_name = snapshot.child("product_name").getValue(String.class);
-//                        String quantity = snapshot.child("quantity").getValue(String.class);
-//                        String sale_rate = snapshot.child("sale_rate").getValue(String.class);
-//                        String unit = snapshot.child("unit").getValue(String.class);
-//                        String product_id = snapshot.child("product_id").getValue(String.class);
-//
-//                    }
-//                    updateRecycler(data);
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                }
-//            });
-
-
-            //Adding to the entered value to the existing database value
-
 
             //adding products to database
             HashMap<String, Object> hashMap = new HashMap<>();

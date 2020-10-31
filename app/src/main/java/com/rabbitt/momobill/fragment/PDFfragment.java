@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintJob;
@@ -14,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -25,25 +23,26 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
-import com.joanzapata.pdfview.PDFView;
+import com.google.gson.Gson;
 import com.rabbitt.momobill.BuildConfig;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.Volley.ServerCallback;
 import com.rabbitt.momobill.Volley.VolleyAdapter;
+import com.rabbitt.momobill.model.ProductInvoice;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.List;
 
 public class PDFfragment extends Fragment {
 
-//    private PDFView imageView;
     Button shareBtn;
     WebView printWeb;
     File file;
+    List<ProductInvoice> data = null;
 
     private static final String TAG  = "pdf";
 
@@ -66,6 +65,7 @@ public class PDFfragment extends Fragment {
 //
         String invoice = bundle.getString("inv");
         Bundle client = bundle.getBundle("client");
+        data = (List<ProductInvoice>) bundle.getSerializable("data");
 
         HashMap<String, String> map = new HashMap<>();
         map.put("name", String.valueOf(client.get("name")));
@@ -77,8 +77,8 @@ public class PDFfragment extends Fragment {
         map.put("state", String.valueOf(client.get("state")));
         map.put("pincode", String.valueOf(client.get("pincode")));
         map.put("gst", String.valueOf(client.get("gst")));
+
 //        map.put("gst", String.valueOf(client.get("gst")));
-//
 //        String path1 = Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice/"+ invoice + "_Inv.pdf";
 //        file = new File(path1);
 //        imageView.fromFile(file);
@@ -88,6 +88,49 @@ public class PDFfragment extends Fragment {
 //                .enableSwipe(true)
 //                .swipeVertical(true)
 //                .load();
+        HashMap<String, String> product;
+        HashMap<String, HashMap<String, String>> pro = new HashMap<>();
+
+        for (int i = 0; i < data.size(); i++) {
+
+            product = new HashMap<>();
+            ProductInvoice productInvoice = data.get(i);
+            product.put("Product_name", productInvoice.getProduct_name());
+            product.put("Sale_rate", productInvoice.getSale_rate());
+            product.put("Unit", productInvoice.getUnit());
+            product.put("Product_id", productInvoice.getProduct_id());
+            product.put("Cgst", productInvoice.getCgst());
+            product.put("Cess", productInvoice.getCess());
+            product.put("Img_url", productInvoice.getImg_url());
+            product.put("In", productInvoice.getIn());
+            product.put("Mrp", productInvoice.getMrp());
+            product.put("Hsn", productInvoice.getHsn());
+
+
+
+
+            pro.put(String.valueOf(i), product);
+            Log.i(TAG, "onCreateView: ================================> "+product);
+        }
+        JSONObject jObject = new JSONObject(pro);
+        JSONArray jarray_product, jsonArray_client;
+
+        //Product
+        jarray_product = new JSONArray();
+        jarray_product.put(jObject);
+
+
+        //Client
+        jsonArray_client = new JSONArray();
+        jsonArray_client.put(new JSONObject(map));
+
+
+        HashMap<String, String> main = new HashMap<>();
+        main.put("client", String.valueOf(jsonArray_client));
+        main.put("product", String.valueOf(jarray_product));
+
+        Log.i(TAG, "onCreateView: Main ********************* "+main);
+
 
         // Initializing the WebView
         final WebView webView = (WebView) inflate.findViewById(R.id.webViewMain);
@@ -97,9 +140,15 @@ public class PDFfragment extends Fragment {
 
         webView.getSettings().setDefaultTextEncodingName("utf-8");
 
-
-        HashMap<String, String> main = new HashMap<>();
-        main.put("client", String.valueOf(new JSONObject(map)));
+        // Setting we View Client
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // initializing the printWeb Object
+                printWeb = webView;
+            }
+        });
 
         VolleyAdapter volleyAdapter = new VolleyAdapter(getContext());
 
@@ -116,15 +165,8 @@ public class PDFfragment extends Fragment {
 
             }
         });
-        // Setting we View Client
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                // initializing the printWeb Object
-                printWeb = webView;
-            }
-        });
+
+
         // setting clickListener for Save Pdf Button
         savePdfBtn.setOnClickListener(new View.OnClickListener() {
             @Override

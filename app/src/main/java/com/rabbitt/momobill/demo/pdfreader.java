@@ -35,6 +35,7 @@ public class pdfreader extends AppCompatActivity {
 
         fname = getIntent().getStringExtra("inv");
         bundle = getIntent().getBundleExtra("inc");
+//        ArrayList<ProductInvoice> myList = getIntent().getParcelableExtra("valuesArray");
         c_bundle = getIntent().getBundleExtra("client");
 
         if (bundle != null) {

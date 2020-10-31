@@ -1,6 +1,7 @@
 package com.rabbitt.momobill.fragment;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -30,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.ClientActivity;
+import com.rabbitt.momobill.activity.CustomActivity;
 import com.rabbitt.momobill.activity.EditClientActivity;
 import com.rabbitt.momobill.adapter.ClientAdapter;
 import com.rabbitt.momobill.model.Client;
@@ -223,6 +225,8 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
         }
     }
 
+
+
     private boolean whatsappInstalledOrNot() {
         PackageManager pm = requireActivity().getPackageManager();
         boolean app_installed;// = false;
@@ -271,6 +275,7 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
             }
             popup.getMenuInflater().inflate(R.menu.client_popup_menu, popup.getMenu());
             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @SuppressLint("NonConstantResourceId")
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
 
@@ -282,6 +287,15 @@ public class ClientFrag extends Fragment implements View.OnClickListener, Client
                         case R.id.edit:
                             editClient(clientid);
                             Toast.makeText(context, "You clicked edit on "+data.get(selectedItemPosition).getName(), Toast.LENGTH_SHORT).show();
+                            break;
+
+                        case R.id.rate:
+
+                            Intent intent = new Intent(context, CustomActivity.class);
+                            intent.putExtra("clientid",clientid);
+                            context.startActivity(intent);
+//                            editClient(clientid);
+//                            Toast.makeText(context, "You clicked edit on "+data.get(selectedItemPosition).getName(), Toast.LENGTH_SHORT).show();
                             break;
                     }
 

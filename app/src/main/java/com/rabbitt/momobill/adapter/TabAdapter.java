@@ -42,6 +42,7 @@ public class TabAdapter extends FragmentPagerAdapter {
                 Bundle bundle = new Bundle();
                 bundle.putString("inv", fname);
                 bundle.putBundle("client", data_client);
+                bundle.putSerializable("data", (Serializable) data);
                 pdFfragment.setArguments(bundle);
                 return pdFfragment;
 
