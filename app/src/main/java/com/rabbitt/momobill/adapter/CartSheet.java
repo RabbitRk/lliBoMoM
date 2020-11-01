@@ -45,6 +45,8 @@ import com.rabbitt.momobill.model.Invoice;
 import com.rabbitt.momobill.model.ProductInvoice;
 import com.rabbitt.momobill.prefsManager.IncrementPref;
 
+import org.w3c.dom.Text;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -75,6 +77,8 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     Context context;
     View v;
     String invoice = "";
+
+    private TextView close;
 
     ProgressDialog progressDialog;
 
@@ -120,6 +124,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         invoice_recycler = v.findViewById(R.id.recycler_cart);
         button = v.findViewById(R.id.ok_button);
         clear = v.findViewById(R.id.clear_data);
+        close = v.findViewById(R.id.txt_close);
 
         if (btn_val.equals("order")) {
             button.setText("Take order");
@@ -127,6 +132,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
         updateRecycler(data);
         clear.setOnClickListener(this);
         button.setOnClickListener(this);
+        close.setOnClickListener(this);
     }
 
     private void updateRecycler(List<ProductInvoice> data) {
@@ -287,33 +293,37 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
     @Override
     public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.ok_button:
+                if (btn_val.equals("order")) {
+                    Toast.makeText(getActivity(), "Order Accepted", Toast.LENGTH_SHORT).show();
+                    updateFirebase(data);
+                } else {
+                    double total = 0.0;
+                    for (int i = 0; i < data.size(); i++) {
+                        Log.i(TAG, "Invoice Amount: " + data.get(i).getIn());
+                        String inc = data.get(i).getIn();
+                        double gst = Double.parseDouble(data.get(i).getCgst());
+                        double ces = Double.parseDouble(data.get(i).getCess());
+                        double rat = Double.parseDouble(data.get(i).getSale_rate());
+                        double val = calculate(inc, gst, ces, rat);
+                        total += val;
+                    }
+                    Log.i(TAG, "Invoice Amount: " + total);
+                    paymentPopup(total);
 
-        if (v.getId() == R.id.ok_button) {
-            if (btn_val.equals("order")) {
-                Toast.makeText(getActivity(), "Order Accepted", Toast.LENGTH_SHORT).show();
-                updateFirebase(data);
-            } else {
-                double total = 0.0;
-                for (int i = 0; i < data.size(); i++) {
-                    Log.i(TAG, "Invoice Amount: " + data.get(i).getIn());
-                    String inc = data.get(i).getIn();
-                    double gst = Double.parseDouble(data.get(i).getCgst());
-                    double ces = Double.parseDouble(data.get(i).getCess());
-                    double rat = Double.parseDouble(data.get(i).getSale_rate());
-                    double val = calculate(inc, gst, ces, rat);
-                    total += val;
                 }
-                Log.i(TAG, "Invoice Amount: " + total);
-                paymentPopup(total);
-
-            }
-        } else {
-            data.clear();
-            productAdapter.notifyDataSetChanged();
-            this.dismiss();
+                break;
+            case R.id.txt_close:
+                this.dismiss();
+                break;
+            default:
+                data.clear();
+                productAdapter.notifyDataSetChanged();
+                this.dismiss();
+                break;
         }
     }
-
 
     private void paymentPopup(final double total) {
 //        String credit_ = String.valueOf(getCredit(client_id));

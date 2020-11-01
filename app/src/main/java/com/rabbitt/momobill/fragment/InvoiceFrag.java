@@ -40,6 +40,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.adapter.CartSheet;
 import com.rabbitt.momobill.adapter.ClientAutoAdapter;
@@ -50,10 +51,12 @@ import com.rabbitt.momobill.adapter.LineAdapter;
 import com.rabbitt.momobill.adapter.OrderAdapter;
 import com.rabbitt.momobill.model.ClientModel;
 import com.rabbitt.momobill.model.Credit;
+import com.rabbitt.momobill.model.Custom;
 import com.rabbitt.momobill.model.Line;
 import com.rabbitt.momobill.model.ProductInvoice;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,6 +64,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleItemListener, View.OnClickListener, OrderAdapter.OnRecyleItemListener, CreditAdapter.OnRecyleItemListener {
 
@@ -311,7 +315,9 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             }
         });
     }
+
     String sale_rate;
+
     private void getProduct(String clientId) {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
@@ -320,70 +326,24 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference().child("Custom").child(clientId);
 
 
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.i(TAG, "onDataChange: " + dataSnapshot);
-                if (data != null) {
-                    data.clear();
-                }
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    String img_url = snapshot.child("img_url").getValue(String.class);
-                    String product_name = snapshot.child("product_name").getValue(String.class);
-                    String unit = snapshot.child("unit").getValue(String.class);
-                    String product_id = snapshot.child("product_id").getValue(String.class);
-                    sale_rate = snapshot.child("sale_rate").getValue(String.class);
+                rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot in) {
 
-                    rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot in) {
-                            Log.i(TAG, "onDataChange: " + in.getKey() + "    " + in.child(product_id).child("product_id").getValue(String.class));
+                        custom(dataSnapshot, in);
+                    }
 
-                            if (in.child(product_id).child("product_id").getValue(String.class) == null) {
-                                sale_rate = snapshot.child("sale_rate").getValue(String.class);
-                                Log.i(TAG, "onDataChange: SaleRate"+sale_rate);
-                            } else {
-                                if (in.getKey().equals(clientId) && (in.child(product_id).child("product_id").getValue(String.class).equals(product_id))) {
-                                    sale_rate = in.child(product_id).child("sale_rate").getValue(String.class);
-                                } else {
-                                    sale_rate = snapshot.child("sale_rate").getValue(String.class);
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                }
-                                Log.i(TAG, "onDataChange: Else SaleRate"+sale_rate);
-
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
+                    }
+                });
 
 
-                    String gst = snapshot.child("cgst_sgst").getValue(String.class);
-                    String cess = snapshot.child("cess").getValue(String.class);
-                    String in_ex = snapshot.child("in_ex").getValue(String.class);
-                    String hsn = snapshot.child("hsn").getValue(String.class);
-                    String mrp = snapshot.child("purchase_rate").getValue(String.class);
-
-                    ProductInvoice product = new ProductInvoice();
-                    product.setImg_url(img_url);
-                    product.setProduct_name(product_name);
-                    product.setSale_rate(sale_rate);
-                    product.setUnit(unit);
-                    product.setProduct_id(product_id);
-                    product.setCgst(gst);
-                    product.setCess(cess);
-                    product.setIn(in_ex);
-                    product.setHsn(hsn);
-                    product.setMrp(mrp);
-
-                    data.add(product);
-                }
-                updateRecycler(data);
             }
 
             @Override
@@ -391,6 +351,67 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
             }
         });
+    }
+
+
+    public void custom(DataSnapshot dataSnapshot, DataSnapshot custom) {
+//        Log.i(TAG, "onDataChange: " + dataSnapshot);
+        Log.i(TAG, "Client==========>: " + custom);
+
+        if (data != null) {
+            data.clear();
+        }
+        String product_id = "";
+
+        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//            Log.i(TAG, "onDataChange Main: ===============>" + snapshot.getKey());
+            String img_url = snapshot.child("img_url").getValue(String.class);
+            String product_name = snapshot.child("product_name").getValue(String.class);
+            String unit = snapshot.child("unit").getValue(String.class);
+            product_id = snapshot.child("product_id").getValue(String.class);
+            String gst = snapshot.child("cgst_sgst").getValue(String.class);
+            String cess = snapshot.child("cess").getValue(String.class);
+            String in_ex = snapshot.child("in_ex").getValue(String.class);
+            String hsn = snapshot.child("hsn").getValue(String.class);
+            String mrp = snapshot.child("purchase_rate").getValue(String.class);
+            sale_rate = snapshot.child("sale_rate").getValue(String.class);
+            try {
+                for (DataSnapshot in : custom.getChildren()) {
+                    Log.i(TAG, "custom: IN "+ in.getKey() +" Pro snap "+in.child("product_id").getValue(String.class)+" Pro_id "+product_id+ " Client id "+clientId );
+                    if (in.child("product_id").getValue(String.class).equals(product_id)) {
+                        sale_rate = in.child("sale_rate").getValue(String.class);
+                        break;
+                    }
+//                    else {
+//                        sale_rate = snapshot.child("sale_rate").getValue(String.class);
+//                        break;
+//                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.i(TAG, "custom: Exception "+ ex.toString()+"  "+ex.getMessage());
+            }
+
+
+            ProductInvoice product = new ProductInvoice();
+            product.setImg_url(img_url);
+            product.setProduct_name(product_name);
+            product.setSale_rate(sale_rate);
+            product.setUnit(unit);
+            product.setProduct_id(product_id);
+            product.setCgst(gst);
+            product.setCess(cess);
+            product.setIn(in_ex);
+            product.setHsn(hsn);
+            product.setMrp(mrp);
+
+//                Log.i(TAG, "onDataChange: GSON -------------------- " + new Gson().toJson(product));
+
+            data.add(product);
+        }
+
+        updateRecycler(data);
     }
 
     private void getCredit(String s) {
@@ -589,7 +610,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
 
         name.setText(name_);
 //        quanitiy.setText(quantity + " ml");
-
+        Log.i(TAG, "openDialog: ========>" + units.getText().toString() + " - " + model.getSale_rate());
         Button dialogButton = dialog.findViewById(R.id.ok_button);
         dialogButton.setOnClickListener(new View.OnClickListener() {
             @Override

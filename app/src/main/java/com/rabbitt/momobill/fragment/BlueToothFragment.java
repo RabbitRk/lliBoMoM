@@ -266,7 +266,7 @@ public class BlueToothFragment extends Fragment implements Runnable {
                             .getRemoteDevice(mDeviceAddress);
                     mBluetoothConnectProgressDialog = ProgressDialog.show(getContext(),
                             "Connecting...", mBluetoothDevice.getName() + " : "
-                                    + mBluetoothDevice.getAddress(), true, false);
+                                    + mBluetoothDevice.getAddress(), true, true);
                     Thread mBlutoothConnectThread = new Thread(this);
                     mBlutoothConnectThread.start();
                     // pairToDevice(mBluetoothDevice); This method is replaced by
