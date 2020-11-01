@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -38,7 +39,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.rabbitt.momobill.MainActivity;
 import com.rabbitt.momobill.R;
+import com.rabbitt.momobill.SignUpActivity;
 import com.rabbitt.momobill.prefsManager.PrefsManager;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -61,6 +64,7 @@ public class SettingsActivity extends AppCompatActivity {
     private static final int STORAGE_REQUEST_CODE = 200;
     private static final int IMAGE_PICK_GALLERY_CODE = 1000;
     private static final int IMAGE_PICK_CAMERA_CODE = 2000;
+    private static final String TAG = "maluSetting";
 
     Uri imageUri, resultUri;
     String[] cameraPermission;
@@ -400,6 +404,13 @@ public class SettingsActivity extends AppCompatActivity {
                     signRef.putBytes(outputStream.toByteArray()).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            signRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                         new PrefsManager(getApplicationContext()).signURL(uri);
+                                    Log.i(TAG, "onSuccess: "+uri);
+                                }
+                            });
                             progressDialog.dismiss();
                             Toast.makeText(SettingsActivity.this, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
                         }

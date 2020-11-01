@@ -1102,7 +1102,6 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         c = row_1.createCell(10);
         c.setCellValue("28%");
 
-
         c = row.createCell(11);
         c.setCellValue("CGST");
         CellUtil.setAlignment(c, wb, CellStyle.ALIGN_CENTER);
@@ -1196,7 +1195,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
 //        String filename = dateFormat.format(calendar.getTime()) + "_Invoice_by_" + method + ".xls";
         // Create a path where we will place our List of objects on external storage
-        File file = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies", filename + ".xls");
+        File file = new File(Environment.getExternalStorageDirectory() + "/Santha Agencies/", filename + ".xls");
 
         FileOutputStream os = null;
 
@@ -1222,8 +1221,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
             // generate URI, I defined authority as the application ID in the Manifest, the last param is file I want to open
-            Uri uri = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID, file);
-
+            Uri uri = FileProvider.getUriForFile(getContext(), "com.rabbitt.momobill.provider", file);
 
             intent.putExtra(Intent.EXTRA_STREAM, uri);
 

@@ -44,6 +44,7 @@ import com.rabbitt.momobill.model.HttpInvoice;
 import com.rabbitt.momobill.model.Invoice;
 import com.rabbitt.momobill.model.ProductInvoice;
 import com.rabbitt.momobill.prefsManager.IncrementPref;
+import com.rabbitt.momobill.prefsManager.PrefsManager;
 
 import org.w3c.dom.Text;
 
@@ -79,15 +80,16 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
     String invoice = "";
 
     private TextView close;
-
+    private String line;
     ProgressDialog progressDialog;
 
-    public CartSheet(List<ProductInvoice> data, Fragment invoiceFrag, Fragment frag, String value, String order, String s, Context context) {
+    public CartSheet(List<ProductInvoice> data, Fragment invoiceFrag, Fragment frag, String value, String order, String s, Context context, String line) {
         this.data = data;
         this.invoiceFrag = invoiceFrag;
         this.btn_val = value;
         this.client_id = order;
         this.date_of = s;
+        this.line = line;
         this.context = context;
     }
 
@@ -379,6 +381,16 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
 
                             String balance = String.valueOf(Double.parseDouble(total_amount.getText().toString()) - final_paid);
 
+                            // Pref data
+                            String crede = "Credit";
+                            if (balance.equals("0") || balance.equals("0.0"))
+                            {
+                                crede = "Cash";
+                            }
+
+                            new PrefsManager(getContext()).setBillInfo(crede, getDate(), line);
+
+                            // Pref data end
                             if (!(Double.parseDouble(balance) <= 0.0)) {
                                 String paidTxt = String.valueOf(final_paid);
                                 String tot = String.valueOf(total);

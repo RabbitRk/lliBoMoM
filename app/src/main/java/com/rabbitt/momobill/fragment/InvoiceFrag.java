@@ -691,7 +691,7 @@ public class InvoiceFrag extends Fragment implements InvoicePAdapter.OnRecyleIte
             try {
                 if (validate()) {
                     revertTick();
-                    CartSheet cartSheet = new CartSheet(cart, this, this, "invoice", clientId, getDate(), getContext());
+                    CartSheet cartSheet = new CartSheet(cart, this, this, "invoice", clientId, getDate(), getContext(), selectedLine);
                     cartSheet.setCancelable(false);
                     cartSheet.show(getParentFragmentManager(), "cart");
                 }

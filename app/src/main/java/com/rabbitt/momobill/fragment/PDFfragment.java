@@ -2,6 +2,7 @@ package com.rabbitt.momobill.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,6 +38,12 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.rabbitt.momobill.prefsManager.PrefsManager.CREDIT;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.DATE;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.LINE;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.PREF_NAME;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.URL;
+
 public class PDFfragment extends Fragment {
 
     Button shareBtn;
@@ -45,7 +52,7 @@ public class PDFfragment extends Fragment {
     List<ProductInvoice> data = null;
 
     private static final String TAG  = "pdf";
-
+    String invoice;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -63,7 +70,7 @@ public class PDFfragment extends Fragment {
 //
         Bundle bundle = getArguments();
 //
-        String invoice = bundle.getString("inv");
+        invoice = bundle.getString("inv");
         Bundle client = bundle.getBundle("client");
         data = (List<ProductInvoice>) bundle.getSerializable("data");
 
@@ -77,6 +84,15 @@ public class PDFfragment extends Fragment {
         map.put("state", String.valueOf(client.get("state")));
         map.put("pincode", String.valueOf(client.get("pincode")));
         map.put("gst", String.valueOf(client.get("gst")));
+
+
+        SharedPreferences shrp = getActivity().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        HashMap<String, String> misc = new HashMap<>();
+        misc.put("inv_no", invoice);
+        misc.put("date", shrp.getString(DATE, ""));
+        misc.put("route", shrp.getString(LINE, ""));
+        misc.put("term", shrp.getString(CREDIT, ""));
+        misc.put("url", shrp.getString(URL, ""));
 
 //        map.put("gst", String.valueOf(client.get("gst")));
 //        String path1 = Environment.getExternalStorageDirectory() + "/Santha Agencies" + "/Invoice/"+ invoice + "_Inv.pdf";
@@ -106,14 +122,11 @@ public class PDFfragment extends Fragment {
             product.put("Mrp", productInvoice.getMrp());
             product.put("Hsn", productInvoice.getHsn());
 
-
-
-
             pro.put(String.valueOf(i), product);
             Log.i(TAG, "onCreateView: ================================> "+product);
         }
         JSONObject jObject = new JSONObject(pro);
-        JSONArray jarray_product, jsonArray_client;
+        JSONArray jarray_product, jsonArray_client, jarray_misc;
 
         //Product
         jarray_product = new JSONArray();
@@ -124,10 +137,15 @@ public class PDFfragment extends Fragment {
         jsonArray_client = new JSONArray();
         jsonArray_client.put(new JSONObject(map));
 
+        //Misc
+        jarray_misc = new JSONArray();
+        jarray_misc.put(new JSONObject(misc));
+
 
         HashMap<String, String> main = new HashMap<>();
         main.put("client", String.valueOf(jsonArray_client));
         main.put("product", String.valueOf(jarray_product));
+        main.put("misc", String.valueOf(jarray_misc));
 
         Log.i(TAG, "onCreateView: Main ********************* "+main);
 
@@ -189,27 +207,42 @@ public class PDFfragment extends Fragment {
         return inflate;
     }
     // object of print job
-    PrintJob printJob;
+//    PrintJob printJob;
 
     // a boolean to check the status of printing
-    boolean printBtnPressed = false;
+//    boolean printBtnPressed = false;
     private void PrintTheWebPage(WebView webView) {
-        // set printBtnPressed true
-        printBtnPressed = true;
+//        // set printBtnPressed true
+//        printBtnPressed = true;
+//
+//        // Creating PrintManager instance
+//        PrintManager printManager = (PrintManager) requireActivity().getSystemService(Context.PRINT_SERVICE);
+//
+//        // setting the name of job
+//        String jobName = getString(R.string.app_name) + " webpage" + webView.getUrl();
+//
+//        // Creating PrintDocumentAdapter instance
+//        PrintDocumentAdapter printAdapter = webView.createPrintDocumentAdapter(jobName);
+//
+//        // Create a print job with name and adapter instance
+//        assert printManager != null;
+//        printJob = printManager.print(jobName, printAdapter,
+//                new PrintAttributes.Builder().build());
 
-        // Creating PrintManager instance
+
         PrintManager printManager = (PrintManager) requireActivity().getSystemService(Context.PRINT_SERVICE);
+        PrintDocumentAdapter printAdapter = webView.createPrintDocumentAdapter();
+        String jobName = "Invoice_"+invoice;
+        PrintAttributes.Builder builder = new PrintAttributes.Builder();
+        builder.setMediaSize(PrintAttributes.MediaSize.ISO_A5.asLandscape());
+        PrintJob printJob = printManager.print(jobName, printAdapter, builder.build());
 
-        // setting the name of job
-        String jobName = getString(R.string.app_name) + " webpage" + webView.getUrl();
-
-        // Creating PrintDocumentAdapter instance
-        PrintDocumentAdapter printAdapter = webView.createPrintDocumentAdapter(jobName);
-
-        // Create a print job with name and adapter instance
-        assert printManager != null;
-        printJob = printManager.print(jobName, printAdapter,
-                new PrintAttributes.Builder().build());
+        if(printJob.isCompleted()){
+            Toast.makeText(getContext(), "Saved", Toast.LENGTH_LONG).show();
+        }
+        else if(printJob.isFailed()){
+            Toast.makeText(getContext(), "PDF Failed", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void sharePdf() {

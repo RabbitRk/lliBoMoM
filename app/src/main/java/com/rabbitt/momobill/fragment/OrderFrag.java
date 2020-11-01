@@ -443,7 +443,7 @@ public class OrderFrag extends Fragment implements InvoicePAdapter.OnRecyleItemL
             case R.id.cart_btn:
                     if (validate())
                     {
-                        CartSheet cartSheet = new CartSheet(cart, this, this, "order", clientId, dateTxt.getText().toString(), getContext());
+                        CartSheet cartSheet = new CartSheet(cart, this, this, "order", clientId, dateTxt.getText().toString(), getContext(), selectedLine);
                         cartSheet.show(getParentFragmentManager(), "cart");
                     }
                 break;

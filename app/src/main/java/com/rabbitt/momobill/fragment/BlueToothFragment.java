@@ -37,8 +37,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.PdfPCell;
+//import com.itextpdf.text.Phrase;
+//import com.itextpdf.text.pdf.PdfPCell;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.DeviceListActivity;
 import com.rabbitt.momobill.adapter.BillAdapter;
@@ -475,7 +475,7 @@ public class BlueToothFragment extends Fragment implements Runnable {
 
             double mrp = total / qty;
 
-            billData.add(new BillModel(product_name, String.valueOf(mrp), String.valueOf((int) qty), String.valueOf(total)));
+            billData.add(new BillModel(product_name, productInvoice.getMrp(), String.valueOf((int) qty), String.valueOf(total)));
         }
         totalTxt.setText(String.valueOf(tax_inc));
         netAmnt.setText(String.valueOf(tax_inc));
@@ -551,7 +551,7 @@ public class BlueToothFragment extends Fragment implements Runnable {
             double cgst = taxable * ((per / 2.0) / 100.0);
             String percentage = String.valueOf(per);
             String taxTxt = String.valueOf(taxable);
-            String cgstTxt = String.valueOf(cgst);
+            String cgstTxt = String.valueOf(roundDecimals(cgst));
             double total = taxable + (cgst * 2);
             total = roundDecimals(total);
             String totalTxt = String.valueOf(total);

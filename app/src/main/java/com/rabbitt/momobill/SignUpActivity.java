@@ -177,13 +177,10 @@ public class SignUpActivity extends AppCompatActivity {
                 city,
                 state,
                 pincode,
-                gst
+                gst,
+                d
         );
-        if (d.equals("Owner")) {
-            new PrefsManager(this).setOwner(true);
-        } else {
-            new PrefsManager(this).setOwner(false);
-        }
+        new PrefsManager(this).setOwner(d.equals("Owner"));
 
         startActivity(new Intent(SignUpActivity.this, MainActivity.class));
     }

@@ -2,6 +2,7 @@ package com.rabbitt.momobill.prefsManager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 
 public class PrefsManager {
     // Shared preferences file name
@@ -22,6 +23,12 @@ public class PrefsManager {
     public static final String USER_STATE = "USER_STATE";
     public static final String USER_PIN = "USER_PIN";
     public static final String USER_GST = "USER_GST";
+    public static final String URL = "URL";
+
+    public static final String CREDIT = "CREDIT";
+    public static final String DATE = "DATE";
+    public static final String LINE = "LINE";
+
     public static final String KEY = "KEY";
 
     private SharedPreferences pref, userpref;
@@ -67,7 +74,7 @@ public class PrefsManager {
             String city,
             String state,
             String pincode,
-            String gst) {
+            String gst, String d) {
         user_editor.putString(KEY,key);
         user_editor.putString(USER_NAME, name);
         user_editor.putString(USER_EMAIL, email);
@@ -78,6 +85,19 @@ public class PrefsManager {
         user_editor.putString(USER_STATE, state);
         user_editor.putString(USER_PIN, pincode);
         user_editor.putString(USER_GST, gst);
+        user_editor.putString(OWNER, d);
         user_editor.commit();
+    }
+
+    public void signURL(Uri uri) {
+        editor.putString(URL, String.valueOf(uri));
+        editor.commit();
+    }
+
+    public void setBillInfo(String crede, String date, String line) {
+        editor.putString(CREDIT, crede);
+        editor.putString(DATE, date);
+        editor.putString(LINE, line);
+        editor.commit();
     }
 }

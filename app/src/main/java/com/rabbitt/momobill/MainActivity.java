@@ -25,6 +25,8 @@ import com.rabbitt.momobill.fragment.InvoiceFrag;
 import com.rabbitt.momobill.fragment.OrderFrag;
 import com.rabbitt.momobill.prefsManager.PrefsManager;
 
+import static com.rabbitt.momobill.prefsManager.PrefsManager.OWNER;
+import static com.rabbitt.momobill.prefsManager.PrefsManager.PREF_NAME;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.USER_PREF;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,9 +42,10 @@ public class MainActivity extends AppCompatActivity {
         PrefsManager prefsManager = new PrefsManager(this);
         prefsManager.setFirstTimeLaunch(true);
 
-        SharedPreferences shrp = getSharedPreferences(USER_PREF, MODE_PRIVATE);
-//        bool = shrp.getBoolean(OWNER,false);
-        bool = true;
+
+        SharedPreferences shrp = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        bool = shrp.getBoolean(OWNER, false);
+//        bool = true;
 
         final Toolbar toolbar = findViewById(R.id.toolbar);
 
@@ -56,52 +59,58 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final BubbleNavigationLinearView bubbleNavigationLinearView = findViewById(R.id.bottom_navigation_view_linear);
-        if (bool) {
-            toolbar.inflateMenu(R.menu.main_menu_item);
-            toolbar.setTitle(getString(R.string.home));
-            loadFragment(new DashFrag());
+//        if (bool) {
+        toolbar.inflateMenu(R.menu.main_menu_item);
+        toolbar.setTitle(getString(R.string.home));
+        loadFragment(new DashFrag());
 
-            bubbleNavigationLinearView.setNavigationChangeListener(new BubbleNavigationChangeListener() {
-                @Override
-                public void onNavigationChanged(View view, int position) {
-                    Log.i(TAG, "onNavigationChanged: " + view.getId() + "  " + position);
-                    switch (position) {
-                        case 0:
+        bubbleNavigationLinearView.setNavigationChangeListener(new BubbleNavigationChangeListener() {
+            @Override
+            public void onNavigationChanged(View view, int position) {
+                Log.i(TAG, "onNavigationChanged: " + view.getId() + "  " + position);
+                switch (position) {
+                    case 0:
+                        if (bool) {
                             toolbar.setTitle(getString(R.string.home));
                             loadFragment(new DashFrag());
-                            break;
-                        case 1:
+                        }
+                        break;
+                    case 1:
+                        if (bool) {
                             toolbar.setTitle("Inventory");
                             loadFragment(new InventoryFrag());
-                            break;
-                        case 2:
-                            toolbar.setTitle("Invoice");
-                            loadFragment(new InvoiceFrag());
-                            break;
-                        case 3:
-                            toolbar.setTitle("Order");
-                            loadFragment(new OrderFrag());
-                            break;
-                        case 4:
+                        }
+                        break;
+                    case 2:
+                        toolbar.setTitle("Invoice");
+                        loadFragment(new InvoiceFrag());
+                        break;
+                    case 3:
+                        toolbar.setTitle("Order");
+                        loadFragment(new OrderFrag());
+                        break;
+                    case 4:
+                        if (bool) {
                             toolbar.setTitle("Clients");
                             loadFragment(new ClientFrag());
-                            break;
-                    }
+                        }
+                        break;
                 }
-            });
-        } else {
-            toolbar.setTitle("Santha agency - Order");
-            bubbleNavigationLinearView.setCurrentActiveItem(3);
-            loadFragment(new OrderFrag());
-        }
-
-        if (getIntent().getBooleanExtra("nav",false)) {
-            BubbleToggleView dashView = findViewById(R.id.l_item_home);
-            dashView.deactivate();
-            bubbleNavigationLinearView.setCurrentActiveItem(2);
-            toolbar.setTitle("Invoice");
-            loadFragment(new InvoiceFrag());
-        }
+            }
+        });
+//        } else {
+//            toolbar.setTitle("Santha agency - Order");
+//            bubbleNavigationLinearView.setCurrentActiveItem(3);
+//            loadFragment(new OrderFrag());
+//        }
+//
+//        if (getIntent().getBooleanExtra("nav",false)) {
+//            BubbleToggleView dashView = findViewById(R.id.l_item_home);
+//            dashView.deactivate();
+//            bubbleNavigationLinearView.setCurrentActiveItem(2);
+//            toolbar.setTitle("Invoice");
+//            loadFragment(new InvoiceFrag());
+//        }
     }
 
     public Boolean loadFragment(final Fragment fragment) {
@@ -137,21 +146,21 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }
         try {
-if (selectedItemId == 0){
+            if (selectedItemId == 0) {
 
-            new AlertDialog.Builder(this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Exit")
-                    .setMessage("Do you really want to exit?")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            //Stop the activity
-                            finish();
-                        }
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
-}
+                new AlertDialog.Builder(this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Exit")
+                        .setMessage("Do you really want to exit?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                //Stop the activity
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+            }
 
 //            String com = prefsManager.getIns();
 //            Log.i(TAG, "onBackPressed: "+com+"        "+getCurrentFragment());
