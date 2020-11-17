@@ -24,6 +24,14 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.rabbitt.momobill.BuildConfig;
 import com.rabbitt.momobill.R;
@@ -35,8 +43,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import static com.rabbitt.momobill.prefsManager.PrefsManager.CREDIT;
 import static com.rabbitt.momobill.prefsManager.PrefsManager.DATE;
@@ -104,6 +114,7 @@ public class PDFfragment extends Fragment {
 //                .enableSwipe(true)
 //                .swipeVertical(true)
 //                .load();
+
         HashMap<String, String> product;
         HashMap<String, HashMap<String, String>> pro = new HashMap<>();
 
@@ -170,20 +181,39 @@ public class PDFfragment extends Fragment {
 
         VolleyAdapter volleyAdapter = new VolleyAdapter(getContext());
 
-        volleyAdapter.getData(main, "http://192.168.43.34/mark45/invoice", new ServerCallback() {
+
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Server");
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onSuccess(String s) {
-                Log.i(TAG, "onSuccess: "+s);
-//                webView.loadUrl(s);
-                webView.loadDataWithBaseURL(null, s, "text/html", "utf-8", null);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String details_child = "http://192.168.43.34:80/mark45/invoice";
+                Log.i("check", "onDataChange: "+dataSnapshot);
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    details_child = child.getValue(String.class);
+                    Log.i("check", "onDataChange: "+details_child);
+                }
+
+                volleyAdapter.getData(main, details_child, new ServerCallback() {
+                    @Override
+                    public void onSuccess(String s) {
+                        Log.i(TAG, "onSuccess: "+s);
+                        webView.loadDataWithBaseURL(null, s, "text/html", "utf-8", null);
+                    }
+
+                    @Override
+                    public void onError(String s) {
+                        Toast.makeText(getContext(), "Server not responding...", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
-            public void onError(String s) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
-
 
         // setting clickListener for Save Pdf Button
         savePdfBtn.setOnClickListener(new View.OnClickListener() {

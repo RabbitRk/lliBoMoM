@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_margin="10dp"
     android:layout_height="match_parent">
 
     <ScrollView
@@ -19,52 +18,102 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical" >
 
             <TextView
                 android:id="@+id/cmpn_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="SANTHA AGENCIES"
+                android:layout_gravity="left"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/add_line_1"
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="No 21 AIRPORT MAIN ROAD,"
-                android:textStyle="bold" />
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/add_line_2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="KUMARAN NAGAR,"
-                android:textStyle="bold" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/add_line_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="No 21 AIRPORT MAIN ROAD,"
+                        android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/add_line_3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="LAWSPET, PUDUCHERRY-605008."
-                android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/add_line_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="KUMARAN NAGAR,"
+                        android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/phone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PH - 0413-2251259."
-                android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/add_line_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LAWSPET, PUDUCHERRY - 605008."
+                        android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/gstin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="GSTIN : 34BIJPM1282L1Z0."
-                android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/phone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PH - 0413-2251259."
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/gstin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="GSTIN : 34BIJPM1282L1Z0."
+                        android:textStyle="bold" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="right"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="No 21 AIRPORT MAIN ROAD,"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="KUMARAN NAGAR,"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LAWSPET, PUDUCHERRY - 605008."
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PH - 0413-2251259."
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="GSTIN : 34BIJPM1282L1Z0."
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -306,25 +355,25 @@
                 android:paddingTop="5dp"
                 android:paddingBottom="2dp">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+<!--                <RelativeLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content">-->
 
-                    <TextView
-                        android:layout_width="130dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="120dp"
-                        android:gravity="end"
-                        android:text="TOTAL :" />
+<!--                    <TextView-->
+<!--                        android:layout_width="130dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="120dp"-->
+<!--                        android:gravity="end"-->
+<!--                        android:text="TOTAL :" />-->
 
-                    <TextView
-                        android:id="@+id/total"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="280dp"
-                        android:text="219.00" />
+<!--                    <TextView-->
+<!--                        android:id="@+id/total"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="280dp"-->
+<!--                        android:text="219.00" />-->
 
-                </RelativeLayout>
+<!--                </RelativeLayout>-->
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -334,7 +383,6 @@
                         android:layout_width="130dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="120dp"
-                        android:layout_marginTop="5dp"
                         android:gravity="end"
                         android:text="NET AMOUNT :"
                         android:textStyle="bold" />
@@ -344,7 +392,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="280dp"
-                        android:layout_marginTop="10dp"
                         android:text="219.00" />
 
                 </RelativeLayout>
@@ -382,7 +429,7 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
-                    android:text="TAX %"
+                    android:text="%"
 
                     android:textStyle="bold" />
 
@@ -391,7 +438,7 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
-                    android:text="Taxable Val"
+                    android:text="Taxable"
                     android:textStyle="bold" />
 
                 <TextView
@@ -408,6 +455,14 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:text="CGST"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="CESS"
                     android:textStyle="bold" />
 
 <!--                <TextView-->

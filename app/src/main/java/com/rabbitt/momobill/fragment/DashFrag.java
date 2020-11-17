@@ -27,6 +27,9 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.BuildConfig;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,6 +41,7 @@ import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.CheckOrderActivity;
 import com.rabbitt.momobill.activity.OpeningActivity;
 import com.rabbitt.momobill.model.CreditModel;
+import com.rabbitt.momobill.prefsManager.IncrementPref;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -57,7 +61,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+
+import static com.rabbitt.momobill.fragment.BlueToothFragment.TAG;
 
 public class DashFrag extends Fragment implements View.OnClickListener {
 
@@ -77,7 +84,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
     AlertDialog invoiceDialogBuilder;
     String monthName;
 
-    public static DatabaseReference myRef, clientRef, productRef, creditRef, invoiceRef;
+    public static DatabaseReference myRef, clientRef, productRef, creditRef, invoiceRef, urlRef;
     static ArrayList<String> crnamelist, billlist, crdatelist, amntlist, paidlist, creditlist;
 
 
@@ -138,6 +145,8 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         productRef = database.getReference("Product");
         creditRef = database.getReference("Credits");
         invoiceRef = database.getReference("Invoice");
+
+        urlRef = database.getReference("Server");
 
 
         Calendar calendar = Calendar.getInstance();

@@ -101,8 +101,7 @@ public class BlueToothFragment extends Fragment implements Runnable {
 
     TextView add1Txt, add2Txt, cityTxt, phoneTxt, gstinTxt;
     TextView billNoTxt, dateTxt, timeTxt, counterTxt;
-    TextView totalItem, totalTxt, netAmnt;
-
+    TextView totalItem, netAmnt;
 
     public static Fragment newInstance(Bundle bundle1) {
         BlueToothFragment fragment = new BlueToothFragment();
@@ -183,7 +182,6 @@ public class BlueToothFragment extends Fragment implements Runnable {
 //        Total item, amount,net amnt
 
         totalItem = inflate.findViewById(R.id.total_item);
-        totalTxt = inflate.findViewById(R.id.total);
         netAmnt = inflate.findViewById(R.id.net_amnt);
 
 
@@ -416,7 +414,7 @@ public class BlueToothFragment extends Fragment implements Runnable {
 
         Log.i(TAG, "viewToImg: " + bitmap.getWidth() + bitmap.getHeight());
 
-        bitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.getWidth()/2), (bitmap.getHeight()/2), true);
+        bitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.getWidth() / 2), (bitmap.getHeight() / 2), true);
 
         String extr = Environment.getExternalStorageDirectory() + "/Santha Agencies/";
         String filename = "Bill" + inv_no + ".jpg";
@@ -455,8 +453,6 @@ public class BlueToothFragment extends Fragment implements Runnable {
 
     private void populateBill() {
 
-//        TODO To feed bill data into recycler
-
         ArrayList<BillModel> billData = new ArrayList<>();
 
         double amtbefore = 0.0, tax_inc = 0.0;
@@ -477,7 +473,6 @@ public class BlueToothFragment extends Fragment implements Runnable {
 
             billData.add(new BillModel(product_name, productInvoice.getMrp(), String.valueOf((int) qty), String.valueOf(total)));
         }
-        totalTxt.setText(String.valueOf(tax_inc));
         netAmnt.setText(String.valueOf(tax_inc));
         BillAdapter billAdapter = new BillAdapter(billData);
         billRecycler.setAdapter(billAdapter);
