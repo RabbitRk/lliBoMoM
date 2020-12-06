@@ -14,12 +14,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -32,13 +26,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-//import com.itextpdf.text.Phrase;
-//import com.itextpdf.text.pdf.PdfPCell;
 import com.rabbitt.momobill.R;
 import com.rabbitt.momobill.activity.DeviceListActivity;
 import com.rabbitt.momobill.adapter.BillAdapter;
@@ -50,7 +43,6 @@ import com.rabbitt.momobill.model.BillModel;
 import com.rabbitt.momobill.model.GstModel;
 import com.rabbitt.momobill.model.ProductInvoice;
 import com.rabbitt.momobill.model.Summary;
-import com.zj.btsdk.PrintPic;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -349,20 +341,20 @@ public class BlueToothFragment extends Fragment implements Runnable {
     private void print(String file) {
 
 
-        PrintPic pg = new PrintPic();
-        pg.initCanvas(490);
-        pg.initPaint();
-        pg.drawImage(0, 0, file);
-        byte[] sendData = pg.printDraw();
-
-        OutputStream os = null;
-        try {
-            os = mBluetoothSocket.getOutputStream();
-            os.write(PrinterCommands.ESC_ALIGN_LEFT);
-            os.write(sendData);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        PrintPic pg = new PrintPic();
+//        pg.initCanvas(490);
+//        pg.initPaint();
+//        pg.drawImage(0, 0, file);
+//        byte[] sendData = pg.printDraw();
+//
+//        OutputStream os = null;
+//        try {
+//            os = mBluetoothSocket.getOutputStream();
+//            os.write(PrinterCommands.ESC_ALIGN_LEFT);
+//            os.write(sendData);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 //
 //        Thread t = new Thread() {
@@ -421,9 +413,7 @@ public class BlueToothFragment extends Fragment implements Runnable {
         File path = new File(extr, filename);
         FileOutputStream fos = null;
         try {
-
             fos = new FileOutputStream(path);
-
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
             fos.close();

@@ -55,6 +55,7 @@ import org.apache.poi.ss.util.CellUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -88,7 +89,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
     static ArrayList<String> crnamelist, billlist, crdatelist, amntlist, paidlist, creditlist;
 
 
-    static ArrayList<String> namelist, gstinlist, datelist, basicvallist, taxlist, cesslist, unitList;
+    static ArrayList<String> namelist, gstinlist, datelist, basicvallist,productNameList, taxlist, cesslist, unitList;
     ArrayList<CreditModel> list;
     String date, billno, name, amnt, paid, cr, clientid;
     ProgressDialog progressDialog;
@@ -126,6 +127,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         datelist = new ArrayList<>();
         gstinlist = new ArrayList<>();
         basicvallist = new ArrayList<>();
+        productNameList =  new ArrayList<>();
         taxlist = new ArrayList<>();
         cesslist = new ArrayList<>();
         unitList = new ArrayList<>();
@@ -136,6 +138,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         amntlist = new ArrayList<>();
         paidlist = new ArrayList<>();
         creditlist = new ArrayList<>();
+        productNameList = new ArrayList<>();
 
         list = new ArrayList<>();
 
@@ -978,6 +981,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                         } else {
                             double cgst=0.0,cess_val=0.0;
 
+
                             switch (per){
                                 case 5:
                                      cgst = sale_rate * ((5 / 2.0) / 100.0);
@@ -1020,6 +1024,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
 //                        Log.i("GST_VALUES", "TOTAL" + total + "   CGST" + final_cgst + "  CESS" + final_cess + "  SGST" + final_sgst);
                     }
+                    DecimalFormat df = new DecimalFormat("0.00");
                     c_nameList.add(client_name);
                     inv_dateList.add(dbDate);
                     inv_noList.add(inv_no);
@@ -1027,11 +1032,12 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                     gst_inList.add(gstin);
                     taxableList.add(String.valueOf(final_taxable));
                     cgst0List.add(String.valueOf(tax0));
-                    cgst5List.add(String.valueOf(tax5));
-                    cgst12List.add(String.valueOf(tax12));
-                    cgst14List.add(String.valueOf(tax14));
-                    cgst28List.add(String.valueOf(tax28));
+                    cgst5List.add(df.format(tax5));
+                    cgst12List.add(df.format(tax12));
+                    cgst14List.add(df.format(tax14));
+                    cgst28List.add(df.format(tax28));
 //                    cgstList.add(String.valueOf(final_cgst));
+//                    sgstList.add(String.valueOf(final_sgst));
 //                    sgstList.add(String.valueOf(final_sgst));
 //                    cess_List.add(String.valueOf(final_cess));
 
@@ -1100,16 +1106,16 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         c.setCellValue("0%");
 
         c = row_1.createCell(7);
-        c.setCellValue("5%");
+        c.setCellValue("2.5%");
 
         c = row_1.createCell(8);
-        c.setCellValue("12%");
+        c.setCellValue("6%");
 
         c = row_1.createCell(9);
-        c.setCellValue("14%");
+        c.setCellValue("7%");
 
         c = row_1.createCell(10);
-        c.setCellValue("28%");
+        c.setCellValue("14%");
 
         c = row.createCell(11);
         c.setCellValue("CGST");
@@ -1122,18 +1128,40 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         c.setCellValue("0%");
 
         c = row_1.createCell(12);
-        c.setCellValue("5%");
+        c.setCellValue("2.5%");
 
         c = row_1.createCell(13);
-        c.setCellValue("12%");
+        c.setCellValue("6%");
 
         c = row_1.createCell(14);
-        c.setCellValue("14%");
+        c.setCellValue("7%");
 
         c = row_1.createCell(15);
-        c.setCellValue("28%");
+        c.setCellValue("14%");
 
         c = row.createCell(16);
+        c.setCellValue("IGST");
+        CellUtil.setAlignment(c, wb, CellStyle.ALIGN_CENTER);
+
+        CellRangeAddress cellRangeAddress2 = new CellRangeAddress(0, 0, 16, 20);
+        sheet1.addMergedRegion(cellRangeAddress2);
+
+        c = row_1.createCell(16);
+        c.setCellValue("0%");
+
+        c = row_1.createCell(17);
+        c.setCellValue("5%");
+
+        c = row_1.createCell(18);
+        c.setCellValue("12%");
+
+        c = row_1.createCell(19);
+        c.setCellValue("14%");
+
+        c = row_1.createCell(20);
+        c.setCellValue("28%");
+
+        c = row.createCell(21);
         c.setCellValue("Total");
 
 
@@ -1192,6 +1220,21 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             cell.setCellValue(cgst28List.get(i - 1));
 
             cell = row1.createCell(16);
+            cell.setCellValue(Double.parseDouble(cgst0List.get(i - 1))*2);
+
+            cell = row1.createCell(17);
+            cell.setCellValue(Double.parseDouble(cgst5List.get(i - 1))*2);
+
+            cell = row1.createCell(18);
+            cell.setCellValue(Double.parseDouble(cgst12List.get(i - 1))*2);
+
+            cell = row1.createCell(19);
+            cell.setCellValue(Double.parseDouble(cgst14List.get(i - 1))*2);
+
+            cell = row1.createCell(20);
+            cell.setCellValue(Double.parseDouble(cgst28List.get(i - 1))*2);
+
+            cell = row1.createCell(21);
             cell.setCellValue(amountList.get(i - 1));
 //
 //            cell = row1.createCell(10);
@@ -1482,6 +1525,8 @@ public class DashFrag extends Fragment implements View.OnClickListener {
 
                                 final String unit = productChild.child("unit").getValue().toString();
 
+                                final String product_name = productChild.child("product_name").getValue().toString();
+
 
                                 DataSnapshot client_child = dataSnapshot.child("Client").child(clientId);
 
@@ -1493,6 +1538,7 @@ public class DashFrag extends Fragment implements View.OnClickListener {
                                 namelist.add(name);
                                 datelist.add(fdate);
                                 basicvallist.add(basicval);
+                                productNameList.add(product_name);
                                 taxlist.add(tax);
                                 cesslist.add(cess);
                                 unitList.add(unit);
@@ -1575,9 +1621,12 @@ public class DashFrag extends Fragment implements View.OnClickListener {
         c.setCellValue("Date");
 
         c = row.createCell(6);
-        c.setCellValue("Unit");
+        c.setCellValue("Product Name");
 
         c = row.createCell(7);
+        c.setCellValue("Unit");
+
+        c = row.createCell(8);
         c.setCellValue("Amount");
 
 //        c = row.createCell(8);
@@ -1625,9 +1674,12 @@ public class DashFrag extends Fragment implements View.OnClickListener {
             cell.setCellValue(datelist.get(i - 1));
 
             cell = row1.createCell(6);
-            cell.setCellValue(unitList.get(i - 1));
+            cell.setCellValue(productNameList.get(i - 1));
 
             cell = row1.createCell(7);
+            cell.setCellValue(unitList.get(i - 1));
+
+            cell = row1.createCell(8);
             cell.setCellValue(basicvallist.get(i - 1));
 
 

@@ -368,7 +368,7 @@ public class CartSheet extends BottomSheetDialogFragment implements CartAdapter.
                     final DatabaseReference invoiceSingle = FirebaseDatabase.getInstance().getReference("Invoice_Single");
                     final DatabaseReference client_ref = FirebaseDatabase.getInstance().getReference("Client").child(client_id);
 
-                    double final_paid = _paid;
+                    final double final_paid = _paid;
                     invoiceSingle.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

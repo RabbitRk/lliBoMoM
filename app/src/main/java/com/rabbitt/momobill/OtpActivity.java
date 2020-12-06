@@ -3,6 +3,7 @@ package com.rabbitt.momobill;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -48,7 +49,7 @@ public class OtpActivity extends AppCompatActivity {
     private void sendVerificationCode(String number) {
         Log.i(TAG, "sendVerificationCode: "+number);
         loading = ProgressDialog.show(this, "Registering", "Please wait...we will automatically verify your OTP", false, true);
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(number, 60, TimeUnit.SECONDS, TaskExecutors.MAIN_THREAD, mCallBack);
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(number, 60, TimeUnit.SECONDS, (Activity) TaskExecutors.MAIN_THREAD, mCallBack);
     }
 
     private void verifyCode(String code) {

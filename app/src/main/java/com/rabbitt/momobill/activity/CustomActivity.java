@@ -134,7 +134,7 @@ public class CustomActivity extends AppCompatActivity implements CustomAdapter.O
     }
 
     @SuppressLint("SetTextI18n")
-    public void openDialog(String pro_id, String pro_name) {
+    public void openDialog(final String pro_id, String pro_name) {
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.custom_pop);
         dialog.setCancelable(true);
