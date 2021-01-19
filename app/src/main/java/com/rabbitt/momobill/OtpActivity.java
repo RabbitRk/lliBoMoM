@@ -19,6 +19,7 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 
 import java.util.Objects;
@@ -49,7 +50,14 @@ public class OtpActivity extends AppCompatActivity {
     private void sendVerificationCode(String number) {
         Log.i(TAG, "sendVerificationCode: "+number);
         loading = ProgressDialog.show(this, "Registering", "Please wait...we will automatically verify your OTP", false, true);
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(number, 60, TimeUnit.SECONDS, (Activity) TaskExecutors.MAIN_THREAD, mCallBack);
+//        PhoneAuthProvider.getInstance().verifyPhoneNumber(number, 60, TimeUnit.SECONDS, (Activity) TaskExecutors.MAIN_THREAD, mCallBack);
+        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
+                .setPhoneNumber(number)
+                .setTimeout(60L,TimeUnit.SECONDS)
+                .setActivity(this)
+                .setCallbacks(mCallBack)
+                .build();
+        PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
     private void verifyCode(String code) {
